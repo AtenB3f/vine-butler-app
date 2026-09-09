@@ -1,149 +1,173 @@
 import 'package:flutter/material.dart';
 
 extension TextStyleHelper on TextStyle {
-  TextStyle get body1 => const TextStyle(
-    fontSize: 13,
-    fontWeight: FontWeight.w400,
-  );
+  static TextStyle body1(Color color) {
+    return const TextStyle(
+      fontSize: 13,
+      fontWeight: FontWeight.w400,
+    ).copyWith(color: color);
+  }
 
-  TextStyle get body2 => const TextStyle(
-    fontSize: 15,
-    fontWeight: FontWeight.w400,
-  );
+  static TextStyle body2(Color color) {
+    return const TextStyle(
+      fontSize: 15,
+      fontWeight: FontWeight.w400,
+    ).copyWith(color: color);
+  }
 
-  TextStyle get body3 => const TextStyle(
-    fontSize: 16,
-    fontWeight: FontWeight.w400,
-  );
+  static TextStyle body3(Color color) {
+    return const TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.w400,
+    ).copyWith(color: color);
+  }
 
-  TextStyle get bold1 => const TextStyle(
-    fontSize: 13,
-    fontWeight: FontWeight.w600,
-  );
+  static TextStyle bold1(Color color) {
+    return const TextStyle(
+      fontSize: 13,
+      fontWeight: FontWeight.w600,
+    ).copyWith(color: color);
+  }
 
-  TextStyle get bold2 => const TextStyle(
-    fontSize: 15,
-    fontWeight: FontWeight.w600,
-  );
+  static TextStyle bold2(Color color) {
+    return const TextStyle(
+      fontSize: 15,
+      fontWeight: FontWeight.w600,
+    ).copyWith(color: color);
+  }
 
-  TextStyle get bold3 => const TextStyle(
-    fontSize: 16,
-    fontWeight: FontWeight.w600,
-  );
+  static TextStyle bold3(Color color) {
+    return const TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.w600,
+    ).copyWith(color: color);
+  }
 
-  TextStyle get sub1 => const TextStyle(
-    fontSize: 18,
-    fontWeight: FontWeight.w500,
-  );
+  static TextStyle sub1(Color color) {
+    return const TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.w500,
+    ).copyWith(color: color);
+  }
 
-  TextStyle get sub2 => const TextStyle(
-    fontSize: 20,
-    fontWeight: FontWeight.w500,
-  );
+  static TextStyle sub2(Color color) {
+    return const TextStyle(
+      fontSize: 20,
+      fontWeight: FontWeight.w500,
+    ).copyWith(color: color);
+  }
 
-  TextStyle get sub3 => const TextStyle(
-    fontSize: 22,
-    fontWeight: FontWeight.w500,
-  );
+  static TextStyle sub3(Color color) {
+    return const TextStyle(
+      fontSize: 22,
+      fontWeight: FontWeight.w500,
+    ).copyWith(color: color);
+  }
 
-  TextStyle get header1 => const TextStyle(
-    fontSize: 18,
-    fontWeight: FontWeight.w600,
-  );
+  static TextStyle header1(Color color) {
+    return const TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.w600,
+    ).copyWith(color: color);
+  }
 
-  TextStyle get header2 => const TextStyle(
-    fontSize: 22,
-    fontWeight: FontWeight.w600,
-  );
+  static TextStyle header2(Color color) {
+    return const TextStyle(
+      fontSize: 22,
+      fontWeight: FontWeight.w600,
+    ).copyWith(color: color);
+  }
 
-  TextStyle get header3 => const TextStyle(
-    fontSize: 28,
-    fontWeight: FontWeight.w600,
-  );
+  static TextStyle header3(Color color) {
+    return const TextStyle(
+      fontSize: 28,
+      fontWeight: FontWeight.w600,
+    ).copyWith(color: color);
+  }
 }
 
 extension TextStyleExtension on Text {
   Text body1(Color color) {
     return Text(
       data ?? '',
-      style: const TextStyle().body1.copyWith(color: color),
+      style: TextStyleHelper.body1(color),
     );
   }
 
   Text body2(Color color) {
     return Text(
       data ?? '',
-      style: const TextStyle().body2.copyWith(color: color),
+      style: TextStyleHelper.body2(color),
     );
   }
 
   Text body3(Color color) {
     return Text(
       data ?? '',
-      style: const TextStyle().body3.copyWith(color: color),
+      style: TextStyleHelper.body3(color),
     );
   }
 
-Text bold1(Color color) {
+  Text bold1(Color color) {
     return Text(
       data ?? '',
-      style: const TextStyle().bold1.copyWith(color: color),
+      style: TextStyleHelper.bold1(color),
     );
   }
 
   Text bold2(Color color) {
     return Text(
       data ?? '',
-      style: const TextStyle().bold2.copyWith(color: color),
+      style: TextStyleHelper.bold2(color),
     );
   }
 
   Text bold3(Color color) {
     return Text(
       data ?? '',
-      style: const TextStyle().bold3.copyWith(color: color),
+      style: TextStyleHelper.bold3(color),
     );
   }
-  
-Text sub1(Color color) {
+
+  Text sub1(Color color) {
     return Text(
       data ?? '',
-      style: const TextStyle().sub1.copyWith(color: color),
+      style: TextStyleHelper.sub1(color),
     );
   }
 
   Text sub2(Color color) {
     return Text(
       data ?? '',
-      style: const TextStyle().sub2.copyWith(color: color),
+      style: TextStyleHelper.sub2(color),
     );
   }
 
   Text sub3(Color color) {
     return Text(
       data ?? '',
-      style: const TextStyle().sub3.copyWith(color: color),
+      style: TextStyleHelper.sub3(color),
     );
   }
 
   Text header1(Color color) {
     return Text(
       data ?? '',
-      style: const TextStyle().header1.copyWith(color: color),
+      style: TextStyleHelper.header1(color),
     );
   }
 
   Text header2(Color color) {
     return Text(
       data ?? '',
-      style: const TextStyle().header2.copyWith(color: color),
+      style: TextStyleHelper.header2(color),
     );
   }
 
   Text header3(Color color) {
     return Text(
       data ?? '',
-      style: const TextStyle().header3.copyWith(color: color),
+      style: TextStyleHelper.header3(color),
     );
   }
 }
