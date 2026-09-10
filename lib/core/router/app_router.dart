@@ -1,7 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:vine_butler/features/map/presentation/screens/map_screen.dart';
-import 'package:vine_butler/features/property/presentation/screens/property_screen.dart';
-import 'package:vine_butler/features/home/home_screen.dart';
+import 'package:vine_butler/features/property_list/presentation/screens/property_list_screen.dart';
+import 'package:vine_butler/features/home/presentation/screens/home_screen.dart';
 import 'package:vine_butler/shared/widgets/main_shell.dart';
 
 final GoRouter appRouter = GoRouter(
@@ -16,7 +16,7 @@ final GoRouter appRouter = GoRouter(
           routes: [
             GoRoute(
               path: '/property',
-              builder: (context, state) => const PropertyScreen(),
+              builder: (context, state) => const PropertyListScreen(),
             ),
           ],
         ),
