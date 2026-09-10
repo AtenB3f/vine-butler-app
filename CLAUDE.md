@@ -90,8 +90,9 @@ lib/
         screens/
         widgets/
         providers/
-  shared/
+  components/
     widgets/             # 공통 재사용 위젯
+  shared/
     utils/               # 유틸 함수
 ```
 
@@ -145,6 +146,19 @@ flutter pub upgrade
 - 비즈니스 로직은 반드시 Provider 안에 둠 (위젯에 직접 쓰지 않음)
 - `ref.watch`는 빌드에, `ref.read`는 이벤트 핸들러에 사용
 - 전역 상태는 `NotifierProvider` / `AsyncNotifierProvider` 우선
+
+### 네비게이션
+- 네비게이션 실행(`context.push`/`pop`/`go`)은 항상 View(위젯)에서 함 — ViewModel이 라우터를
+  직접 호출하지 않음
+- API 응답 등 비즈니스 로직 결과에 따라 이동해야 할 때: ViewState에 일회성 이벤트 필드(예:
+  `navigateTo`)를 두고, View의 `build()`에서 `ref.listen`으로 감지해 이동 실행
+  ("UI State vs UI Event" 패턴)
+- `ref.watch`는 렌더링용, `ref.listen`은 네비게이션/스낵바/다이얼로그 같은 1회성
+  부수효과(side effect)용으로 구분해서 사용
+- 이벤트 필드는 소비 후 반드시 리셋할 것 (특히 Freezed 등 값 동등성을 쓰는 상태에서 동일
+  이벤트가 연달아 발생해도 다시 감지되게 하기 위함)
+- 탭 전환/탭 루트 복귀처럼 화면 구조 자체에 종속된 네비게이션은 View 레이어에 남기고, 이
+  패턴은 비즈니스 로직이 결정하는 네비게이션에만 적용
 
 ### 기타
 
