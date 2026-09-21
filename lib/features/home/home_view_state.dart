@@ -1,8 +1,7 @@
-
 class HomeViewState {
-  final int count;
+  final String? navigateTo;
 
-  HomeViewState({required this.count});
+  HomeViewState({this.navigateTo});
 }
 
 enum HomeViewAction {

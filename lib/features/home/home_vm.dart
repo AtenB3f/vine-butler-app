@@ -1,15 +1,23 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vine_butler/features/home/home_view_state.dart';
 
-class HomeViewModel {
+final homeVMProvider = NotifierProvider<HomeVM, HomeViewState>(HomeVM.new);
+class HomeVM extends Notifier<HomeViewState> {
+  @override
+  HomeViewState build() => HomeViewState();
+
   void action(HomeViewAction action) {
     switch (action) {
       case HomeViewAction.find:
-        // Handle find action
+        state = HomeViewState(navigateTo: '/find-property');
         break;
       case HomeViewAction.apply:
-        // Handle apply action
+        state = HomeViewState(navigateTo: '/apply-property');
         break;
     }
+  }
+
+  void consumeNavigation() {
+    state = HomeViewState(navigateTo: null);
   }
 }

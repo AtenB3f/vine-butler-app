@@ -55,12 +55,12 @@ class IconButton extends StatelessWidget {
         ContentAlignment.top => Column(
           mainAxisSize: MainAxisSize.min,
           spacing: spacing,
-          children: [textWidget, iconWidget],
+          children: [iconWidget, textWidget],
         ),
         ContentAlignment.bottom => Column(
           mainAxisSize: MainAxisSize.min,
           spacing: spacing,
-          children: [iconWidget, textWidget],
+          children: [textWidget, iconWidget],
         ),
       },
     );

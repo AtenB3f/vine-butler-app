@@ -49,12 +49,12 @@ class ImageButton extends StatelessWidget {
         ContentAlignment.top => Column(
           mainAxisSize: MainAxisSize.min,
           spacing: spacing,
-          children: [textWidget, imageWidget],
+          children: [imageWidget, textWidget],
         ),
         ContentAlignment.bottom => Column(
           mainAxisSize: MainAxisSize.min,
           spacing: spacing,
-          children: [imageWidget, textWidget],
+          children: [textWidget, imageWidget],
         ),
       },
     );

@@ -1,20 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vine_butler/components/components.dart';
+import 'package:vine_butler/features/home/home_vm.dart';
+import 'package:vine_butler/features/home/home_view_state.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen<HomeViewState>(homeVMProvider, (previous, next) {
+      final navigateTo = next.navigateTo;
+      if (navigateTo != null) {
+        context.push(navigateTo);
+        ref.read(homeVMProvider.notifier).consumeNavigation();
+      }
+    });
+
     if (context.isMobile) {
-      return _mobileScreen();
+      return _mobileScreen(ref);
     } else {
-      return _desktopScreen();
+      return _desktopScreen(ref);
     }
   }
 
-  Column _mobileScreen() {
+  Column _mobileScreen(WidgetRef ref) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -22,14 +33,14 @@ class HomeScreen extends ConsumerWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 8, right: 8, top: 9, bottom: 9),
-          child: _HomeBanner(),
+          child: _homeBanner(),
         ),
-        _mobileHomeContents(),
+        _mobileHomeContents(ref),
       ],
     );
   }
 
-  Column _desktopScreen() {
+  Column _desktopScreen(WidgetRef ref) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -37,14 +48,14 @@ class HomeScreen extends ConsumerWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 8, right: 8, top: 9, bottom: 9),
-          child: _HomeBanner(),
+          child: _homeBanner(),
         ),
-        _desktopHomeContents(),
+        _desktopHomeContents(ref),
       ],
     );
   }
 
-  Widget _HomeBanner() {
+  Widget _homeBanner() {
     return Row(
       children: [
         AppImages.tabHome(true),
@@ -60,7 +71,7 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _mobileHomeContents() {
+  Widget _mobileHomeContents(WidgetRef ref) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -75,9 +86,7 @@ class HomeScreen extends ConsumerWidget {
           font: AppFontStyle.sub3,
           fontColor: TextColor.dark,
           text: '찾아요',
-          onTap: () {
-            // Handle search button press
-          },
+          onTap: () => ref.read(homeVMProvider.notifier).action(HomeViewAction.find),
         ),
         ImageButton(
           image: 'Tab_Home_Enable',
@@ -87,15 +96,13 @@ class HomeScreen extends ConsumerWidget {
           font: AppFontStyle.sub3,
           fontColor: TextColor.dark,
           text: '맡겨요',
-          onTap: () {
-            // Handle search button press
-          },
+          onTap: () => ref.read(homeVMProvider.notifier).action(HomeViewAction.apply),
         ),
       ],
     );
   }
 
-  Widget _desktopHomeContents() {
+  Widget _desktopHomeContents(WidgetRef ref) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -110,9 +117,7 @@ class HomeScreen extends ConsumerWidget {
           font: AppFontStyle.sub3,
           fontColor: TextColor.dark,
           text: '찾아요',
-          onTap: () {
-            // Handle search button press
-          },
+          onTap: () => ref.read(homeVMProvider.notifier).action(HomeViewAction.find),
         ),
         ImageButton(
           image: 'Tab_Home_Enable',
@@ -122,9 +127,7 @@ class HomeScreen extends ConsumerWidget {
           font: AppFontStyle.sub3,
           fontColor: TextColor.dark,
           text: '맡겨요',
-          onTap: () {
-            // Handle search button press
-          },
+          onTap: () => ref.read(homeVMProvider.notifier).action(HomeViewAction.apply),
         ),
       ],
     );

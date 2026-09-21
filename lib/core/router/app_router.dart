@@ -1,4 +1,6 @@
 import 'package:go_router/go_router.dart';
+import 'package:vine_butler/features/apply_property/presentation/screens/apply_property_screen.dart';
+import 'package:vine_butler/features/find_property/presentation/screens/find_property_screen.dart';
 import 'package:vine_butler/features/map/presentation/screens/map_screen.dart';
 import 'package:vine_butler/features/property_list/presentation/screens/property_list_screen.dart';
 import 'package:vine_butler/features/home/presentation/screens/home_screen.dart';
@@ -37,6 +39,14 @@ final GoRouter appRouter = GoRouter(
           ],
         ),
       ],
+    ),
+    GoRoute(
+      path: '/find-property',
+      builder: (context, state) => const FindPropertyScreen(),
+    ),
+    GoRoute(
+      path: '/apply-property',
+      builder: (context, state) => const ApplyPropertyScreen(),
     ),
   ],
 );
