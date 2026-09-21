@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vine_butler/core/router/app_router.dart';
 
 void main() {
-  runApp(const ProviderScope(child: MyApp()));
+  runApp(const ProviderScope(child: VineButlerApp()));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class VineButlerApp extends StatelessWidget {
+  const VineButlerApp({super.key});
 
   @override
   Widget build(BuildContext context) {

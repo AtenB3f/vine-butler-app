@@ -48,13 +48,14 @@ class TabItem extends ConsumerWidget {
 
   Widget _getLabel(TabItemType type) {
     final color = TextColor.dark;
+    final font = isSelected ? AppFontStyle.bold1 : AppFontStyle.body1;
     switch (type) {
       case TabItemType.property:
-        return Text('매물', style: isSelected ? TextStyleHelper.bold1(color) : TextStyleHelper.body1(color));
+        return font.text('매물', color);
       case TabItemType.home:
-        return Text('홈', style: isSelected ? TextStyleHelper.bold1(color) : TextStyleHelper.body1(color));
+        return font.text('홈', color);
       case TabItemType.map:
-        return Text('지도', style: isSelected ? TextStyleHelper.bold1(color) : TextStyleHelper.body1(color));
+        return font.text('지도', color);
     }
   }
 }

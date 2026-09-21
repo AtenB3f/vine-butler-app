@@ -35,7 +35,7 @@ class AppScaffold extends StatelessWidget {
                     child: Center(
                       child: Text(
                         title ?? '',
-                        style: TextStyleHelper.sub1(TextColor.dark),
+                        style: AppFontStyle.sub1.style(TextColor.dark),
                       ),
                     ),
                   ),
