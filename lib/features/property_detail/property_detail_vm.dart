@@ -19,6 +19,6 @@ class PropertyDetailVM extends Notifier<PropertyDetailViewState>{
   }
 
   void pushNavigation(String path) {
-    state = PropertyDetailViewState(navigateTo: '${path}');
+    state = PropertyDetailViewState(navigateTo: path);
   }
 }

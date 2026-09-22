@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+import 'package:vine_butler/components/components.dart';
+import 'package:vine_butler/core/router/app_router.dart';
 import 'package:vine_butler/domain/property_type.dart';
 import 'package:vine_butler/features/property_list/presentation/screens/property_list_item.dart';
 import 'package:vine_butler/features/property_list/presentation/property_list_view_state.dart';
-import 'package:vine_butler/components/components.dart';
 
 class PropertyListScreen extends ConsumerWidget {
   const PropertyListScreen({super.key});
@@ -48,7 +48,7 @@ class PropertyListScreen extends ConsumerWidget {
               separatorBuilder: (context, index) => const SizedBox(height: 16),
               itemBuilder: (context, index) => PropertyListItem(
                 viewState: items[index],
-                onTap: () => context.push('/property/${items[index].id}'),
+                onTap: () => PropertyDetailRoute(id: items[index].id).push(context),
               ),
             ),
           ),
@@ -87,7 +87,7 @@ class PropertyListScreen extends ConsumerWidget {
               separatorBuilder: (context, index) => const SizedBox(height: 16),
               itemBuilder: (context, index) => PropertyListItem(
                 viewState: items[index],
-                onTap: () => context.push('/property/${items[index].id}'),
+                onTap: () => PropertyDetailRoute(id: items[index].id).push(context),
               ),
             ),
           ),

@@ -17,7 +17,7 @@
 | 역할 | 라이브러리 | 버전 |
 |---|---|---|
 | 상태관리 | flutter_riverpod | ^3.2.1 |
-| 라우터 | go_router | — |
+| 라우터 | go_router + go_router_builder (typed route) | ^18.0.1 |
 | 로컬 DB | Isar (예정) | — |
 | 백엔드 | [추후 연동] | — |
 
@@ -58,6 +58,15 @@ Dart SDK: `^3.9.2`
 - 지도 라이브러리 통합
 - 지도 탭 추가
 - 매물 위치 표시
+
+**6단계: 플레이스토어 배포 (1차 릴리즈)**
+- 1~5단계 완료 후 배포 진행
+
+**7단계: 백엔드 연동 (2차 릴리즈 준비)**
+- vine-butler-backend API/클라우드 세팅 완료 후 매물 정보 서버 업로드 연동
+- 로그인 기능 추가
+- 백엔드에서 크롤링한 부동산 정보(네이버 부동산 등) 반영을 위한 UI 수정
+- 완료 후 앱 업데이트 배포
 
 ## 프로젝트 구조
 
@@ -127,6 +136,9 @@ flutter analyze
 # 의존성
 flutter pub get
 flutter pub upgrade
+
+# 라우트 코드 생성 (app_router.dart 수정 후 실행)
+dart run build_runner build --delete-conflicting-outputs
 ```
 
 ## 코딩 규칙
@@ -159,6 +171,17 @@ flutter pub upgrade
   이벤트가 연달아 발생해도 다시 감지되게 하기 위함)
 - 탭 전환/탭 루트 복귀처럼 화면 구조 자체에 종속된 네비게이션은 View 레이어에 남기고, 이
   패턴은 비즈니스 로직이 결정하는 네비게이션에만 적용
+
+### 라우팅 전략 (go_router)
+- id 같은 리소스 식별자는 path parameter로 전달 (`extra`는 이미 메모리에 있는 객체를 재직렬화
+  없이 그대로 넘길 때만 사용)
+- `build_runner` + `go_router_builder`(`GoRouteData`/`@TypedGoRoute`) 기반 typed route로
+  전체 라우트를 통일해서 사용 중 (`lib/core/router/app_router.dart` + 생성된
+  `app_router.g.dart`) — 문자열 기반 `GoRoute`/`context.push('/path')`는 사용하지 않음
+- 새 라우트 추가 시에도 `GoRouteData` 서브클래스 + `@TypedGoRoute`로 정의하고
+  `dart run build_runner build --delete-conflicting-outputs`로 코드 생성할 것
+- ViewModel에서 네비게이션 이벤트로 경로를 넘길 때도(`navigateTo` 필드) 리터럴 문자열 대신
+  해당 라우트의 `.location`을 사용 (예: `FindPropertyRoute().location`)
 
 ### 기타
 
