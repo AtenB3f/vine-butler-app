@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vine_butler/components/components.dart';
 import 'package:vine_butler/features/home/home_vm.dart';
-import 'package:vine_butler/features/home/home_view_state.dart';
+import 'package:vine_butler/features/home/presentation/home_view_state.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -14,7 +14,7 @@ class HomeScreen extends ConsumerWidget {
       final navigateTo = next.navigateTo;
       if (navigateTo != null) {
         context.push(navigateTo);
-        ref.read(homeVMProvider.notifier).consumeNavigation();
+        ref.read(homeVMProvider.notifier).popNavigation();
       }
     });
 

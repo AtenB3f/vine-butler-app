@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:vine_butler/features/home/home_view_state.dart';
+import 'package:vine_butler/features/home/presentation/home_view_state.dart';
 
 final homeVMProvider = NotifierProvider<HomeVM, HomeViewState>(HomeVM.new);
 class HomeVM extends Notifier<HomeViewState> {
@@ -17,7 +17,7 @@ class HomeVM extends Notifier<HomeViewState> {
     }
   }
 
-  void consumeNavigation() {
+  void popNavigation() {
     state = HomeViewState(navigateTo: null);
   }
 }
