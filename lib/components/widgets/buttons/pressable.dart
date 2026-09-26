@@ -10,7 +10,7 @@ class Pressable extends StatefulWidget {
     super.key,
     required this.child,
     required this.onTap,
-    this.hoverOpacity = 0.8,
+    this.hoverOpacity = 0.9,
     this.pressedScale = 0.98,
   });
 
