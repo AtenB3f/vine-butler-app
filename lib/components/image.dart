@@ -114,6 +114,19 @@ class AppIcons {
   static Widget arrowLeftMD([Color color = GrayColor.dark]) {
     return iconMD('Arrow_Left_MD', color);
   }
+  static Widget arrowLeftLG([Color color = GrayColor.dark]) {
+    return iconLG('Arrow_Left_LG', color);
+  }
+
+  static Widget arrowRightSM([Color color = GrayColor.dark]) {
+    return iconSM('Arrow_Right_SM', color);
+  }
+  static Widget arrowRightMD([Color color = GrayColor.dark]) {
+    return iconMD('Arrow_Right_MD', color);
+  }
+  static Widget arrowRightLG([Color color = GrayColor.dark]) {
+    return iconLG('Arrow_Right_LG', color);
+  }
 
   static Widget calendarSM([Color color = GrayColor.dark]) {
     return iconSM('Calendar_SM', color);
@@ -121,12 +134,18 @@ class AppIcons {
   static Widget calendarMD([Color color = GrayColor.dark]) {
     return iconMD('Calendar_MD', color);
   }
+  static Widget calendarLG([Color color = GrayColor.dark]) {
+    return iconLG('Calendar_LG', color);
+  }
 
   static Widget callSM([Color color = GrayColor.dark]) {
     return iconSM('Call_SM', color);
   }
   static Widget callMD([Color color = GrayColor.dark]) {
     return iconMD('Call_MD', color);
+  }
+  static Widget callLG([Color color = GrayColor.dark]) {
+    return iconLG('Call_LG', color);
   }
 
   static Widget checkSM([Color color = GrayColor.dark]) {
@@ -195,12 +214,18 @@ class AppIcons {
   static Widget editMD([Color color = GrayColor.dark]) {
     return iconMD('Edit_MD', color);
   }
+  static Widget editLG([Color color = GrayColor.dark]) {
+    return iconLG('Edit_LG', color);
+  }
 
   static Widget filterSM([Color color = GrayColor.dark]) {
     return iconSM('Filter_SM', color);
   }
   static Widget filterMD([Color color = GrayColor.dark]) {
     return iconMD('Filter_MD', color);
+  }
+  static Widget filterLG([Color color = GrayColor.dark]) {
+    return iconLG('Filter_LG', color);
   }
 
   static Widget homeSM([Color color = GrayColor.dark]) {
@@ -209,6 +234,9 @@ class AppIcons {
   static Widget homeMD([Color color = GrayColor.dark]) {
     return iconMD('Home_MD', color);
   }
+  static Widget homeLG([Color color = GrayColor.dark]) {
+    return iconLG('Home_LG', color);
+  }
 
   static Widget homeAddSM([Color color = GrayColor.dark]) {
     return iconSM('Home_Add_SM', color);
@@ -216,12 +244,18 @@ class AppIcons {
   static Widget homeAddMD([Color color = GrayColor.dark]) {
     return iconMD('Home_Add_MD', color);
   }
+  static Widget homeAddLG([Color color = GrayColor.dark]) {
+    return iconLG('Home_Add_LG', color);
+  }
 
   static Widget houseSM([Color color = GrayColor.dark]) {
     return iconSM('House_SM', color);
   }
   static Widget houseMD([Color color = GrayColor.dark]) {
     return iconMD('House_MD', color);
+  }
+  static Widget houseLG([Color color = GrayColor.dark]) {
+    return iconLG('House_LG', color);
   }
 
   static Widget imageSM([Color color = GrayColor.dark]) {
@@ -240,12 +274,18 @@ class AppIcons {
   static Widget linkMD([Color color = GrayColor.dark]) {
     return iconMD('Link_MD', color);
   }
+  static Widget linkLG([Color color = GrayColor.dark]) {
+    return iconLG('Link_LG', color);
+  }
 
   static Widget mapSM([Color color = GrayColor.dark]) {
     return iconSM('Map_SM', color);
   }
   static Widget mapMD([Color color = GrayColor.dark]) {
     return iconMD('Map_MD', color);
+  }
+  static Widget mapLG([Color color = GrayColor.dark]) {
+    return iconLG('Map_LG', color);
   }
 
   static Widget searchSM([Color color = GrayColor.dark]) {
@@ -254,6 +294,9 @@ class AppIcons {
   static Widget searchMD([Color color = GrayColor.dark]) {
     return iconMD('Search_MD', color);
   }
+  static Widget searchLG([Color color = GrayColor.dark]) {
+    return iconLG('Search_LG', color);
+  }
 
   static Widget settingSM([Color color = GrayColor.dark]) {
     return iconSM('Setting_SM', color);
@@ -261,11 +304,17 @@ class AppIcons {
   static Widget settingMD([Color color = GrayColor.dark]) {
     return iconMD('Setting_MD', color);
   }
+  static Widget settingLG([Color color = GrayColor.dark]) {
+    return iconLG('Setting_LG', color);
+  }
 
   static Widget sortSM([Color color = GrayColor.dark]) {
     return iconSM('Sort_SM', color);
   }
   static Widget sortMD([Color color = GrayColor.dark]) {
     return iconMD('Sort_MD', color);
+  }
+  static Widget sortLG([Color color = GrayColor.dark]) {
+    return iconLG('Sort_LG', color);
   }
 }
