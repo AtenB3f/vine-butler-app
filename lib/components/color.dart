@@ -48,4 +48,23 @@ class BaseColor {
 
 class StateColor {
   static const Color error = Color(0xFFED003C);
+  static const Color white = Color(0xFFFFFFFF);
+  static const Color black = Color(0xFF111111);
+  static const Color overlay = Color(0x1A000000);
+}
+
+class AppShadow {
+  static const BoxShadow top = BoxShadow(
+    color: Color(0x14000000),
+    offset: Offset(0, -2),
+    blurRadius: 16,
+    spreadRadius: 0,
+  );
+
+  static const BoxShadow bottom = BoxShadow(
+    color: Color(0x29000000),
+    offset: Offset(0, 4),
+    blurRadius: 8,
+    spreadRadius: 0,
+  );
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vine_butler/components/components.dart';
 import 'package:vine_butler/components/widgets/tab/tab_type.dart';
 import 'package:vine_butler/components/widgets/tab/tab_item.dart';
 
@@ -14,10 +15,10 @@ class Tabbar extends ConsumerWidget {
     return Container(
       height: 68,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: StateColor.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: StateColor.overlay,
             blurRadius: 4,
             offset: const Offset(0, -2),
           ),

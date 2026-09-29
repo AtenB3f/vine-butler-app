@@ -317,4 +317,124 @@ class AppIcons {
   static Widget sortLG([Color color = GrayColor.dark]) {
     return iconLG('Sort_LG', color);
   }
+
+  static Widget buildingSM([Color color = GrayColor.dark]) {
+    return iconSM('Building_SM', color);
+  }
+  static Widget buildingMD([Color color = GrayColor.dark]) {
+    return iconMD('Building_MD', color);
+  }
+  static Widget buildingLG([Color color = GrayColor.dark]) {
+    return iconLG('Building_LG', color);
+  }
+
+  static Widget carSM([Color color = GrayColor.dark]) {
+    return iconSM('Car_SM', color);
+  }
+  static Widget carMD([Color color = GrayColor.dark]) {
+    return iconMD('Car_MD', color);
+  }
+  static Widget carLG([Color color = GrayColor.dark]) {
+    return iconLG('Car_LG', color);
+  }
+
+  static Widget chatSM([Color color = GrayColor.dark]) {
+    return iconSM('Chat_SM', color);
+  }
+  static Widget chatMD([Color color = GrayColor.dark]) {
+    return iconMD('Chat_MD', color);
+  }
+  static Widget chatLG([Color color = GrayColor.dark]) {
+    return iconLG('Chat_LG', color);
+  }
+
+  static Widget heartSM([Color color = GrayColor.dark]) {
+    return iconSM('Heart_SM', color);
+  }
+  static Widget heartMD([Color color = GrayColor.dark]) {
+    return iconMD('Heart_MD', color);
+  }
+  static Widget heartLG([Color color = GrayColor.dark]) {
+    return iconLG('Heart_LG', color);
+  }
+
+  static Widget heartFillSM([Color color = GrayColor.dark]) {
+    return iconSM('Heart_Fill_SM', color);
+  }
+  static Widget heartFillMD([Color color = GrayColor.dark]) {
+    return iconMD('Heart_Fill_MD', color);
+  }
+  static Widget heartFillLG([Color color = GrayColor.dark]) {
+    return iconLG('Heart_Fill_LG', color);
+  }
+
+  static Widget houseCheckSM([Color color = GrayColor.dark]) {
+    return iconSM('House_Check_SM', color);
+  }
+  static Widget houseCheckMD([Color color = GrayColor.dark]) {
+    return iconMD('House_Check_MD', color);
+  }
+  static Widget houseCheckLG([Color color = GrayColor.dark]) {
+    return iconLG('House_Check_LG', color);
+  }
+
+  static Widget infoSM([Color color = GrayColor.dark]) {
+    return iconSM('Info_SM', color);
+  }
+  static Widget infoMD([Color color = GrayColor.dark]) {
+    return iconMD('Info_MD', color);
+  }
+  static Widget infoLG([Color color = GrayColor.dark]) {
+    return iconLG('Info_LG', color);
+  }
+
+  static Widget labelSM([Color color = GrayColor.dark]) {
+    return iconSM('Label_SM', color);
+  }
+  static Widget labelMD([Color color = GrayColor.dark]) {
+    return iconMD('Label_MD', color);
+  }
+  static Widget labelLG([Color color = GrayColor.dark]) {
+    return iconLG('Label_LG', color);
+  }
+
+  static Widget logOutSM([Color color = GrayColor.dark]) {
+    return iconSM('Log_Out_SM', color);
+  }
+  static Widget logOutMD([Color color = GrayColor.dark]) {
+    return iconMD('Log_Out_MD', color);
+  }
+  static Widget logOutLG([Color color = GrayColor.dark]) {
+    return iconLG('Log_Out_LG', color);
+  }
+
+  static Widget mapPinSM([Color color = GrayColor.dark]) {
+    return iconSM('Map_Pin_SM', color);
+  }
+  static Widget mapPinMD([Color color = GrayColor.dark]) {
+    return iconMD('Map_Pin_MD', color);
+  }
+  static Widget mapPinLG([Color color = GrayColor.dark]) {
+    return iconLG('Map_Pin_LG', color);
+  }
+
+  static Widget userSM([Color color = GrayColor.dark]) {
+    return iconSM('User_SM', color);
+  }
+  static Widget userMD([Color color = GrayColor.dark]) {
+    return iconMD('User_MD', color);
+  }
+  static Widget userLG([Color color = GrayColor.dark]) {
+    return iconLG('User_LG', color);
+  }
+
+  static Widget warningSM([Color color = GrayColor.dark]) {
+    return iconSM('Warning_SM', color);
+  }
+  static Widget warningMD([Color color = GrayColor.dark]) {
+    return iconMD('Warning_MD', color);
+  }
+  static Widget warningLG([Color color = GrayColor.dark]) {
+    return iconLG('Warning_LG', color);
+  }
 }
