@@ -19,66 +19,45 @@ extension AppFontStyleX on AppFontStyle {
   TextStyle style(Color color) {
     switch (this) {
       case AppFontStyle.body1:
-        return const TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w400,
-        ).copyWith(color: color);
+        return _style(color, 13, FontWeight.w400, 16);
       case AppFontStyle.body2:
-        return const TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w400,
-        ).copyWith(color: color);
+        return _style(color, 15, FontWeight.w400, 18);
       case AppFontStyle.body3:
-        return const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w400,
-        ).copyWith(color: color);
+        return _style(color, 16, FontWeight.w400, 20);
       case AppFontStyle.bold1:
-        return const TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-        ).copyWith(color: color);
+        return _style(color, 13, FontWeight.w600, 16);
       case AppFontStyle.bold2:
-        return const TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w600,
-        ).copyWith(color: color);
+        return _style(color, 15, FontWeight.w600, 18);
       case AppFontStyle.bold3:
-        return const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-        ).copyWith(color: color);
+        return _style(color, 16, FontWeight.w600, 20);
       case AppFontStyle.sub1:
-        return const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.w500,
-        ).copyWith(color: color);
+        return _style(color, 18, FontWeight.w500, 26);
       case AppFontStyle.sub2:
-        return const TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.w500,
-        ).copyWith(color: color);
+        return _style(color, 20, FontWeight.w500, 30);
       case AppFontStyle.sub3:
-        return const TextStyle(
-          fontSize: 22,
-          fontWeight: FontWeight.w500,
-        ).copyWith(color: color);
+        return _style(color, 22, FontWeight.w500, 30);
       case AppFontStyle.header1:
-        return const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-        ).copyWith(color: color);
+        return _style(color, 18, FontWeight.w600, 26);
       case AppFontStyle.header2:
-        return const TextStyle(
-          fontSize: 22,
-          fontWeight: FontWeight.w600,
-        ).copyWith(color: color);
+        return _style(color, 22, FontWeight.w600, 30);
       case AppFontStyle.header3:
-        return const TextStyle(
-          fontSize: 28,
-          fontWeight: FontWeight.w600,
-        ).copyWith(color: color);
+        return _style(color, 28, FontWeight.w600, 40);
     }
+  }
+
+  TextStyle _style(
+    Color color,
+    double fontSize,
+    FontWeight fontWeight,
+    double lineHeight,
+  ) {
+    return TextStyle(
+      color: color,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      height: lineHeight / fontSize,
+      letterSpacing: fontSize * -0.0025,
+    );
   }
 
   Text text(String data, Color color) {

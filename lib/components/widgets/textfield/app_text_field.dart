@@ -4,17 +4,13 @@ import 'package:vine_butler/components/components.dart';
 class AppTextField extends StatefulWidget {
   const AppTextField({
     super.key,
+    required this.viewState,
     required this.controller,
-    this.title,
-    this.placeholder,
-    this.errorText,
     this.onChanged,
   });
 
+  final AppTextFieldViewState viewState;
   final TextEditingController controller;
-  final String? title;
-  final String? placeholder;
-  final String? errorText;
   final ValueChanged<String>? onChanged;
 
   @override
@@ -59,16 +55,17 @@ class _AppTextFieldState extends State<AppTextField> {
   @override
   Widget build(BuildContext context) {
     final hasText = widget.controller.text.isNotEmpty;
-    final hasError = widget.errorText != null;
+    final viewState = widget.viewState;
+    final hasError = viewState.status == AppTextFieldStatus.error;
     final underlineColor = hasError ? BaseColor.light : (_focusNode.hasFocus ? MainColor.medium : BaseColor.medium);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (widget.title != null)
+        if (viewState.title != null)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 6),
-            child: Text(widget.title!, style: AppFontStyle.bold1.style(TextColor.medium)),
+            child: Text(viewState.title!, style: AppFontStyle.bold1.style(TextColor.medium)),
           ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
@@ -84,7 +81,7 @@ class _AppTextFieldState extends State<AppTextField> {
                     isDense: true,
                     contentPadding: EdgeInsets.zero,
                     border: InputBorder.none,
-                    hintText: widget.placeholder,
+                    hintText: viewState.placeholder,
                     hintStyle: AppFontStyle.body2.style(TextColor.light),
                   ),
                 ),
@@ -97,11 +94,11 @@ class _AppTextFieldState extends State<AppTextField> {
           ),
         ),
         Container(height: 1, color: underlineColor),
-        if (hasError) ...[
+        if (hasError && viewState.errorText != null) ...[
           const SizedBox(height: 4),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 6),
-            child: Text(widget.errorText!, style: AppFontStyle.body1.style(StateColor.error)),
+            child: Text(viewState.errorText!, style: AppFontStyle.body1.style(StateColor.error)),
           ),
         ],
       ],

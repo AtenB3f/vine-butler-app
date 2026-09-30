@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class MainColor {
-  static const Color dark = Color(0xFF4B5D49);
-  static const Color medium = Color(0xFF6E886C);
-  static const Color light = Color(0xFFB3C6B1);
-  static const Color disable = Color(0x4D6E886C);
+  static const Color dark = Color(0xFF3A4539);
+  static const Color medium = Color(0xFF60735E);
+  static const Color light = Color(0xFFC2CBC1);
+  static const Color disable = Color(0x4D92A390);
 }
 
 class PrimaryColor {
