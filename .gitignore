@@ -293,3 +293,8 @@ fabric.properties
 !/gradle/wrapper/gradle-wrapper.jar
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,xcode,androidstudio,flutter
+
+# Local / machine-specific settings
+.vscode/
+.claude/settings.local.json
+devtools_options.yaml
