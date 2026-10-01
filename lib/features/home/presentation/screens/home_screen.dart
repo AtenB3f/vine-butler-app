@@ -31,10 +31,7 @@ class HomeScreen extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       spacing: 40,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 8, right: 8, top: 9, bottom: 9),
-          child: _homeBanner(),
-        ),
+        _homeBanner(),
         _mobileHomeContents(ref),
       ],
     );
@@ -46,29 +43,14 @@ class HomeScreen extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       spacing: 40,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 8, right: 8, top: 9, bottom: 9),
-          child: _homeBanner(),
-        ),
+        _homeBanner(),
         _desktopHomeContents(ref),
       ],
     );
   }
 
   Widget _homeBanner() {
-    return Row(
-      children: [
-        AppImages.tabHome(true),
-        Expanded(
-          child: AppTextField(
-            controller: TextEditingController(),
-            onChanged: (value) {
-              // Handle text change
-            },
-          ),
-        ),
-      ],
-    );
+    return const _HomeBanner();
   }
 
   Widget _mobileHomeContents(WidgetRef ref) {
@@ -130,6 +112,36 @@ class HomeScreen extends ConsumerWidget {
           onTap: () => ref.read(homeVMProvider.notifier).action(HomeViewAction.apply),
         ),
       ],
+    );
+  }
+}
+class _HomeBanner extends StatefulWidget {
+  const _HomeBanner();
+
+  @override
+  State<_HomeBanner> createState() => _HomeBannerState();
+}
+
+class _HomeBannerState extends State<_HomeBanner> {
+  final TextEditingController _controller = TextEditingController();
+  AppBndSearchStatus _status = AppBndSearchStatus.disable;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBndSearch(
+      viewState: AppBndSearchViewState(status: _status, placeholder: '매물 찾기'),
+      controller: _controller,
+      onFocusChanged: (hasFocus) => setState(() {
+        _status = hasFocus ? AppBndSearchStatus.enable : AppBndSearchStatus.disable;
+      }),
+      onSearchTap: () {},
+      onFilterTap: () {},
     );
   }
 }

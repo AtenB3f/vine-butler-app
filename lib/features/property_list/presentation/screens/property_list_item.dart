@@ -46,9 +46,9 @@ class PropertyListItem extends StatelessWidget {
       width: 6,
       height: 122,
       color: switch (type) {
-        PropertyTransactionType.buy => PrimaryColor.medium,
+        PropertyTransactionType.buy => TertiaryColor.medium,
         PropertyTransactionType.depositOnly => SecondaryColor.medium,
-        PropertyTransactionType.rent => TertiaryColor.medium,
+        PropertyTransactionType.rent => PrimaryColor.medium,
       },
     );
   }
@@ -87,7 +87,7 @@ class PropertyListItem extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 5,
       children: [
-        for (final tag in viewState.tag) GrayTag(text: tag),
+        for (final tag in viewState.tag) GrayTag(text: tag, size: GrayTagSize.small),
       ],
     );
   }
