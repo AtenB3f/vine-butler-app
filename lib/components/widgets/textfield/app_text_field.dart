@@ -18,6 +18,9 @@ class AppTextField extends StatefulWidget {
 }
 
 class _AppTextFieldState extends State<AppTextField> {
+  static const Duration _underlineDuration = Duration(milliseconds: 300);
+  static const Curve _underlineCurve = Curves.easeInOut;
+
   final FocusNode _focusNode = FocusNode();
 
   @override
@@ -57,9 +60,8 @@ class _AppTextFieldState extends State<AppTextField> {
     final hasText = widget.controller.text.isNotEmpty;
     final viewState = widget.viewState;
     final hasError = viewState.status == AppTextFieldStatus.error;
-    final underlineColor = hasError ? BaseColor.light : (_focusNode.hasFocus ? MainColor.medium : BaseColor.medium);
 
-    return Column(
+    final content = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (viewState.title != null)
@@ -93,7 +95,24 @@ class _AppTextFieldState extends State<AppTextField> {
             ],
           ),
         ),
-        Container(height: 1, color: underlineColor),
+        SizedBox(
+          height: 1,
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: ColoredBox(color: BaseColor.medium),
+              ),
+              Positioned.fill(
+                child: AnimatedOpacity(
+                  duration: _underlineDuration,
+                  curve: _underlineCurve,
+                  opacity: _focusNode.hasFocus ? 1 : 0,
+                  child: const ColoredBox(color: MainColor.medium),
+                ),
+              ),
+            ],
+          ),
+        ),
         if (hasError && viewState.errorText != null) ...[
           const SizedBox(height: 4),
           Padding(
@@ -102,6 +121,12 @@ class _AppTextFieldState extends State<AppTextField> {
           ),
         ],
       ],
+    );
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: _focusNode.requestFocus,
+      child: content,
     );
   }
 }

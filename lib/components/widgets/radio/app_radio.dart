@@ -11,6 +11,9 @@ class AppRadio extends StatelessWidget {
     required this.onTap,
   });
 
+  static const Duration _duration = Duration(milliseconds: 200);
+  static const Curve _curve = Curves.easeInOut;
+
   bool get _isDisabled => viewState.status == AppRadioStatus.disabled;
 
   @override
@@ -20,9 +23,11 @@ class AppRadio extends StatelessWidget {
       spacing: 4,
       children: [
         _circle(),
-        AppFontStyle.body2.text(
-          viewState.text,
-          _isDisabled ? TextColor.light : TextColor.dark,
+        AnimatedDefaultTextStyle(
+          duration: _duration,
+          curve: _curve,
+          style: AppFontStyle.body2.style(_isDisabled ? TextColor.light : TextColor.dark),
+          child: Text(viewState.text),
         ),
       ],
     );
@@ -37,29 +42,51 @@ class AppRadio extends StatelessWidget {
   Widget _circle() {
     final isChecked = viewState.status == AppRadioStatus.checked;
 
-    return Opacity(
+    return AnimatedOpacity(
+      duration: _duration,
+      curve: _curve,
       opacity: _isDisabled ? 0.5 : 1,
-      child: Container(
+      child: SizedBox(
         width: 18,
         height: 18,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: isChecked ? MainColor.medium : StateColor.white,
-          shape: BoxShape.circle,
-          border: isChecked ? null : Border.all(color: BaseColor.medium),
-        ),
-        child: isChecked
-            ? const SizedBox(
-                width: 8,
-                height: 8,
-                child: DecoratedBox(
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: StateColor.white,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: BaseColor.medium),
+                ),
+              ),
+            ),
+            Positioned.fill(
+              child: AnimatedOpacity(
+                duration: _duration,
+                curve: _curve,
+                opacity: isChecked ? 1 : 0,
+                child: const DecoratedBox(
                   decoration: BoxDecoration(
-                    color: StateColor.white,
+                    color: MainColor.medium,
                     shape: BoxShape.circle,
                   ),
+                  child: Center(
+                    child: SizedBox(
+                      width: 8,
+                      height: 8,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: StateColor.white,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-              )
-            : null,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

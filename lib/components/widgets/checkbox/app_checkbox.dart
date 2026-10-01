@@ -11,6 +11,9 @@ class AppCheckbox extends StatelessWidget {
     required this.onTap,
   });
 
+  static const Duration _duration = Duration(milliseconds: 200);
+  static const Curve _curve = Curves.easeInOut;
+
   bool get _isDisabled => viewState.status == AppCheckboxStatus.disabled;
 
   @override
@@ -20,9 +23,11 @@ class AppCheckbox extends StatelessWidget {
       spacing: 4,
       children: [
         _box(),
-        AppFontStyle.body2.text(
-          viewState.text,
-          _isDisabled ? TextColor.light : TextColor.dark,
+        AnimatedDefaultTextStyle(
+          duration: _duration,
+          curve: _curve,
+          style: AppFontStyle.body2.style(_isDisabled ? TextColor.light : TextColor.dark),
+          child: Text(viewState.text),
         ),
       ],
     );
@@ -37,30 +42,43 @@ class AppCheckbox extends StatelessWidget {
   Widget _box() {
     final isChecked = viewState.status == AppCheckboxStatus.checked;
 
-    return Opacity(
+    return AnimatedOpacity(
+      duration: _duration,
+      curve: _curve,
       opacity: _isDisabled ? 0.5 : 1,
-      child: Container(
+      child: SizedBox(
         width: 18,
         height: 18,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: _backgroundColor(),
-          borderRadius: BorderRadius.circular(4),
-          border: isChecked ? null : Border.all(color: BaseColor.medium),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: AnimatedContainer(
+                duration: _duration,
+                curve: _curve,
+                decoration: BoxDecoration(
+                  color: _isDisabled ? BaseColor.light : StateColor.white,
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: BaseColor.medium),
+                ),
+              ),
+            ),
+            Positioned.fill(
+              child: AnimatedOpacity(
+                duration: _duration,
+                curve: _curve,
+                opacity: isChecked ? 1 : 0,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: MainColor.medium,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Center(child: AppIcons.checkSM(StateColor.white)),
+                ),
+              ),
+            ),
+          ],
         ),
-        child: isChecked ? AppIcons.checkSM(StateColor.white) : null,
       ),
     );
-  }
-
-  Color _backgroundColor() {
-    switch (viewState.status) {
-      case AppCheckboxStatus.unchecked:
-        return StateColor.white;
-      case AppCheckboxStatus.checked:
-        return MainColor.medium;
-      case AppCheckboxStatus.disabled:
-        return BaseColor.light;
-    }
   }
 }
