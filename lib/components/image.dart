@@ -437,4 +437,77 @@ class AppIcons {
   static Widget warningLG([Color color = GrayColor.dark]) {
     return iconLG('Warning_LG', color);
   }
+
+  static Widget moreSM([Color color = GrayColor.dark]) {
+    return iconSM('More_SM', color);
+  }
+  static Widget moreMD([Color color = GrayColor.dark]) {
+    return iconMD('More_MD', color);
+  }
+  static Widget moreLG([Color color = GrayColor.dark]) {
+    return iconLG('More_LG', color);
+  }
+  static Widget reloadSM([Color color = GrayColor.dark]) {
+    return iconSM('Reload_SM', color);
+  }
+  static Widget reloadMD([Color color = GrayColor.dark]) {
+    return iconMD('Reload_MD', color);
+  }
+  static Widget reloadLG([Color color = GrayColor.dark]) {
+    return iconLG('Reload_LG', color);
+  }
+  static Widget fileUploadSM([Color color = GrayColor.dark]) {
+    return iconSM('File_Upload_SM', color);
+  }
+  static Widget fileUploadMD([Color color = GrayColor.dark]) {
+    return iconMD('File_Upload_MD', color);
+  }
+  static Widget fileUploadLG([Color color = GrayColor.dark]) {
+    return iconLG('File_Upload_LG', color);
+  }
+  static Widget fileSM([Color color = GrayColor.dark]) {
+    return iconSM('File_SM', color);
+  }
+  static Widget fileMD([Color color = GrayColor.dark]) {
+    return iconMD('File_MD', color);
+  }
+  static Widget fileLG([Color color = GrayColor.dark]) {
+    return iconLG('File_LG', color);
+  }
+  static Widget fileCheckSM([Color color = GrayColor.dark]) {
+    return iconSM('File_Check_SM', color);
+  }
+  static Widget fileCheckMD([Color color = GrayColor.dark]) {
+    return iconMD('File_Check_MD', color);
+  }
+  static Widget fileCheckLG([Color color = GrayColor.dark]) {
+    return iconLG('File_Check_LG', color);
+  }
+  static Widget linkConnectSM([Color color = GrayColor.dark]) {
+    return iconSM('Link_Connect_SM', color);
+  }
+  static Widget linkConnectMD([Color color = GrayColor.dark]) {
+    return iconMD('Link_Connect_MD', color);
+  }
+  static Widget linkConnectLG([Color color = GrayColor.dark]) {
+    return iconLG('Link_Connect_LG', color);
+  }
+  static Widget linkDisconnectSM([Color color = GrayColor.dark]) {
+    return iconSM('Link_Disconnect_SM', color);
+  }
+  static Widget linkDisconnectMD([Color color = GrayColor.dark]) {
+    return iconMD('Link_Disconnect_MD', color);
+  }
+  static Widget linkDisconnectLG([Color color = GrayColor.dark]) {
+    return iconLG('Link_Disconnect_LG', color);
+  }
+  static Widget trashSM([Color color = GrayColor.dark]) {
+    return iconSM('Trash_SM', color);
+  }
+  static Widget trashMD([Color color = GrayColor.dark]) {
+    return iconMD('Trash_MD', color);
+  }
+  static Widget trashLG([Color color = GrayColor.dark]) {
+    return iconLG('Trash_LG', color);
+  }
 }
