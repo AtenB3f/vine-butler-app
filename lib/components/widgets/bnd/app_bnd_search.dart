@@ -7,7 +7,6 @@ class AppBndSearch extends StatefulWidget {
     required this.viewState,
     required this.controller,
     required this.onSearchTap,
-    required this.onFilterTap,
     this.onChanged,
     this.onFocusChanged,
   });
@@ -15,7 +14,6 @@ class AppBndSearch extends StatefulWidget {
   final AppBndSearchViewState viewState;
   final TextEditingController controller;
   final VoidCallback onSearchTap;
-  final VoidCallback onFilterTap;
   final ValueChanged<String>? onChanged;
   final ValueChanged<bool>? onFocusChanged;
 
@@ -48,7 +46,7 @@ class _AppBndSearchState extends State<AppBndSearch> {
     return Container(
       width: double.infinity,
       height: 62,
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       color: StateColor.white,
       foregroundDecoration: const BoxDecoration(
         border: Border(bottom: BorderSide(color: BaseColor.light)),
@@ -86,12 +84,9 @@ class _AppBndSearchState extends State<AppBndSearch> {
                       ),
                     ),
                     GestureDetector(
+                      behavior: HitTestBehavior.opaque,
                       onTap: widget.onSearchTap,
                       child: AppIcons.searchLG(searchIconColor(status)),
-                    ),
-                    GestureDetector(
-                      onTap: widget.onFilterTap,
-                      child: AppIcons.filterLG(filterIconColor(status)),
                     ),
                   ],
                 ),
@@ -106,9 +101,10 @@ class _AppBndSearchState extends State<AppBndSearch> {
   Color lineColor(AppBndSearchStatus status) {
     switch (status) {
       case AppBndSearchStatus.enable:
+      case AppBndSearchStatus.search:
         return MainColor.medium;
       case AppBndSearchStatus.disable:
-      case AppBndSearchStatus.disableFilter:
+      case AppBndSearchStatus.filter:
         return MainColor.light;
     }
   }
@@ -116,20 +112,10 @@ class _AppBndSearchState extends State<AppBndSearch> {
   Color searchIconColor(AppBndSearchStatus status) {
     switch (status) {
       case AppBndSearchStatus.disable:
-        return GrayColor.light;
       case AppBndSearchStatus.enable:
-        return MainColor.medium;
-      case AppBndSearchStatus.disableFilter:
-        return BaseColor.dark;
-    }
-  }
-
-  Color filterIconColor(AppBndSearchStatus status) {
-    switch (status) {
-      case AppBndSearchStatus.disable:
         return GrayColor.light;
-      case AppBndSearchStatus.enable:
-      case AppBndSearchStatus.disableFilter:
+      case AppBndSearchStatus.search:
+      case AppBndSearchStatus.filter:
         return MainColor.medium;
     }
   }

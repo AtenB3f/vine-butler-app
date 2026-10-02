@@ -1,7 +1,8 @@
 enum AppBndSearchStatus {
   disable,
   enable,
-  disableFilter
+  search,
+  filter
 }
 
 class AppBndSearchViewState {
