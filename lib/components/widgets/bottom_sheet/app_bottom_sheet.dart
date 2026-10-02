@@ -51,7 +51,10 @@ class AppBottomSheet extends StatelessWidget {
   }
 
   Widget _item(int index) {
+    final item = viewState.items[index];
+    final image = item.image;
     final isSelected = index == viewState.selectedIndex;
+    final color = isSelected ? StateColor.black : (image != null ? TextColor.medium : TextColor.light);
 
     return Pressable(
       onTap: () => onSelect(index),
@@ -59,12 +62,12 @@ class AppBottomSheet extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 4),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          spacing: 6,
           children: [
-            if (isSelected)
-              AppFontStyle.bold2.text(viewState.items[index], StateColor.black)
-            else
-              AppFontStyle.body2.text(viewState.items[index], TextColor.light),
+            if (image != null) image(color),
+            Expanded(
+              child: isSelected ? AppFontStyle.bold2.text(item.text, color) : AppFontStyle.body2.text(item.text, color),
+            ),
             if (isSelected) AppIcons.checkMD(StateColor.black),
           ],
         ),
