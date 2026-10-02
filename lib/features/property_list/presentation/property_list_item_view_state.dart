@@ -1,6 +1,6 @@
 import 'package:vine_butler/domain/property_type.dart';
 
-class PropertyListViewState {
+class PropertyListItemViewState {
   final int id;
   final int amount;
   final int? monthlyAmount;
@@ -10,7 +10,7 @@ class PropertyListViewState {
   final PropertyType propertyType;
   final List<String> tag;
 
-  PropertyListViewState({
+  PropertyListItemViewState({
     required this.id,
     required this.amount,
     this.monthlyAmount,

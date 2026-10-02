@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:vine_butler/components/components.dart';
 import 'package:vine_butler/domain/property_type.dart';
-import 'package:vine_butler/features/property_list/presentation/property_list_view_state.dart';
+import 'package:vine_butler/features/property_list/presentation/property_list_item_view_state.dart';
 import 'package:vine_butler/shared/utils/krw_formatter.dart';
 
 class PropertyListItem extends StatelessWidget {
-  final PropertyListViewState viewState;
+  final PropertyListItemViewState viewState;
   final VoidCallback onTap;
 
   const PropertyListItem({

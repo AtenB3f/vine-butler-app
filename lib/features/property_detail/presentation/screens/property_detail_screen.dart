@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vine_butler/components/components.dart';
-import 'package:vine_butler/components/widgets/tab/slide_tab.dart';
 import 'package:vine_butler/domain/property_type.dart';
 import 'package:vine_butler/features/property_detail/presentation/property_detail_view_state.dart';
 import 'package:vine_butler/features/property_detail/property_detail_vm.dart';
@@ -85,7 +84,7 @@ class PropertyDetailScreen extends ConsumerWidget {
           width: double.infinity,
           child: context.isMobile
               ? _ImageMapToggle(imageUrls: data.imageUrls)
-              : SliderTab(imageUrls: data.imageUrls),
+              : AppImagePage(viewState: AppImagePageViewState.urls(data.imageUrls)),
         ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -314,7 +313,7 @@ class _ImageMapToggleState extends State<_ImageMapToggle> {
     return Stack(
       children: [
         Positioned.fill(
-          child: _isMapVisible ? Container(color: BaseColor.light) : SliderTab(imageUrls: widget.imageUrls),
+          child: _isMapVisible ? Container(color: BaseColor.light) : AppImagePage(viewState: AppImagePageViewState.urls(widget.imageUrls)),
         ),
         Positioned(
           right: 12,
