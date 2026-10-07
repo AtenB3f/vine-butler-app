@@ -44,7 +44,7 @@ class AppAlertDialog extends StatelessWidget {
           Text(
             title,
             textAlign: TextAlign.center,
-            style: AppFontStyle.header1.style(TextColor.dark),
+            style: AppFontStyle.header3.style(TextColor.dark),
           ),
         Text(
           viewState.message,

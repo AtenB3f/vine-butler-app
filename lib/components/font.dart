@@ -37,11 +37,11 @@ extension AppFontStyleX on AppFontStyle {
       case AppFontStyle.sub3:
         return _style(color, 22, FontWeight.w500, 30);
       case AppFontStyle.header1:
-        return _style(color, 18, FontWeight.w700, 26);
+        return _style(color, 28, FontWeight.w700, 40);
       case AppFontStyle.header2:
         return _style(color, 22, FontWeight.w700, 30);
       case AppFontStyle.header3:
-        return _style(color, 28, FontWeight.w700, 40);
+        return _style(color, 18, FontWeight.w700, 26);
     }
   }
 

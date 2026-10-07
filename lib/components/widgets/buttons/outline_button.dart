@@ -28,6 +28,7 @@ class OutlineButton extends StatelessWidget {
     return Pressable(
       onTap: onTap,
       child: Container(
+        alignment: Alignment.center,
         padding: padding(),
         decoration: BoxDecoration(
           color: background(),
