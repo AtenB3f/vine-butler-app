@@ -3,12 +3,25 @@ import 'package:vine_butler/domain/property_type.dart';
 class PropertyDetailViewState {
   final PropertyDetailData? data;
   final String? navigateTo;
+  final bool isMapVisible;
 
-  const PropertyDetailViewState({this.data, this.navigateTo});
+  const PropertyDetailViewState({this.data, this.navigateTo, this.isMapVisible = false});
+
+  PropertyDetailViewState copyWith({
+    String? Function()? navigateTo,
+    bool? isMapVisible,
+  }) {
+    return PropertyDetailViewState(
+      data: data,
+      navigateTo: navigateTo != null ? navigateTo() : this.navigateTo,
+      isMapVisible: isMapVisible ?? this.isMapVisible,
+    );
+  }
 }
 
 enum PropertyDetailAction {
   fetch,
+  toggleMap,
 }
 
 class PropertyDetailData {

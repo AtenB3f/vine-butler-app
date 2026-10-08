@@ -6,12 +6,7 @@ import 'package:vine_butler/features/property_list/property_list_vm.dart';
 import 'package:vine_butler/shared/extensions/extensions.dart';
 
 class PropertyFilterPanel extends ConsumerStatefulWidget {
-  final PropertyListVM viewModel;
-
-  const PropertyFilterPanel({
-    super.key,
-    required this.viewModel,
-  });
+  const PropertyFilterPanel({super.key});
 
   @override
   ConsumerState<PropertyFilterPanel> createState() => _PropertyFilterPanelState();
@@ -19,6 +14,8 @@ class PropertyFilterPanel extends ConsumerStatefulWidget {
 
 class _PropertyFilterPanelState extends ConsumerState<PropertyFilterPanel> {
   late final ValueNotifier<double> _priceController = ValueNotifier(_filter.price);
+
+  PropertyListVM get _viewModel => ref.read(propertyListVMProvider.notifier);
 
   PropertyFilterData get _filter => ref.read(propertyListVMProvider).filter.data;
 
@@ -37,11 +34,11 @@ class _PropertyFilterPanelState extends ConsumerState<PropertyFilterPanel> {
 
   void _onPriceChange() => _applyFilter(_filter.copyWith(price: _priceController.value));
 
-  void _applyFilter(PropertyFilterData filter) => widget.viewModel.action(Filtering(filter));
+  void _applyFilter(PropertyFilterData filter) => _viewModel.action(Filtering(filter));
 
   void _onCollapseTap() {
     FocusManager.instance.primaryFocus?.unfocus();
-    widget.viewModel.action(const PushFilter(false));
+    _viewModel.action(const PushFilter(false));
   }
 
   @override

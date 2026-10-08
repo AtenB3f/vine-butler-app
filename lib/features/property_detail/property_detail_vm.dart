@@ -85,14 +85,16 @@ class PropertyDetailVM extends Notifier<PropertyDetailViewState> {
     switch (action) {
       case PropertyDetailAction.fetch:
         break;
+      case PropertyDetailAction.toggleMap:
+        state = state.copyWith(isMapVisible: !state.isMapVisible);
     }
   }
 
   void popNavigation() {
-    state = PropertyDetailViewState(data: state.data, navigateTo: null);
+    state = state.copyWith(navigateTo: () => null);
   }
 
   void pushNavigation(String path) {
-    state = PropertyDetailViewState(data: state.data, navigateTo: path);
+    state = state.copyWith(navigateTo: () => path);
   }
 }

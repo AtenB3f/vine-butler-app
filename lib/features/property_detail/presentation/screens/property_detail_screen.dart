@@ -2,15 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vine_butler/components/components.dart';
-import 'package:vine_butler/domain/property_type.dart';
 import 'package:vine_butler/features/property_detail/presentation/property_detail_view_state.dart';
 import 'package:vine_butler/features/property_detail/property_detail_vm.dart';
+import 'package:vine_butler/shared/extensions/extensions.dart';
 import 'package:vine_butler/shared/utils/utils.dart';
 
 class PropertyDetailScreen extends ConsumerWidget {
   final int id;
 
   const PropertyDetailScreen({super.key, required this.id});
+
+  static final List<({String text, Widget Function(Color color) image})> _menuItems = [
+    (text: '수정', image: AppIcons.editMD),
+    (text: '삭제', image: AppIcons.trashMD),
+    (text: '내보내기', image: AppIcons.linkMD),
+    (text: '동기화', image: AppIcons.reloadMD),
+  ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -22,38 +29,55 @@ class PropertyDetailScreen extends ConsumerWidget {
       }
     });
 
-    final data = ref.watch(propertyDetailVMProvider(id)).data;
+    final state = ref.watch(propertyDetailVMProvider(id));
 
     if (context.isMobile) {
-      return _mobileScreen(context, ref, data);
+      return _mobileScreen(context, ref, state);
     } else {
-      return _desktopScreen(context, ref, data);
+      return _desktopScreen(context, ref, state);
     }
   }
 
-  AppScaffold _mobileScreen(BuildContext context, WidgetRef ref, PropertyDetailData? data) {
+  AppScaffold _mobileScreen(BuildContext context, WidgetRef ref, PropertyDetailViewState state) {
     return AppScaffold(
       title: '매물 찾기',
       leftIcon: AppIcons.chevronLeftMD,
-      rightIcon: AppIcons.editMD,
+      rightIcon: AppIcons.moreMD,
       onLeftTap: () => context.pop(),
-      onRightTap: () => context.pop(),
-      body: data == null ? const Center(child: CircularProgressIndicator()) : _contents(context, data),
+      onRightTap: () => showAppBottomSheet(
+        context,
+        AppBottomSheetViewState(
+          items: [for (final item in _menuItems) AppSheetItemViewState(text: item.text, image: item.image)],
+          selectedIndex: -1,
+        ),
+      ),
+      body: state.data == null
+          ? const Center(child: CircularProgressIndicator())
+          : _contents(context, ref, state.data!, state.isMapVisible),
     );
   }
 
-  AppScaffold _desktopScreen(BuildContext context, WidgetRef ref, PropertyDetailData? data) {
+  AppScaffold _desktopScreen(BuildContext context, WidgetRef ref, PropertyDetailViewState state) {
     return AppScaffold(
       title: '매물 찾기',
       leftIcon: AppIcons.chevronLeftMD,
-      rightIcon: AppIcons.editMD,
+      rightIcon: AppIcons.moreMD,
       onLeftTap: () => context.pop(),
-      onRightTap: () => context.pop(),
-      body: data == null ? const Center(child: CircularProgressIndicator()) : _contents(context, data),
+      onRightTap: () => showAppDropdown(
+        context,
+        AppDropdownViewState(
+          items: [for (final item in _menuItems) AppDropdownItemViewState(text: item.text, image: item.image)],
+          selectedIndex: -1,
+        ),
+        topRight: Offset(context.screenWidth - 16, MediaQuery.paddingOf(context).top + 58),
+      ),
+      body: state.data == null
+          ? const Center(child: CircularProgressIndicator())
+          : _contents(context, ref, state.data!, state.isMapVisible),
     );
   }
 
-  Widget _contents(BuildContext context, PropertyDetailData data) {
+  Widget _contents(BuildContext context, WidgetRef ref, PropertyDetailData data, bool isMapVisible) {
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsetsGeometry.only(left: 16, right: 16, top: 20, bottom: 40),
@@ -62,7 +86,7 @@ class PropertyDetailScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 44,
           children: [
-            _basicInfo(context, data),
+            _basicInfo(context, ref, data, isMapVisible),
             _call(data),
             _options(data),
             _furnitures(data),
@@ -73,24 +97,24 @@ class PropertyDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _basicInfo(BuildContext context, PropertyDetailData data) {
+  Widget _basicInfo(BuildContext context, WidgetRef ref, PropertyDetailData data, bool isMapVisible) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 14,
+      spacing: context.isMobile ? 8 : 14,
       children: [
         SizedBox(
-          height: 240,
+          height: context.isMobile ? 246 : 240,
           width: double.infinity,
           child: context.isMobile
-              ? _ImageMapToggle(imageUrls: data.imageUrls)
+              ? _imageMap(data, isMapVisible)
               : AppImagePage(viewState: AppImagePageViewState.urls(data.imageUrls)),
         ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 44,
           children: [
-            _address(data),
+            _address(context, ref, data, isMapVisible),
             _priceInfo(data),
           ],
         ),
@@ -98,21 +122,45 @@ class PropertyDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _address(PropertyDetailData data) {
-    return Column(
+  Widget _address(BuildContext context, WidgetRef ref, PropertyDetailData data, bool isMapVisible) {
+    final address = Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 4,
       children: [
         Text(
           data.unitAddress,
-          style: AppFontStyle.header3.style(TextColor.dark),
+          style: AppFontStyle.header1.style(TextColor.dark),
         ),
-        Text(
-          data.address,
-          style: AppFontStyle.sub1.style(TextColor.dark),
-        ),
+        if (context.isMobile)
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 6,
+            children: [
+              Flexible(
+                child: Text(
+                  data.address,
+                  style: AppFontStyle.sub1.style(TextColor.dark),
+                ),
+              ),
+              isMapVisible ? AppIcons.imageMD(TextColor.dark) : AppIcons.mapMD(TextColor.dark),
+            ],
+          )
+        else
+          Text(
+            data.address,
+            style: AppFontStyle.sub1.style(TextColor.dark),
+          ),
       ],
+    );
+
+    if (!context.isMobile) {
+      return address;
+    }
+
+    return Pressable(
+      onTap: () => ref.read(propertyDetailVMProvider(id).notifier).action(PropertyDetailAction.toggleMap),
+      child: address,
     );
   }
 
@@ -122,16 +170,16 @@ class PropertyDetailScreen extends ConsumerWidget {
       spacing: 6,
       children: [
         LineTag(
-          text: _transactionLabel(data.transactionType),
-          type: _transactionTagType(data.transactionType)
+          text: data.transactionType.label,
+          type: data.transactionType.tagType
         ),
         Row(
           spacing: 6,
           children: [
-            AppFontStyle.header3.text(formatKRW(data.amount), TextColor.dark),
+            AppFontStyle.header1.text(data.amount.formattedKRW, TextColor.dark),
             if (data.monthlyAmount case final monthlyAmount?) ... [
               const Circle(size: 3, color: TextColor.medium),
-              AppFontStyle.header3.text(formatKRW(monthlyAmount), TextColor.dark),
+              AppFontStyle.header1.text(monthlyAmount.formattedKRW, TextColor.dark),
             ],
           ],
         ),
@@ -140,7 +188,7 @@ class PropertyDetailScreen extends ConsumerWidget {
             spacing: 6,
             children: [
               AppFontStyle.sub1.text('관리비', TextColor.light),
-              AppFontStyle.header1.text(formatKRW(maintenanceCost), TextColor.dark),
+              AppFontStyle.header3.text(maintenanceCost.formattedKRW, TextColor.dark),
             ],
           ),
         Row(
@@ -153,28 +201,6 @@ class PropertyDetailScreen extends ConsumerWidget {
         ),
       ],
     );
-  }
-
-  String _transactionLabel(PropertyTransactionType type) {
-    switch (type) {
-      case PropertyTransactionType.buy:
-        return '매매';
-      case PropertyTransactionType.depositOnly:
-        return '전세';
-      case PropertyTransactionType.rent:
-        return '월세';
-    }
-  }
-
-  LineTagType _transactionTagType(PropertyTransactionType type) {
-    switch (type) {
-      case PropertyTransactionType.buy:
-        return LineTagType.tertiary;
-      case PropertyTransactionType.depositOnly:
-        return LineTagType.secondary;
-      case PropertyTransactionType.rent:
-        return LineTagType.primary;
-    }
   }
 
   Widget _call(PropertyDetailData data) {
@@ -294,45 +320,10 @@ class PropertyDetailScreen extends ConsumerWidget {
       ],
     );
   }
-}
 
-class _ImageMapToggle extends StatefulWidget {
-  final List<String> imageUrls;
-
-  const _ImageMapToggle({required this.imageUrls});
-
-  @override
-  State<_ImageMapToggle> createState() => _ImageMapToggleState();
-}
-
-class _ImageMapToggleState extends State<_ImageMapToggle> {
-  bool _isMapVisible = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: _isMapVisible ? Container(color: BaseColor.light) : AppImagePage(viewState: AppImagePageViewState.urls(widget.imageUrls)),
-        ),
-        Positioned(
-          right: 12,
-          bottom: 12,
-          child: Pressable(
-            onTap: () => setState(() => _isMapVisible = !_isMapVisible),
-            child: Container(
-              width: 36,
-              height: 36,
-              alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              child: _isMapVisible ? AppIcons.imageMD() : AppIcons.mapMD(),
-            ),
-          ),
-        ),
-      ],
-    );
+  Widget _imageMap(PropertyDetailData data, bool isMapVisible) {
+    return isMapVisible
+        ? Container(color: BaseColor.light)
+        : AppImagePage(viewState: AppImagePageViewState.urls(data.imageUrls));
   }
 }

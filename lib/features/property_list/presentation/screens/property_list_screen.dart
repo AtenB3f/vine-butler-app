@@ -123,8 +123,6 @@ class PropertyListScreen extends ConsumerWidget {
   }
 
   Widget _overlayPanel(WidgetRef ref, PropertyListViewState state) {
-    final vm = ref.read(propertyListVMProvider.notifier);
-
     return Container(
       decoration: const BoxDecoration(
         color: StateColor.white,
@@ -138,7 +136,7 @@ class PropertyListScreen extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (state.isSearchResultVisible) _searchResults(ref, state),
-            if (state.filter.isFilterOpen) PropertyFilterPanel(viewModel: vm),
+            if (state.filter.isFilterOpen) const PropertyFilterPanel(),
           ],
         ),
       ),
