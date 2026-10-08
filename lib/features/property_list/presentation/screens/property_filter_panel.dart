@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vine_butler/components/components.dart';
-import 'package:vine_butler/domain/property_type.dart';
 import 'package:vine_butler/features/property_list/presentation/property_filter_view_state.dart';
 import 'package:vine_butler/features/property_list/property_list_vm.dart';
-import 'package:vine_butler/shared/utils/krw_formatter.dart';
+import 'package:vine_butler/shared/extensions/extensions.dart';
 
 class PropertyFilterPanel extends ConsumerStatefulWidget {
   final PropertyListVM viewModel;
@@ -124,7 +123,7 @@ class _PropertyFilterPanelState extends ConsumerState<PropertyFilterPanel> {
     return OutlineButton(
       type: isSelected ? OutlineButtonType.main : OutlineButtonType.gray,
       size: BoxButtonSize.small,
-      text: _propertyTypeLabel(option),
+      text: option.label,
       onTap: () => _applyFilter(filter.copyWith(
         propertyTypes: isSelected
             ? filter.propertyTypes.difference(option.types)
@@ -139,9 +138,9 @@ class _PropertyFilterPanelState extends ConsumerState<PropertyFilterPanel> {
       children: [
         for (final type in PropertyListVM.transactionTypeOptions)
           OutlineButton(
-            type: filter.transactionType == type ? _transactionButtonType(type) : OutlineButtonType.gray,
+            type: filter.transactionType == type ? type.buttonType : OutlineButtonType.gray,
             size: BoxButtonSize.small,
-            text: _transactionLabel(type),
+            text: type.label,
             onTap: () => _applyFilter(filter.copyWith(transactionType: () => filter.transactionType == type ? null : type)),
           ),
       ],
@@ -156,7 +155,7 @@ class _PropertyFilterPanelState extends ConsumerState<PropertyFilterPanel> {
           title: '금액', 
           children: [
             Text(
-                formatKRW(filter.price.toInt()),
+                filter.price.formattedKRW,
                 style: AppFontStyle.sub3.style(TextColor.dark),
                 textAlign: TextAlign.right,
               )
@@ -191,44 +190,5 @@ class _PropertyFilterPanelState extends ConsumerState<PropertyFilterPanel> {
         ),
       ),
     );
-  }
-
-  OutlineButtonType _transactionButtonType(PropertyTransactionType type) {
-    switch (type) {
-      case PropertyTransactionType.rent:
-        return OutlineButtonType.primary;
-      case PropertyTransactionType.depositOnly:
-        return OutlineButtonType.secondary;
-      case PropertyTransactionType.buy:
-        return OutlineButtonType.tertiary;
-    }
-  }
-
-  String _transactionLabel(PropertyTransactionType type) {
-    switch (type) {
-      case PropertyTransactionType.buy:
-        return '매매';
-      case PropertyTransactionType.depositOnly:
-        return '전세';
-      case PropertyTransactionType.rent:
-        return '월세';
-    }
-  }
-
-  String _propertyTypeLabel(PropertyTypeFilterOption option) {
-    switch (option) {
-      case PropertyTypeFilterOption.oneRoom:
-        return '원룸';
-      case PropertyTypeFilterOption.twoRoom:
-        return '투룸';
-      case PropertyTypeFilterOption.villa:
-        return '빌라';
-      case PropertyTypeFilterOption.apartment:
-        return '아파트';
-      case PropertyTypeFilterOption.singleMulti:
-        return '단독/다세대';
-      case PropertyTypeFilterOption.commercialBuilding:
-        return '상가';
-    }
   }
 }

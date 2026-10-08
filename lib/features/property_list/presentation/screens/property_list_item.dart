@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:vine_butler/components/components.dart';
 import 'package:vine_butler/domain/property_type.dart';
 import 'package:vine_butler/features/property_list/presentation/property_list_item_view_state.dart';
-import 'package:vine_butler/shared/utils/krw_formatter.dart';
+import 'package:vine_butler/shared/extensions/extensions.dart';
 
 class PropertyListItem extends StatelessWidget {
   final PropertyListItemViewState viewState;
@@ -70,10 +70,10 @@ class PropertyListItem extends StatelessWidget {
         Row(
           spacing: 4,
           children: [
-            AppFontStyle.sub1.text(formatKRW(viewState.amount), TextColor.medium),
+            AppFontStyle.sub1.text(viewState.amount.formattedKRW, TextColor.medium),
             if (viewState.monthlyAmount case final monthlyAmount?) ...[
               const Circle(size: 2, color: BaseColor.medium),
-              AppFontStyle.sub1.text(formatKRW(monthlyAmount), TextColor.medium),
+              AppFontStyle.sub1.text(monthlyAmount.formattedKRW, TextColor.medium),
             ],
           ],
         ),

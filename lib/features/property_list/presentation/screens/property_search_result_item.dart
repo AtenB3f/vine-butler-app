@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vine_butler/components/components.dart';
-import 'package:vine_butler/domain/property_type.dart';
 import 'package:vine_butler/features/property_list/presentation/property_list_item_view_state.dart';
+import 'package:vine_butler/shared/extensions/extensions.dart';
 
 class PropertySearchResultItem extends StatelessWidget {
   final PropertyListItemViewState viewState;
@@ -26,8 +26,8 @@ class PropertySearchResultItem extends StatelessWidget {
           spacing: 6,
           children: [
             LineTag(
-              text: _transactionLabel(viewState.transactionType),
-              type: _transactionTagType(viewState.transactionType),
+              text: viewState.transactionType.label,
+              type: viewState.transactionType.tagType,
             ),
             Expanded(
               child: Text.rich(
@@ -57,27 +57,5 @@ class PropertySearchResultItem extends StatelessWidget {
       TextSpan(text: text.substring(matchIndex, matchEnd), style: normalStyle.copyWith(fontWeight: FontWeight.w700)),
       TextSpan(text: text.substring(matchEnd), style: normalStyle),
     ];
-  }
-
-  String _transactionLabel(PropertyTransactionType type) {
-    switch (type) {
-      case PropertyTransactionType.buy:
-        return '매매';
-      case PropertyTransactionType.depositOnly:
-        return '전세';
-      case PropertyTransactionType.rent:
-        return '월세';
-    }
-  }
-
-  LineTagType _transactionTagType(PropertyTransactionType type) {
-    switch (type) {
-      case PropertyTransactionType.buy:
-        return LineTagType.tertiary;
-      case PropertyTransactionType.depositOnly:
-        return LineTagType.secondary;
-      case PropertyTransactionType.rent:
-        return LineTagType.primary;
-    }
   }
 }
