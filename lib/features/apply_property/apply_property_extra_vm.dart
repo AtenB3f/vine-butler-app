@@ -1,5 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vine_butler/core/router/app_router.dart';
 import 'package:vine_butler/features/apply_property/presentation/apply_property_extra_view_state.dart';
+import 'package:vine_butler/features/property_list/property_list_event_vm.dart';
+import 'package:vine_butler/features/property_list/property_list_vm.dart';
 
 final applyPropertyExtraVMProvider =
     NotifierProvider<ApplyPropertyExtraVM, ApplyPropertyExtraViewState>(ApplyPropertyExtraVM.new);
@@ -15,6 +18,8 @@ sealed class ApplyPropertyExtraAction {
   const factory ApplyPropertyExtraAction.selectRoomCount(int count) = _SelectRoomCount;
   const factory ApplyPropertyExtraAction.toggleFurniture(String option) = _ToggleFurniture;
   const factory ApplyPropertyExtraAction.changeMemo(String memo) = _ChangeMemo;
+  const factory ApplyPropertyExtraAction.save() = _Save;
+  const factory ApplyPropertyExtraAction.popNavigation() = _PopNavigation;
 }
 
 class _SelectSuretyInsurance extends ApplyPropertyExtraAction {
@@ -63,6 +68,14 @@ class _ChangeMemo extends ApplyPropertyExtraAction {
   const _ChangeMemo(this.memo);
 }
 
+class _Save extends ApplyPropertyExtraAction {
+  const _Save();
+}
+
+class _PopNavigation extends ApplyPropertyExtraAction {
+  const _PopNavigation();
+}
+
 class ApplyPropertyExtraVM extends Notifier<ApplyPropertyExtraViewState> {
   static const List<int> roomCountOptions = [1, 2, 3, 4];
 
@@ -108,6 +121,12 @@ class ApplyPropertyExtraVM extends Notifier<ApplyPropertyExtraViewState> {
         state = state.copyWith(furnitureOptions: options);
       case _ChangeMemo(:final memo):
         state = state.copyWith(memo: memo);
+      case _Save():
+        final mockPropertyId = ref.read(propertyListVMProvider).items.length;
+        ref.read(propertyListEventVMProvider.notifier).action(PropertyListEventAction.register(mockPropertyId));
+        state = state.copyWith(navigateTo: () => const PropertyListRoute().location);
+      case _PopNavigation():
+        state = state.copyWith(navigateTo: () => null);
     }
   }
 }

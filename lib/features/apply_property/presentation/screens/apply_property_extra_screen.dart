@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vine_butler/components/components.dart';
 import 'package:vine_butler/features/apply_property/apply_property_extra_vm.dart';
 import 'package:vine_butler/features/apply_property/presentation/apply_property_extra_view_state.dart';
+import 'package:vine_butler/shared/extensions/extensions.dart';
 import 'package:vine_butler/shared/utils/utils.dart';
 
 class ApplyPropertyExtraScreen extends ConsumerStatefulWidget {
@@ -42,6 +43,12 @@ class _ApplyPropertyExtraScreenState extends ConsumerState<ApplyPropertyExtraScr
     final state = ref.watch(applyPropertyExtraVMProvider);
     final viewModel = ref.read(applyPropertyExtraVMProvider.notifier);
 
+    ref.handleEvent(
+      applyPropertyExtraVMProvider.select((state) => state.navigateTo),
+      consume: () => viewModel.action(const ApplyPropertyExtraAction.popNavigation()),
+      onEvent: (location) => context.go(location),
+    );
+
     return AppScaffold(
       title: '매물 등록',
       leftIcon: AppIcons.chevronLeftMD,
@@ -62,7 +69,7 @@ class _ApplyPropertyExtraScreenState extends ConsumerState<ApplyPropertyExtraScr
               ),
             ),
           ),
-          _buttons(),
+          _saveButton(viewModel),
         ],
       ),
     );
@@ -243,29 +250,18 @@ class _ApplyPropertyExtraScreenState extends ConsumerState<ApplyPropertyExtraScr
     );
   }
 
-  Widget _buttons() {
+  Widget _saveButton(ApplyPropertyExtraVM viewModel) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
       decoration: const BoxDecoration(
         color: StateColor.white,
         boxShadow: [AppShadow.top],
       ),
-      child: Column(
-        spacing: 6,
-        children: [
-          FillButton(
-            type: FillButtonType.gray,
-            size: BoxButtonSize.large,
-            text: '건너뛰기',
-            onTap: () {},
-          ),
-          FillButton(
-            type: FillButtonType.medium,
-            size: BoxButtonSize.large,
-            text: '완료',
-            onTap: () {},
-          ),
-        ],
+      child: FillButton(
+        type: FillButtonType.medium,
+        size: BoxButtonSize.large,
+        text: '저장',
+        onTap: () => viewModel.action(const ApplyPropertyExtraAction.save()),
       ),
     );
   }

@@ -7,6 +7,7 @@ class ApplyPropertyExtraViewState {
   final int? roomCount;
   final Set<String> furnitureOptions;
   final String memo;
+  final String? navigateTo;
 
   const ApplyPropertyExtraViewState({
     this.isAvailableSuretyInsurance,
@@ -17,6 +18,7 @@ class ApplyPropertyExtraViewState {
     this.roomCount,
     this.furnitureOptions = const {},
     this.memo = '',
+    this.navigateTo,
   });
 
   ApplyPropertyExtraViewState copyWith({
@@ -28,6 +30,7 @@ class ApplyPropertyExtraViewState {
     int? Function()? roomCount,
     Set<String>? furnitureOptions,
     String? memo,
+    String? Function()? navigateTo,
   }) {
     return ApplyPropertyExtraViewState(
       isAvailableSuretyInsurance:
@@ -39,6 +42,7 @@ class ApplyPropertyExtraViewState {
       roomCount: roomCount != null ? roomCount() : this.roomCount,
       furnitureOptions: furnitureOptions ?? this.furnitureOptions,
       memo: memo ?? this.memo,
+      navigateTo: navigateTo != null ? navigateTo() : this.navigateTo,
     );
   }
 }

@@ -6,7 +6,9 @@ import 'package:vine_butler/core/router/app_router.dart';
 import 'package:vine_butler/features/property_list/presentation/screens/property_filter_panel.dart';
 import 'package:vine_butler/features/property_list/presentation/screens/property_list_item.dart';
 import 'package:vine_butler/features/property_list/presentation/screens/property_search_result_item.dart';
+import 'package:vine_butler/features/property_list/property_list_event_vm.dart';
 import 'package:vine_butler/features/property_list/property_list_vm.dart';
+import 'package:vine_butler/shared/extensions/extensions.dart';
 
 class PropertyListScreen extends ConsumerWidget {
   static const Duration _duration = Duration(milliseconds: 250);
@@ -16,13 +18,23 @@ class PropertyListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.listen<PropertyListViewState>(propertyListVMProvider, (previous, next) {
-      final navigateTo = next.navigateTo;
-      if (navigateTo != null) {
-        context.push(navigateTo);
-        ref.read(propertyListVMProvider.notifier).popNavigation();
-      }
-    });
+    ref.handleEvent(
+      propertyListVMProvider.select((state) => state.navigateTo),
+      consume: ref.read(propertyListVMProvider.notifier).popNavigation,
+      onEvent: (location) => context.push(location),
+    );
+
+    ref.handleEvent(
+      propertyListEventVMProvider.select((state) => state.registerId),
+      consume: () => ref.read(propertyListEventVMProvider.notifier).action(
+            const PropertyListEventAction.clearRegistration(),
+          ),
+      onEvent: (registerId) => showAppToast(
+        context,
+        const AppToastViewState(type: AppToastType.check, text: '매물이 등록되었습니다.'),
+        onTap: () => PropertyDetailRoute(id: registerId).push(context),
+      ),
+    );
 
     final state = ref.watch(propertyListVMProvider);
 
