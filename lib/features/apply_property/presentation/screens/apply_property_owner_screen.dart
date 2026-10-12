@@ -31,6 +31,13 @@ class _ApplyPropertyOwnerScreenState extends ConsumerState<ApplyPropertyOwnerScr
     final state = ref.watch(applyPropertyOwnerVMProvider);
     final viewModel = ref.read(applyPropertyOwnerVMProvider.notifier);
 
+    ref.listen(applyPropertyOwnerVMProvider.select((state) => state.navigateTo), (_, navigateTo) {
+      if (navigateTo != null) {
+        context.push(navigateTo);
+        viewModel.action(const ApplyPropertyOwnerAction.popNavigation());
+      }
+    });
+
     return AppScaffold(
       title: '매물 등록',
       leftIcon: AppIcons.chevronLeftMD,
@@ -51,7 +58,7 @@ class _ApplyPropertyOwnerScreenState extends ConsumerState<ApplyPropertyOwnerScr
               ),
             ),
           ),
-          _nextButton(state),
+          _nextButton(state, viewModel),
         ],
       ),
     );
@@ -91,7 +98,7 @@ class _ApplyPropertyOwnerScreenState extends ConsumerState<ApplyPropertyOwnerScr
     );
   }
 
-  Widget _nextButton(ApplyPropertyOwnerViewState state) {
+  Widget _nextButton(ApplyPropertyOwnerViewState state, ApplyPropertyOwnerVM viewModel) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
       decoration: const BoxDecoration(
@@ -102,7 +109,7 @@ class _ApplyPropertyOwnerScreenState extends ConsumerState<ApplyPropertyOwnerScr
         type: state.isCompleted ? FillButtonType.medium : FillButtonType.gray,
         size: BoxButtonSize.large,
         text: '다음',
-        onTap: () {},
+        onTap: () => viewModel.action(const ApplyPropertyOwnerAction.next()),
       ),
     );
   }
