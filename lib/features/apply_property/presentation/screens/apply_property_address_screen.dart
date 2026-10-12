@@ -118,7 +118,7 @@ class _ApplyPropertyAddressScreenState extends ConsumerState<ApplyPropertyAddres
               placeholder: '주소를 검색하세요.',
             ),
             controller: _controller,
-            onChanged: viewModel.search,
+            onChanged: (query) => viewModel.action(ApplyPropertyAddressAction.search(query)),
           ),
         ],
       ),
@@ -161,7 +161,7 @@ class _ApplyPropertyAddressScreenState extends ConsumerState<ApplyPropertyAddres
 
   Widget _resultItem(AddressResultViewState result, ApplyPropertyAddressVM viewModel) {
     return Pressable(
-      onTap: () => viewModel.select(result),
+      onTap: () => viewModel.action(ApplyPropertyAddressAction.select(result)),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 6),
@@ -192,13 +192,13 @@ class _ApplyPropertyAddressScreenState extends ConsumerState<ApplyPropertyAddres
               type: FillButtonType.gray,
               size: BoxButtonSize.large,
               text: '다시 입력하기',
-              onTap: viewModel.reset,
+              onTap: () => viewModel.action(const ApplyPropertyAddressAction.reset()),
             ),
           FillButton(
             type: state.isMapVisible ? FillButtonType.medium : FillButtonType.gray,
             size: BoxButtonSize.large,
             text: '다음',
-            onTap: viewModel.next,
+            onTap: () => viewModel.action(const ApplyPropertyAddressAction.next()),
           ),
         ],
       ),

@@ -34,11 +34,11 @@ class _PropertyFilterPanelState extends ConsumerState<PropertyFilterPanel> {
 
   void _onPriceChange() => _applyFilter(_filter.copyWith(price: _priceController.value));
 
-  void _applyFilter(PropertyFilterData filter) => _viewModel.action(Filtering(filter));
+  void _applyFilter(PropertyFilterData filter) => _viewModel.action(PropertyListAction.filtering(filter));
 
   void _onCollapseTap() {
     FocusManager.instance.primaryFocus?.unfocus();
-    _viewModel.action(const PushFilter(false));
+    _viewModel.action(const PropertyListAction.pushFilter(false));
   }
 
   @override

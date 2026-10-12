@@ -35,10 +35,10 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
     super.dispose();
   }
 
-  void _onPriceChange() => ref.read(applyPropertyTypeVMProvider.notifier).changePrice(_priceController.value);
+  void _onPriceChange() => ref.read(applyPropertyTypeVMProvider.notifier).action(ApplyPropertyTypeAction.changePrice(_priceController.value));
 
   void _onMonthlyRentChange() =>
-      ref.read(applyPropertyTypeVMProvider.notifier).changeMonthlyRent(_monthlyRentController.value);
+      ref.read(applyPropertyTypeVMProvider.notifier).action(ApplyPropertyTypeAction.changeMonthlyRent(_monthlyRentController.value));
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +107,7 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
                   type: state.transactionType == type ? type.buttonType : OutlineButtonType.gray,
                   size: BoxButtonSize.large,
                   text: type.label,
-                  onTap: () => viewModel.selectTransactionType(type),
+                  onTap: () => viewModel.action(ApplyPropertyTypeAction.selectTransactionType(type)),
                 ),
               ),
           ],
@@ -135,7 +135,7 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
                         type: state.propertyType == option ? FillButtonType.light : FillButtonType.gray,
                         size: BoxButtonSize.medium,
                         text: option.label,
-                        onTap: () => viewModel.selectPropertyType(option),
+                        onTap: () => viewModel.action(ApplyPropertyTypeAction.selectPropertyType(option)),
                       ),
                     ),
                 ],
@@ -215,7 +215,7 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
         type: state.isCompleted ? FillButtonType.medium : FillButtonType.gray,
         size: BoxButtonSize.large,
         text: '다음',
-        onTap: viewModel.next,
+        onTap: () => viewModel.action(const ApplyPropertyTypeAction.next()),
       ),
     );
   }

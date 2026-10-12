@@ -75,7 +75,7 @@ class _ApplyPropertyOwnerScreenState extends ConsumerState<ApplyPropertyOwnerScr
             placeholder: '이름을 입력하세요.',
           ),
           controller: _nameController,
-          onChanged: (name) => viewModel.action(ChangeName(name)),
+          onChanged: (name) => viewModel.action(ApplyPropertyOwnerAction.changeName(name)),
         ),
         AppTextField(
           viewState: const AppTextFieldViewState(
@@ -85,7 +85,7 @@ class _ApplyPropertyOwnerScreenState extends ConsumerState<ApplyPropertyOwnerScr
             keyboardType: AppTextFieldKeyboardType.number,
           ),
           controller: _phoneController,
-          onChanged: (phone) => viewModel.action(ChangePhone(phone)),
+          onChanged: (phone) => viewModel.action(ApplyPropertyOwnerAction.changePhone(phone)),
         ),
       ],
     );

@@ -30,7 +30,7 @@ class _FindPropertyScreenState extends ConsumerState<FindPropertyScreen> {
     super.dispose();
   }
 
-  void _onPriceChange() => ref.read(findPropertyVMProvider.notifier).changePrice(_priceController.value);
+  void _onPriceChange() => ref.read(findPropertyVMProvider.notifier).action(FindPropertyAction.changePrice(_priceController.value));
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +92,7 @@ class _FindPropertyScreenState extends ConsumerState<FindPropertyScreen> {
                   type: state.transactionType == type ? type.buttonType : OutlineButtonType.gray,
                   size: BoxButtonSize.large,
                   text: type.label,
-                  onTap: () => viewModel.selectTransactionType(type),
+                  onTap: () => viewModel.action(FindPropertyAction.selectTransactionType(type)),
                 ),
               ),
           ],
@@ -128,7 +128,7 @@ class _FindPropertyScreenState extends ConsumerState<FindPropertyScreen> {
                             : FillButtonType.gray,
                         size: BoxButtonSize.medium,
                         text: option.label,
-                        onTap: () => viewModel.togglePropertyType(option),
+                        onTap: () => viewModel.action(FindPropertyAction.togglePropertyType(option)),
                       ),
                     ),
                 ],

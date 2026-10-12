@@ -5,6 +5,35 @@ import 'package:vine_butler/features/apply_property/presentation/apply_property_
 final applyPropertyAddressVMProvider =
     NotifierProvider<ApplyPropertyAddressVM, ApplyPropertyAddressViewState>(ApplyPropertyAddressVM.new);
 
+sealed class ApplyPropertyAddressAction {
+  const ApplyPropertyAddressAction();
+
+  const factory ApplyPropertyAddressAction.search(String query) = _Search;
+  const factory ApplyPropertyAddressAction.select(AddressResultViewState address) = _Select;
+  const factory ApplyPropertyAddressAction.next() = _Next;
+  const factory ApplyPropertyAddressAction.reset() = _Reset;
+}
+
+class _Search extends ApplyPropertyAddressAction {
+  final String query;
+
+  const _Search(this.query);
+}
+
+class _Select extends ApplyPropertyAddressAction {
+  final AddressResultViewState address;
+
+  const _Select(this.address);
+}
+
+class _Next extends ApplyPropertyAddressAction {
+  const _Next();
+}
+
+class _Reset extends ApplyPropertyAddressAction {
+  const _Reset();
+}
+
 class ApplyPropertyAddressVM extends Notifier<ApplyPropertyAddressViewState> {
   static const List<AddressResultViewState> _mockAddresses = [
     AddressResultViewState(zipCode: '00000', address: '서울 동작구 장승배기로 70 동작구청', lotAddress: '상도동 123-4'),
@@ -19,36 +48,33 @@ class ApplyPropertyAddressVM extends Notifier<ApplyPropertyAddressViewState> {
   @override
   ApplyPropertyAddressViewState build() => const ApplyPropertyAddressViewState();
 
-  void search(String query) {
-    final keyword = _normalize(query);
-    state = ApplyPropertyAddressViewState(
-      query: query,
-      results: keyword.isEmpty
-          ? const []
-          : [for (final item in _mockAddresses) if (_normalize(item.address).contains(keyword)) item],
-    );
-  }
-
-  void select(AddressResultViewState address) {
-    state = state.copyWith(
-      results: const [],
-      selected: () => address,
-    );
-  }
-
-  void next() {
-    if (!state.isMapVisible) {
-      return;
+  void action(ApplyPropertyAddressAction action) {
+    switch (action) {
+      case _Search(:final query):
+        final keyword = _normalize(query);
+        state = ApplyPropertyAddressViewState(
+          query: query,
+          results: keyword.isEmpty
+              ? const []
+              : [for (final item in _mockAddresses) if (_normalize(item.address).contains(keyword)) item],
+        );
+      case _Select(:final address):
+        state = state.copyWith(
+          results: const [],
+          selected: () => address,
+        );
+      case _Next():
+        if (!state.isMapVisible) {
+          return;
+        }
+        state = state.copyWith(navigateTo: () => const ApplyPropertyOwnerRoute().location);
+      case _Reset():
+        state = const ApplyPropertyAddressViewState();
     }
-    state = state.copyWith(navigateTo: () => const ApplyPropertyOwnerRoute().location);
   }
 
   void popNavigation() {
     state = state.copyWith(navigateTo: () => null);
-  }
-
-  void reset() {
-    state = const ApplyPropertyAddressViewState();
   }
 
   String _normalize(String text) => text.replaceAll(' ', '');

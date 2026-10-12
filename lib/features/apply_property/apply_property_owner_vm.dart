@@ -6,18 +6,21 @@ final applyPropertyOwnerVMProvider =
 
 sealed class ApplyPropertyOwnerAction {
   const ApplyPropertyOwnerAction();
+
+  const factory ApplyPropertyOwnerAction.changeName(String name) = _ChangeName;
+  const factory ApplyPropertyOwnerAction.changePhone(String phone) = _ChangePhone;
 }
 
-class ChangeName extends ApplyPropertyOwnerAction {
+class _ChangeName extends ApplyPropertyOwnerAction {
   final String name;
 
-  const ChangeName(this.name);
+  const _ChangeName(this.name);
 }
 
-class ChangePhone extends ApplyPropertyOwnerAction {
+class _ChangePhone extends ApplyPropertyOwnerAction {
   final String phone;
 
-  const ChangePhone(this.phone);
+  const _ChangePhone(this.phone);
 }
 
 class ApplyPropertyOwnerVM extends Notifier<ApplyPropertyOwnerViewState> {
@@ -26,9 +29,9 @@ class ApplyPropertyOwnerVM extends Notifier<ApplyPropertyOwnerViewState> {
 
   void action(ApplyPropertyOwnerAction action) {
     switch (action) {
-      case ChangeName(:final name):
+      case _ChangeName(:final name):
         state = state.copyWith(name: name);
-      case ChangePhone(:final phone):
+      case _ChangePhone(:final phone):
         state = state.copyWith(phone: phone);
     }
   }

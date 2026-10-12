@@ -69,36 +69,42 @@ class PropertyListViewState {
 
 sealed class PropertyListAction {
   const PropertyListAction();
+
+  const factory PropertyListAction.search(String query) = _Search;
+  const factory PropertyListAction.changeFocus(bool hasFocus) = _ChangeFocus;
+  const factory PropertyListAction.selectSearchResult(int id) = _SelectSearchResult;
+  const factory PropertyListAction.pushFilter(bool isPresented) = _PushFilter;
+  const factory PropertyListAction.filtering(PropertyFilterData data) = _Filtering;
 }
 
-class Search extends PropertyListAction {
+class _Search extends PropertyListAction {
   final String query;
 
-  const Search(this.query);
+  const _Search(this.query);
 }
 
-class ChangeFocus extends PropertyListAction {
+class _ChangeFocus extends PropertyListAction {
   final bool hasFocus;
 
-  const ChangeFocus(this.hasFocus);
+  const _ChangeFocus(this.hasFocus);
 }
 
-class SelectSearchResult extends PropertyListAction {
+class _SelectSearchResult extends PropertyListAction {
   final int id;
 
-  const SelectSearchResult(this.id);
+  const _SelectSearchResult(this.id);
 }
 
-class PushFilter extends PropertyListAction {
+class _PushFilter extends PropertyListAction {
   final bool isPresented;
 
-  const PushFilter(this.isPresented);
+  const _PushFilter(this.isPresented);
 }
 
-class Filtering extends PropertyListAction {
+class _Filtering extends PropertyListAction {
   final PropertyFilterData data;
 
-  const Filtering(this.data);
+  const _Filtering(this.data);
 }
 
 class PropertyListVM extends Notifier<PropertyListViewState> {
@@ -307,23 +313,23 @@ class PropertyListVM extends Notifier<PropertyListViewState> {
 
   void action(PropertyListAction action) {
     switch (action) {
-      case Search(:final query):
+      case _Search(:final query):
         state = state.copyWith(query: query, isSearchCommitted: false);
-      case ChangeFocus(:final hasFocus):
+      case _ChangeFocus(:final hasFocus):
         state = state.copyWith(
           isSearchFocused: hasFocus,
           filter: hasFocus ? state.filter.copyWith(isFilterOpen: true) : null,
         );
-      case SelectSearchResult(:final id):
+      case _SelectSearchResult(:final id):
         state = state.copyWith(
           isSearchCommitted: true,
           isSearchFocused: false,
           filter: state.filter.copyWith(isFilterOpen: false),
           navigateTo: PropertyDetailRoute(id: id).location,
         );
-      case PushFilter(:final isPresented):
+      case _PushFilter(:final isPresented):
         state = state.copyWith(filter: state.filter.copyWith(isFilterOpen: isPresented));
-      case Filtering(:final data):
+      case _Filtering(:final data):
         state = state.copyWith(filter: state.filter.copyWith(data: data));
     }
   }
