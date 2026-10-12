@@ -58,7 +58,7 @@ class HomeScreen extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       spacing: 40,
       children: [
-        AppFontStyle.header3.text('어떻게 찾아 오셨나요?', TextColor.dark),
+        AppFontStyle.header1.text('어떻게 찾아 오셨나요?', TextColor.dark),
         ImageButton(
           image: 'Tab_Home_Enable',
           size: const Size(240, 120),
@@ -89,7 +89,7 @@ class HomeScreen extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       spacing: 40,
       children: [
-        AppFontStyle.header3.text('어떻게 찾아 오셨나요?', TextColor.dark),
+        AppFontStyle.header1.text('어떻게 찾아 오셨나요?', TextColor.dark),
         ImageButton(
           image: 'Tab_Home_Enable',
           size: const Size(120, 75),
@@ -140,7 +140,6 @@ class _HomeBannerState extends State<_HomeBanner> {
         _status = hasFocus ? AppBndSearchStatus.enable : AppBndSearchStatus.disable;
       }),
       onSearchTap: () {},
-      onFilterTap: () {},
     );
   }
 }
