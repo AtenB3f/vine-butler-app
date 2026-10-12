@@ -11,6 +11,7 @@ List<RouteBase> get $appRoutes => [
   $findPropertyRoute,
   $applyPropertyRoute,
   $applyPropertyAddressRoute,
+  $applyPropertyOwnerRoute,
   $propertyDetailRoute,
 ];
 
@@ -179,6 +180,33 @@ mixin $ApplyPropertyAddressRoute on GoRouteData {
 
   @override
   String get location => GoRouteData.$location('/apply-property/address');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $applyPropertyOwnerRoute => GoRouteData.$route(
+  path: '/apply-property/owner',
+  hasOverriddenOnExit: false,
+  factory: $ApplyPropertyOwnerRoute._fromState,
+);
+
+mixin $ApplyPropertyOwnerRoute on GoRouteData {
+  static ApplyPropertyOwnerRoute _fromState(GoRouterState state) =>
+      const ApplyPropertyOwnerRoute();
+
+  @override
+  String get location => GoRouteData.$location('/apply-property/owner');
 
   @override
   void go(BuildContext context) => context.go(location);

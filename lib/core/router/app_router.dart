@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vine_butler/components/main_shell.dart';
 import 'package:vine_butler/features/apply_property/presentation/screens/apply_property_address_screen.dart';
+import 'package:vine_butler/features/apply_property/presentation/screens/apply_property_owner_screen.dart';
 import 'package:vine_butler/features/apply_property/presentation/screens/apply_property_type_screen.dart';
 import 'package:vine_butler/features/find_property/presentation/screens/find_property_screen.dart';
 import 'package:vine_butler/features/home/presentation/screens/home_screen.dart';
@@ -103,6 +104,14 @@ class ApplyPropertyAddressRoute extends GoRouteData with $ApplyPropertyAddressRo
 
   @override
   Widget build(BuildContext context, GoRouterState state) => const ApplyPropertyAddressScreen();
+}
+
+@TypedGoRoute<ApplyPropertyOwnerRoute>(path: '/apply-property/owner')
+class ApplyPropertyOwnerRoute extends GoRouteData with $ApplyPropertyOwnerRoute {
+  const ApplyPropertyOwnerRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const ApplyPropertyOwnerScreen();
 }
 
 @TypedGoRoute<PropertyDetailRoute>(path: '/property/:id')

@@ -77,6 +77,7 @@ class _AppTextFieldState extends State<AppTextField> {
                 child: TextField(
                   controller: widget.controller,
                   focusNode: _focusNode,
+                  keyboardType: viewState.keyboardType == AppTextFieldKeyboardType.number ? TextInputType.number : null,
                   style: AppFontStyle.body2.style(TextColor.dark),
                   onChanged: widget.onChanged,
                   decoration: InputDecoration(

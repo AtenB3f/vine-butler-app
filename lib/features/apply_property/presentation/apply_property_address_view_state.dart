@@ -2,11 +2,13 @@ class ApplyPropertyAddressViewState {
   final String query;
   final List<AddressResultViewState> results;
   final AddressResultViewState? selected;
+  final String? navigateTo;
 
   const ApplyPropertyAddressViewState({
     this.query = '',
     this.results = const [],
     this.selected,
+    this.navigateTo,
   });
 
   bool get isNotFound => query.isNotEmpty && selected == null && results.isEmpty;
@@ -17,11 +19,13 @@ class ApplyPropertyAddressViewState {
     String? query,
     List<AddressResultViewState>? results,
     AddressResultViewState? Function()? selected,
+    String? Function()? navigateTo,
   }) {
     return ApplyPropertyAddressViewState(
       query: query ?? this.query,
       results: results ?? this.results,
       selected: selected != null ? selected() : this.selected,
+      navigateTo: navigateTo != null ? navigateTo() : this.navigateTo,
     );
   }
 }

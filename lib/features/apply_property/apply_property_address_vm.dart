@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vine_butler/core/router/app_router.dart';
 import 'package:vine_butler/features/apply_property/presentation/apply_property_address_view_state.dart';
 
 final applyPropertyAddressVMProvider =
@@ -33,6 +34,17 @@ class ApplyPropertyAddressVM extends Notifier<ApplyPropertyAddressViewState> {
       results: const [],
       selected: () => address,
     );
+  }
+
+  void next() {
+    if (!state.isMapVisible) {
+      return;
+    }
+    state = state.copyWith(navigateTo: () => const ApplyPropertyOwnerRoute().location);
+  }
+
+  void popNavigation() {
+    state = state.copyWith(navigateTo: () => null);
   }
 
   void reset() {

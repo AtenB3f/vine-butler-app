@@ -26,6 +26,13 @@ class _ApplyPropertyAddressScreenState extends ConsumerState<ApplyPropertyAddres
     final state = ref.watch(applyPropertyAddressVMProvider);
     final viewModel = ref.read(applyPropertyAddressVMProvider.notifier);
 
+    ref.listen(applyPropertyAddressVMProvider.select((state) => state.navigateTo), (_, navigateTo) {
+      if (navigateTo != null) {
+        context.push(navigateTo);
+        viewModel.popNavigation();
+      }
+    });
+
     ref.listen(applyPropertyAddressVMProvider.select((state) => state.selected), (_, selected) {
       if (selected == null) {
         _controller.clear();
@@ -191,7 +198,7 @@ class _ApplyPropertyAddressScreenState extends ConsumerState<ApplyPropertyAddres
             type: state.isMapVisible ? FillButtonType.medium : FillButtonType.gray,
             size: BoxButtonSize.large,
             text: '다음',
-            onTap: () {},
+            onTap: viewModel.next,
           ),
         ],
       ),
