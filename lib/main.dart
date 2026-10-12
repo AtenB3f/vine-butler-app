@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vine_butler/components/components.dart';
 import 'package:vine_butler/core/router/app_router.dart';
 
 void main() {
@@ -14,6 +15,7 @@ class VineButlerApp extends StatelessWidget {
     return MaterialApp.router(
       theme: ThemeData(
         fontFamily: 'Pretendard',
+        datePickerTheme: AppPickerTheme.date,
       ),
       routerConfig: appRouter,
     );

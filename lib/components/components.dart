@@ -2,6 +2,7 @@ export 'alignment.dart';
 export 'color.dart';
 export 'font.dart';
 export 'image.dart';
+export 'picker.dart';
 export 'responsive.dart';
 export 'widgets/buttons/button_size.dart';
 export 'widgets/buttons/fill_button.dart';
