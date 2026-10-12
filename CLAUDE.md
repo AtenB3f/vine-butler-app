@@ -8,8 +8,8 @@
 지도 SDK를 연동하여 매물 주소와 연동되어 지도로 표시 가능하도록 함.
 추후 백엔드를 연동할 경우 네이버 부동산에서 검색한 내용을 크롤링한 데이터도 표기 가능하도록 할 예정.
 
-- **타겟 플랫폼**: Android / iOS / Windows
-- **최소 지원 버전**: Android 6.0 (API 23) / iOS 16.0 / Windows 10
+- **타겟 플랫폼**: iOS / macOS / Windows / Android
+- **최소 지원 버전**: iOS 15.0 / macOS 12.0 / Windows 10 / Android 6.0 (API 23)
 - **현재 버전**: 1.0.0
 
 ## 기술 스택
@@ -18,7 +18,8 @@
 |---|---|---|
 | 상태관리 | flutter_riverpod | ^3.2.1 |
 | 라우터 | go_router + go_router_builder (typed route) | ^18.0.1 |
-| 로컬 DB | Isar (예정) | — |
+| 로컬 DB | drift + drift_flutter (SQLite), drift_dev (dev) | ^2.35.2 / ^0.3.1 / ^2.35.1 |
+| UUID 생성 | uuid | ^4.6.0 |
 | 백엔드 | [추후 연동] | — |
 
 Dart SDK: `^3.9.2`
@@ -33,14 +34,14 @@ Dart SDK: `^3.9.2`
 
 ## 개발 순서 (순차적 진행)
 
-**1단계: UI 컴포넌트 개발**
-- 재사용 가능한 기본 위젯 구축 (버튼, 입력창, 카드, 바텀시트 등)
-- 디자인 시스템 기초 작성
+**1단계: UI 컴포넌트 개발 (완료)**
+- 재사용 가능한 기본 위젯 구축 (버튼, 입력창, 카드, 바텀시트 등) — `lib/components/widgets/` 하위에 버튼, 태그, 텍스트필드, 체크박스, 라디오, 토글, 슬라이더, 툴팁, 토스트, 얼럿 다이얼로그, 바텀시트, 인디케이터, 스피너, 탭바, BND 등 구현
+- 디자인 시스템 기초 작성 — `lib/components/color.dart`(컬러), `font.dart`(타이포), `image.dart`(아이콘)에 Figma 변수/이펙트와 동기화된 토큰 정의
 
-**2단계: 뼈대 레이아웃 작성**
-- 네비게이션 구조 구현 (go_router 설정)
-- 화면 전환 / 팝업 표시 로직
-- 주요 탭/페이지 뼈대
+**2단계: 뼈대 레이아웃 작성 (완료)**
+- 네비게이션 구조 구현 (go_router 설정) — `lib/core/router/app_router.dart`에 `StatefulShellRoute`(매물/홈/지도 3탭) + `TypedGoRoute` 기반 하위 라우트(찾기/등록/상세) 구성
+- 화면 전환 / 팝업 표시 로직 — ViewModel의 `navigateTo` 이벤트 필드 + View의 `ref.listen` 패턴(`home_vm.dart`/`home_screen.dart` 예시) 적용, `showAppAlertDialog`/`showAppBottomSheet`/`showAppToast` 팝업 표시 함수 구현
+- 주요 탭/페이지 뼈대 — `MainShell` + `Tabbar`로 매물/홈/지도 탭 전환 구현, 찾기·등록·상세 페이지는 뼈대만 존재 (세부 레이아웃은 3단계에서 진행)
 
 **3단계: 세부 페이지 UI 레이아웃** (API 없이 선 작업 가능)
 - 매물 리스트 페이지 (검색/필터 UI)
@@ -49,8 +50,10 @@ Dart SDK: `^3.9.2`
 - 매물 삭제 기능 UI
 
 **4단계: 로컬 저장 기능 추가**
-- Isar DB 연동
-- Property 모델 정의 (Freezed + Isar)
+- Drift DB 연동
+- Property 모델 정의 — 도메인 모델은 Freezed, 저장용 테이블은 Drift로 분리하고 Repository 구현체에서 매핑
+- 동기화 대비 식별자·필드 포함: 기본키는 앱에서 생성한 UUID(`id`), `updatedAt`, `deletedAt`(소프트 삭제, 삭제 시 행을 지우지 않고 표시), `syncStatus`(`pending` / `synced`, 기본값 `pending`)
+- 서버 DB 기본키는 숫자 `id`를 유지하고 앱 UUID는 `uuid` 컬럼(UNIQUE)으로 매핑됨 (백엔드 설계 기준)
 - Repository / UseCase 구현
 - Riverpod Notifier로 상태 관리
 
@@ -64,6 +67,8 @@ Dart SDK: `^3.9.2`
 
 **7단계: 백엔드 연동 (2차 릴리즈 준비)**
 - vine-butler-backend API/클라우드 세팅 완료 후 매물 정보 서버 업로드 연동
+- 기존 로컬 데이터 동기화: `syncStatus == pending`인 매물을 UUID 기준 upsert로 일괄 업로드(재시도 안전) → 성공 시 `synced`로 변경, 이후 `updatedSince` 기준으로 서버 변경분(크롤링 데이터 포함)을 받아 로컬에 반영
+- 충돌 처리는 1차에서 마지막 수정(`updatedAt`) 우선
 - 로그인 기능 추가
 - 백엔드에서 크롤링한 부동산 정보(네이버 부동산 등) 반영을 위한 UI 수정
 - 완료 후 앱 업데이트 배포
@@ -184,6 +189,7 @@ dart run build_runner build --delete-conflicting-outputs
   해당 라우트의 `.location`을 사용 (예: `FindPropertyRoute().location`)
 
 ### 기타
+- UI 작업 패턴(레이아웃, 컴포넌트, VM Action, 네비게이션 등)은 `.claude/ui_patterns.md` 참고
 
 ## Claude에게 주는 지침
 
