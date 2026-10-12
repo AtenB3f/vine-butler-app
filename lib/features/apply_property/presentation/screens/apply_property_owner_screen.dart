@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vine_butler/components/components.dart';
 import 'package:vine_butler/features/apply_property/apply_property_owner_vm.dart';
 import 'package:vine_butler/features/apply_property/presentation/apply_property_owner_view_state.dart';
+import 'package:vine_butler/shared/extensions/extensions.dart';
 import 'package:vine_butler/shared/utils/utils.dart';
 
 class ApplyPropertyOwnerScreen extends ConsumerStatefulWidget {
@@ -31,12 +32,11 @@ class _ApplyPropertyOwnerScreenState extends ConsumerState<ApplyPropertyOwnerScr
     final state = ref.watch(applyPropertyOwnerVMProvider);
     final viewModel = ref.read(applyPropertyOwnerVMProvider.notifier);
 
-    ref.listen(applyPropertyOwnerVMProvider.select((state) => state.navigateTo), (_, navigateTo) {
-      if (navigateTo != null) {
-        context.push(navigateTo);
-        viewModel.action(const ApplyPropertyOwnerAction.popNavigation());
-      }
-    });
+    ref.handleEvent(
+      applyPropertyOwnerVMProvider.select((state) => state.navigateTo),
+      consume: () => viewModel.action(const ApplyPropertyOwnerAction.popNavigation()),
+      onEvent: (location) => context.push(location),
+    );
 
     return AppScaffold(
       title: '매물 등록',

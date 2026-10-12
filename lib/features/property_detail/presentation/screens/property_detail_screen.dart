@@ -21,13 +21,11 @@ class PropertyDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.listen<PropertyDetailViewState>(propertyDetailVMProvider(id), (previous, next) {
-      final navigateTo = next.navigateTo;
-      if (navigateTo != null) {
-        context.push(navigateTo);
-        ref.read(propertyDetailVMProvider(id).notifier).popNavigation();
-      }
-    });
+    ref.handleEvent(
+      propertyDetailVMProvider(id).select((state) => state.navigateTo),
+      consume: ref.read(propertyDetailVMProvider(id).notifier).popNavigation,
+      onEvent: (location) => context.push(location),
+    );
 
     final state = ref.watch(propertyDetailVMProvider(id));
 

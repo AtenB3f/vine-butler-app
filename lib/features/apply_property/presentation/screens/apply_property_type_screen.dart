@@ -45,12 +45,11 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
     final state = ref.watch(applyPropertyTypeVMProvider);
     final viewModel = ref.read(applyPropertyTypeVMProvider.notifier);
 
-    ref.listen(applyPropertyTypeVMProvider.select((state) => state.navigateTo), (_, navigateTo) {
-      if (navigateTo != null) {
-        context.push(navigateTo);
-        viewModel.popNavigation();
-      }
-    });
+    ref.handleEvent(
+      applyPropertyTypeVMProvider.select((state) => state.navigateTo),
+      consume: viewModel.popNavigation,
+      onEvent: (location) => context.push(location),
+    );
 
     ref.listen(applyPropertyTypeVMProvider.select((state) => state.price), (_, price) {
       if (_priceController.value != price) {

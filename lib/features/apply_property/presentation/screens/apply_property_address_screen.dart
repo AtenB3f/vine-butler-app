@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vine_butler/components/components.dart';
 import 'package:vine_butler/features/apply_property/apply_property_address_vm.dart';
 import 'package:vine_butler/features/apply_property/presentation/apply_property_address_view_state.dart';
+import 'package:vine_butler/shared/extensions/extensions.dart';
 
 class ApplyPropertyAddressScreen extends ConsumerStatefulWidget {
   const ApplyPropertyAddressScreen({super.key});
@@ -26,12 +27,11 @@ class _ApplyPropertyAddressScreenState extends ConsumerState<ApplyPropertyAddres
     final state = ref.watch(applyPropertyAddressVMProvider);
     final viewModel = ref.read(applyPropertyAddressVMProvider.notifier);
 
-    ref.listen(applyPropertyAddressVMProvider.select((state) => state.navigateTo), (_, navigateTo) {
-      if (navigateTo != null) {
-        context.push(navigateTo);
-        viewModel.popNavigation();
-      }
-    });
+    ref.handleEvent(
+      applyPropertyAddressVMProvider.select((state) => state.navigateTo),
+      consume: viewModel.popNavigation,
+      onEvent: (location) => context.push(location),
+    );
 
     ref.listen(applyPropertyAddressVMProvider.select((state) => state.selected), (_, selected) {
       if (selected == null) {
