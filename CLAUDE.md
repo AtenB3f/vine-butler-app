@@ -50,9 +50,9 @@ Dart SDK: `^3.9.2`
 - 매물 삭제 기능 UI
 
 **4단계: 로컬 저장 기능 추가**
-- Drift DB 연동
+- Drift DB 연동 — `lib/data/local/` (구현 완료: `PropertyTable`, `AppDatabase`)
 - Property 모델 정의 — 도메인 모델은 Freezed, 저장용 테이블은 Drift로 분리하고 Repository 구현체에서 매핑
-- 동기화 대비 식별자·필드 포함: 기본키는 앱에서 생성한 UUID(`id`), `updatedAt`, `deletedAt`(소프트 삭제, 삭제 시 행을 지우지 않고 표시), `syncStatus`(`pending` / `synced`, 기본값 `pending`)
+- 동기화 대비 식별자·필드 포함: 기본키는 앱에서 생성한 UUID(`id`), `updatedAt`, `deletedAt`(소프트 삭제, 삭제 시 행을 지우지 않고 표시), `syncedAt`(nullable, 마지막으로 동기화된 시점의 `updatedAt` 값. `syncedAt == null || updatedAt > syncedAt`이면 동기화 필요)
 - 서버 DB 기본키는 숫자 `id`를 유지하고 앱 UUID는 `uuid` 컬럼(UNIQUE)으로 매핑됨 (백엔드 설계 기준)
 - Repository / UseCase 구현
 - Riverpod Notifier로 상태 관리
@@ -67,7 +67,7 @@ Dart SDK: `^3.9.2`
 
 **7단계: 백엔드 연동 (2차 릴리즈 준비)**
 - vine-butler-backend API/클라우드 세팅 완료 후 매물 정보 서버 업로드 연동
-- 기존 로컬 데이터 동기화: `syncStatus == pending`인 매물을 UUID 기준 upsert로 일괄 업로드(재시도 안전) → 성공 시 `synced`로 변경, 이후 `updatedSince` 기준으로 서버 변경분(크롤링 데이터 포함)을 받아 로컬에 반영
+- 기존 로컬 데이터 동기화: 동기화 필요(`syncedAt == null || updatedAt > syncedAt`)한 매물을 UUID 기준 upsert로 일괄 업로드(재시도 안전) → 성공 시 업로드한 시점의 `updatedAt` 값을 `syncedAt`에 기록, 이후 `updatedSince` 기준으로 서버 변경분(크롤링 데이터 포함)을 받아 로컬에 반영
 - 충돌 처리는 1차에서 마지막 수정(`updatedAt`) 우선
 - 로그인 기능 추가
 - 백엔드에서 크롤링한 부동산 정보(네이버 부동산 등) 반영을 위한 UI 수정
@@ -82,28 +82,23 @@ lib/
   main.dart
   core/
     router/              # go_router 설정
+    di/                  # Riverpod provider (DB, Repository 구현체를 인터페이스 타입으로 노출)
     theme/               # 앱 테마, 색상, 텍스트 스타일
     constants/           # 전역 상수
     network/             # dio 인스턴스, 인터셉터
+  domain/                # 순수 Dart (Drift/Flutter 의존 금지)
+    model/               # 도메인 모델(Freezed)
+    repository/          # Repository 인터페이스
+    usecase/             # UseCase
+  data/
+    local/
+      app_database.dart  # Drift DB
+      tables/            # Drift 테이블 정의
+    mapper/              # Drift Row <-> 도메인 모델
+    repository/          # Repository 구현체
   features/
-    property/            # 매물
-      domain/            # 모델(Freezed), Repository 인터페이스
-      data/
-        local/           # 로컬 DB 접근 (Isar 등)
-        remote/          # 백엔드 API (추후)
-      presentation/
-        screens/         # 화면 위젯
-        widgets/         # 매물 전용 위젯
-        providers/       # Notifier (ViewModel)
-    auth/                # 로그인
-      domain/
-      data/
-      presentation/
-    map/                 # 지도 SDK 연동
-      presentation/
-        screens/
-        widgets/
-        providers/
+    apply_property/ property_list/ property_detail/ map/ ...
+      presentation/      # 화면, ViewState, VM (domain 인터페이스만 참조)
   components/
     widgets/             # 공통 재사용 위젯
   shared/
