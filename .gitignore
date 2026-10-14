@@ -298,3 +298,6 @@ fabric.properties
 .vscode/
 .claude/settings.local.json
 devtools_options.yaml
+
+# API keys (dart-define-from-file)
+env.json
