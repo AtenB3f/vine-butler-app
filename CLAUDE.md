@@ -122,6 +122,9 @@ flutter run
 # 특정 디바이스 지정 실행
 flutter run -d [device-id]
 
+# API 키 주입 실행 (env.json에 NAVER_MAPS_CLIENT_ID / NAVER_MAPS_CLIENT_SECRET 작성, env.json은 gitignore)
+flutter run --dart-define-from-file=env.json
+
 # 릴리즈 빌드 확인
 flutter build apk --release
 flutter build ios --release
