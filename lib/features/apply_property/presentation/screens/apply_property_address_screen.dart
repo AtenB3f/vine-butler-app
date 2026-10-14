@@ -27,10 +27,21 @@ class _ApplyPropertyAddressScreenState extends ConsumerState<ApplyPropertyAddres
     final state = ref.watch(applyPropertyAddressVMProvider);
     final viewModel = ref.read(applyPropertyAddressVMProvider.notifier);
 
+    // 네비게이션
     ref.handleEvent(
       applyPropertyAddressVMProvider.select((state) => state.navigateTo),
       consume: viewModel.popNavigation,
       onEvent: (location) => context.push(location),
+    );
+
+    // 에러 토스트
+    ref.handleEvent(
+      applyPropertyAddressVMProvider.select((state) => state.errorMessage),
+      consume: () => viewModel.action(const ApplyPropertyAddressAction.clearError()),
+      onEvent: (message) => showAppToast(
+        context,
+        AppToastViewState(type: AppToastType.warning, text: message, hasLink: false),
+      ),
     );
 
     ref.listen(applyPropertyAddressVMProvider.select((state) => state.selected), (_, selected) {
@@ -150,12 +161,24 @@ class _ApplyPropertyAddressScreenState extends ConsumerState<ApplyPropertyAddres
       );
     }
 
-    return ListView.separated(
-      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
-      itemCount: state.results.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 10),
-      itemBuilder: (_, index) => _resultItem(state.results[index], viewModel),
+    return NotificationListener<ScrollNotification>(
+      onNotification: (notification) {
+        if (notification.metrics.extentAfter < 200) {
+          viewModel.action(const ApplyPropertyAddressAction.loadMore());
+        }
+        return false;
+      },
+      child: ListView.separated(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
+        itemCount: state.results.length + (state.isLoading ? 1 : 0),
+        separatorBuilder: (_, _) => const SizedBox(height: 10),
+        itemBuilder: (_, index) => index < state.results.length
+            ? _resultItem(state.results[index], viewModel)
+            : const Center(
+                child: AppLoadingSpinner(viewState: AppLoadingSpinnerViewState(size: AppLoadingSpinnerSize.small)),
+              ),
+      ),
     );
   }
 
@@ -195,7 +218,7 @@ class _ApplyPropertyAddressScreenState extends ConsumerState<ApplyPropertyAddres
               onTap: () => viewModel.action(const ApplyPropertyAddressAction.reset()),
             ),
           FillButton(
-            type: state.isMapVisible ? FillButtonType.medium : FillButtonType.gray,
+            type: state.canProceed ? FillButtonType.medium : FillButtonType.gray,
             size: BoxButtonSize.large,
             text: '다음',
             onTap: () => viewModel.action(const ApplyPropertyAddressAction.next()),

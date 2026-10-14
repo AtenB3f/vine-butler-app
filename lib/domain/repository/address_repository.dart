@@ -1,5 +1,7 @@
-import 'package:vine_butler/domain/model/address.dart';
+import 'package:vine_butler/domain/model/address_page.dart';
 
 abstract class AddressRepository {
-  Future<List<Address>> search(String query, {({double latitude, double longitude})? coordinate});
+  Future<AddressPage> search(String query, {int page = 1});
+
+  Future<({double latitude, double longitude})?> locate(String roadAddress);
 }

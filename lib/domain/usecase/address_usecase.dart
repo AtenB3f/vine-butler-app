@@ -1,4 +1,6 @@
 import 'package:vine_butler/domain/model/address.dart';
+import 'package:vine_butler/domain/model/address_candidate.dart';
+import 'package:vine_butler/domain/model/address_page.dart';
 import 'package:vine_butler/domain/repository/address_repository.dart';
 
 class AddressUseCase {
@@ -6,11 +8,19 @@ class AddressUseCase {
 
   final AddressRepository _repository;
 
-  Future<List<Address>> search(String query, {({double latitude, double longitude})? coordinate}) async {
+  Future<AddressPage> search(String query, {int page = 1}) async {
     final keyword = query.trim();
     if (keyword.isEmpty) {
-      return const [];
+      return const AddressPage(addresses: [], totalCount: 0);
     }
-    return _repository.search(keyword, coordinate: coordinate);
+    return _repository.search(keyword, page: page);
+  }
+
+  Future<Address?> locate(AddressCandidate candidate) async {
+    final coordinate = await _repository.locate(candidate.baseRoadAddress);
+    if (coordinate == null) {
+      return null;
+    }
+    return candidate.toAddress(latitude: coordinate.latitude, longitude: coordinate.longitude);
   }
 }
