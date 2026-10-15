@@ -56,7 +56,7 @@ class _ApplyPropertyOwnerScreenState extends ConsumerState<ApplyPropertyOwnerScr
                 spacing: 40,
                 children: [
                   _title(),
-                  _fields(viewModel),
+                  _fields(state, viewModel),
                 ],
               ),
             ),
@@ -69,12 +69,12 @@ class _ApplyPropertyOwnerScreenState extends ConsumerState<ApplyPropertyOwnerScr
 
   Widget _title() {
     return Padding(
-      padding: const EdgeInsets.only(top: 100, bottom: 16),
+      padding: const EdgeInsets.only(top: 64),
       child: AppFontStyle.header1.text('성함과 휴대폰 번호를\n알려주세요.', TextColor.dark),
     );
   }
 
-  Widget _fields(ApplyPropertyOwnerVM viewModel) {
+  Widget _fields(ApplyPropertyOwnerViewState state, ApplyPropertyOwnerVM viewModel) {
     return Column(
       spacing: 16,
       children: [
@@ -91,11 +91,12 @@ class _ApplyPropertyOwnerScreenState extends ConsumerState<ApplyPropertyOwnerScr
         ),
         AppTextField(
           key: _phoneKey,
-          viewState: const AppTextFieldViewState(
-            status: AppTextFieldStatus.normal,
+          viewState: AppTextFieldViewState(
+            status: state.hasPhoneError ? AppTextFieldStatus.error : AppTextFieldStatus.normal,
             title: '전화번호',
             placeholder: '숫자만 입력해주세요.',
             keyboardType: AppTextFieldKeyboardType.number,
+            errorText: '전화번호 형식이 올바르지 않습니다.',
           ),
           controller: _phoneController,
           onChange: (phone) => viewModel.action(ApplyPropertyOwnerAction.changePhone(phone)),
@@ -122,6 +123,10 @@ class _ApplyPropertyOwnerScreenState extends ConsumerState<ApplyPropertyOwnerScr
   }
 
   void _focus(GlobalKey key, bool hasFocus) {
-    if (hasFocus) { setState(() => _focusedKey = key); }
+    if (hasFocus) {
+      setState(() => _focusedKey = key);
+    } else if (_focusedKey == key) {
+      setState(() => _focusedKey = null);
+    }
   }
 }

@@ -13,6 +13,8 @@ class ApplyPropertyOwnerViewState {
 
   bool get isPhoneValid => _phonePattern.hasMatch(phone);
 
+  bool get hasPhoneError => phone.isNotEmpty && !isPhoneValid;
+
   bool get isCompleted => name.trim().isNotEmpty && isPhoneValid;
 
   ApplyPropertyOwnerViewState copyWith({
