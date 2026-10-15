@@ -18,6 +18,12 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
       ValueNotifier(ref.read(applyPropertyTypeVMProvider).price);
   late final ValueNotifier<double> _monthlyRentController =
       ValueNotifier(ref.read(applyPropertyTypeVMProvider).monthlyRent);
+  late final TextEditingController _priceTextController =
+      TextEditingController(text: ref.read(applyPropertyTypeVMProvider).price.formattedKRW);
+  late final TextEditingController _monthlyRentTextController =
+      TextEditingController(text: ref.read(applyPropertyTypeVMProvider).monthlyRent.formattedKRW);
+  bool _isPriceEditing = false;
+  bool _isMonthlyRentEditing = false;
 
   @override
   void initState() {
@@ -32,6 +38,8 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
     _monthlyRentController.removeListener(_onMonthlyRentChange);
     _priceController.dispose();
     _monthlyRentController.dispose();
+    _priceTextController.dispose();
+    _monthlyRentTextController.dispose();
     super.dispose();
   }
 
@@ -53,6 +61,12 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
 
     ref.listen(applyPropertyTypeVMProvider.select((state) => state.price), (_, price) {
       if (_priceController.value != price) { _priceController.value = price; }
+      if (!_isPriceEditing) { _priceTextController.text = price.formattedKRW; }
+    });
+
+    ref.listen(applyPropertyTypeVMProvider.select((state) => state.monthlyRent), (_, monthlyRent) {
+      if (_monthlyRentController.value != monthlyRent) { _monthlyRentController.value = monthlyRent; }
+      if (!_isMonthlyRentEditing) { _monthlyRentTextController.text = monthlyRent.formattedKRW; }
     });
 
     return AppScaffold(
@@ -71,7 +85,7 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
                   _title(),
                   _transaction(state, viewModel),
                   _propertyType(state, viewModel),
-                  _price(state),
+                  _price(state, viewModel),
                 ],
               ),
             ),
@@ -143,13 +157,12 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
     );
   }
 
-  Widget _price(ApplyPropertyTypeViewState state) {
+  Widget _price(ApplyPropertyTypeViewState state, ApplyPropertyTypeVM viewModel) {
     return Column(
       spacing: 16,
       children: [
         _slider(
           label: state.priceLabel,
-          value: state.price,
           viewState: AppSliderViewState(
             size: AppSliderSize.medium,
             min: state.minPrice,
@@ -157,11 +170,20 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
             distance: ApplyPropertyTypeViewState.priceDistance,
           ),
           controller: _priceController,
+          textController: _priceTextController,
+          onFocus: (hasFocus) {
+            _isPriceEditing = hasFocus;
+            _onAmountFocus(
+              hasFocus: hasFocus,
+              textController: _priceTextController,
+              value: () => ref.read(applyPropertyTypeVMProvider).price,
+              apply: (amount) => viewModel.action(ApplyPropertyTypeAction.changePrice(amount)),
+            );
+          },
         ),
         if (state.isMonthlyRentVisible)
           _slider(
             label: '월세',
-            value: state.monthlyRent,
             viewState: const AppSliderViewState(
               size: AppSliderSize.medium,
               min: ApplyPropertyTypeViewState.minMonthlyRent,
@@ -169,16 +191,54 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
               distance: ApplyPropertyTypeViewState.monthlyRentDistance,
             ),
             controller: _monthlyRentController,
+            textController: _monthlyRentTextController,
+            onFocus: (hasFocus) {
+              _isMonthlyRentEditing = hasFocus;
+              _onAmountFocus(
+                hasFocus: hasFocus,
+                textController: _monthlyRentTextController,
+                value: () => ref.read(applyPropertyTypeVMProvider).monthlyRent,
+                apply: (amount) => viewModel.action(ApplyPropertyTypeAction.changeMonthlyRent(amount)),
+              );
+            },
           ),
       ],
     );
   }
 
+  /// 금액 입력란 포커스 처리
+  ///
+  /// - 포커스를 얻으면 원 단위 숫자로 바꾸고 전체 선택
+  /// - 포커스가 풀리면 숫자를 반영하고 다시 `○억 ○만원` 형식으로 표시 (숫자가 아니면 원래 금액으로 되돌림)
+  void _onAmountFocus({
+    required bool hasFocus,
+    required TextEditingController textController,
+    required double Function() value,
+    required void Function(double amount) apply,
+  }) {
+    if (hasFocus) {
+      final digits = '${value().toInt()}';
+
+      textController.value = TextEditingValue(
+        text: digits,
+        selection: TextSelection(baseOffset: 0, extentOffset: digits.length),
+      );
+      return;
+    }
+
+    final amount = double.tryParse(textController.text);
+
+    if (amount != null) { apply(amount); }
+
+    textController.text = value().formattedKRW;
+  }
+
   Widget _slider({
     required String label,
-    required double value,
     required AppSliderViewState viewState,
     required ValueNotifier<double> controller,
+    required TextEditingController textController,
+    required ValueChanged<bool> onFocus,
   }) {
     return Column(
       spacing: 10,
@@ -188,10 +248,14 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
           children: [
             AppFontStyle.bold1.text(label, TextColor.medium),
             Expanded(
-              child: Text(
-                value.formattedKRW,
-                style: AppFontStyle.sub3.style(TextColor.dark),
-                textAlign: TextAlign.right,
+              child: BasicTextField(
+                viewState: BasicTextFieldViewState(
+                  style: AppFontStyle.sub3.style(TextColor.dark),
+                  textAlign: TextAlign.right,
+                  keyboardType: AppTextFieldKeyboardType.number,
+                ),
+                controller: textController,
+                onFocus: onFocus,
               ),
             ),
           ],

@@ -74,7 +74,9 @@ class ApplyPropertyTypeVM extends Notifier<ApplyPropertyTypeViewState> {
           transactionType: () => state.transactionType == type ? null : type,
         );
 
-        state = selected.copyWith(price: selected.midPrice);
+        final isInRange = selected.price >= selected.minPrice && selected.price <= selected.maxPrice;
+
+        state = isInRange ? selected : selected.copyWith(price: selected.midPrice);
 
       case _SelectPropertyType(:final option):
         state = state.copyWith(

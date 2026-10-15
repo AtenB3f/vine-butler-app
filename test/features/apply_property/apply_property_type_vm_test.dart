@@ -1,0 +1,77 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:vine_butler/domain/property_type.dart';
+import 'package:vine_butler/features/apply_property/apply_property_type_vm.dart';
+import 'package:vine_butler/features/apply_property/presentation/apply_property_type_view_state.dart';
+
+void main() {
+  late ProviderContainer container;
+
+  ApplyPropertyTypeViewState state() => container.read(applyPropertyTypeVMProvider);
+  void action(ApplyPropertyTypeAction action) => container.read(applyPropertyTypeVMProvider.notifier).action(action);
+
+  setUp(() {
+    container = ProviderContainer();
+    action(const ApplyPropertyTypeAction.selectTransactionType(PropertyTransactionType.rent));
+  });
+
+  tearDown(() => container.dispose());
+
+  group('금액', () {
+    test('최대보다 큰 값도 입력한 그대로 둔다', () {
+      action(ApplyPropertyTypeAction.changePrice(state().maxPrice + 1));
+
+      expect(state().price, state().maxPrice + 1);
+    });
+
+    test('최소보다 작은 값도 입력한 그대로 둔다', () {
+      action(ApplyPropertyTypeAction.changePrice(state().minPrice - 1));
+
+      expect(state().price, state().minPrice - 1);
+    });
+
+    test('범위 안이면 입력한 값 그대로 둔다', () {
+      action(const ApplyPropertyTypeAction.changePrice(123456789));
+
+      expect(state().price, 123456789);
+    });
+  });
+
+  group('월세', () {
+    test('최대보다 큰 값도 입력한 그대로 둔다', () {
+      action(const ApplyPropertyTypeAction.changeMonthlyRent(ApplyPropertyTypeViewState.maxMonthlyRent + 1));
+
+      expect(state().monthlyRent, ApplyPropertyTypeViewState.maxMonthlyRent + 1);
+    });
+
+    test('최소보다 작은 값도 입력한 그대로 둔다', () {
+      action(const ApplyPropertyTypeAction.changeMonthlyRent(0));
+
+      expect(state().monthlyRent, 0);
+    });
+
+    test('범위 안이면 입력한 값 그대로 둔다', () {
+      action(const ApplyPropertyTypeAction.changeMonthlyRent(555555));
+
+      expect(state().monthlyRent, 555555);
+    });
+  });
+
+  group('거래 유형 전환', () {
+    test('입력한 금액이 새 범위 안이면 그대로 둔다', () {
+      action(const ApplyPropertyTypeAction.changePrice(300000000));
+
+      action(const ApplyPropertyTypeAction.selectTransactionType(PropertyTransactionType.depositOnly));
+
+      expect(state().price, 300000000);
+    });
+
+    test('입력한 금액이 새 범위 밖이면 새 범위의 중간값으로 바꾼다', () {
+      action(const ApplyPropertyTypeAction.changePrice(50000000));
+
+      action(const ApplyPropertyTypeAction.selectTransactionType(PropertyTransactionType.buy));
+
+      expect(state().price, state().midPrice);
+    });
+  });
+}
