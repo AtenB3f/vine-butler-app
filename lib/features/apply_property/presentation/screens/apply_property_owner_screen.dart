@@ -19,6 +19,9 @@ class _ApplyPropertyOwnerScreenState extends ConsumerState<ApplyPropertyOwnerScr
       TextEditingController(text: ref.read(applyPropertyOwnerVMProvider).name);
   late final PhoneNumberEditingController _phoneController =
       PhoneNumberEditingController(text: ref.read(applyPropertyOwnerVMProvider).phone);
+  final GlobalKey _nameKey = GlobalKey();
+  final GlobalKey _phoneKey = GlobalKey();
+  GlobalKey? _focusedKey;
 
   @override
   void dispose() {
@@ -45,9 +48,9 @@ class _ApplyPropertyOwnerScreenState extends ConsumerState<ApplyPropertyOwnerScr
       body: Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            child: AppKeyboardScrollView(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
+              focusedKey: _focusedKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 spacing: 40,
@@ -76,15 +79,18 @@ class _ApplyPropertyOwnerScreenState extends ConsumerState<ApplyPropertyOwnerScr
       spacing: 16,
       children: [
         AppTextField(
+          key: _nameKey,
           viewState: const AppTextFieldViewState(
             status: AppTextFieldStatus.normal,
             title: '이름',
             placeholder: '이름을 입력하세요.',
           ),
           controller: _nameController,
-          onChanged: (name) => viewModel.action(ApplyPropertyOwnerAction.changeName(name)),
+          onChange: (name) => viewModel.action(ApplyPropertyOwnerAction.changeName(name)),
+          onFocus: (hasFocus) => _focus(_nameKey, hasFocus),
         ),
         AppTextField(
+          key: _phoneKey,
           viewState: const AppTextFieldViewState(
             status: AppTextFieldStatus.normal,
             title: '전화번호',
@@ -92,7 +98,8 @@ class _ApplyPropertyOwnerScreenState extends ConsumerState<ApplyPropertyOwnerScr
             keyboardType: AppTextFieldKeyboardType.number,
           ),
           controller: _phoneController,
-          onChanged: (phone) => viewModel.action(ApplyPropertyOwnerAction.changePhone(phone)),
+          onChange: (phone) => viewModel.action(ApplyPropertyOwnerAction.changePhone(phone)),
+          onFocus: (hasFocus) => _focus(_phoneKey, hasFocus),
         ),
       ],
     );
@@ -112,5 +119,9 @@ class _ApplyPropertyOwnerScreenState extends ConsumerState<ApplyPropertyOwnerScr
         onTap: () => viewModel.action(const ApplyPropertyOwnerAction.next()),
       ),
     );
+  }
+
+  void _focus(GlobalKey key, bool hasFocus) {
+    if (hasFocus) { setState(() => _focusedKey = key); }
   }
 }

@@ -15,8 +15,13 @@ class ApplyPropertyAddressScreen extends ConsumerStatefulWidget {
 }
 
 class _ApplyPropertyAddressScreenState extends ConsumerState<ApplyPropertyAddressScreen> {
+  static const _focusDuration = Duration(milliseconds: 500);
+  static const _focusCurve = Curves.easeOutCubic;
+
   final TextEditingController _controller = TextEditingController();
   final TextEditingController _detailController = TextEditingController();
+  final GlobalKey _detailKey = GlobalKey();
+  bool _isFocus = false;
 
   @override
   void dispose() {
@@ -53,6 +58,7 @@ class _ApplyPropertyAddressScreenState extends ConsumerState<ApplyPropertyAddres
         _detailController.clear();
       } else {
         FocusManager.instance.primaryFocus?.unfocus();
+        setState(() => _isFocus = false);
       }
     });
 
@@ -85,8 +91,9 @@ class _ApplyPropertyAddressScreenState extends ConsumerState<ApplyPropertyAddres
     final located = state.located;
     final detail = state.hasDetailAddress ? ', ${state.detailAddress.trim()}' : '';
 
-    return SingleChildScrollView(
+    return AppKeyboardScrollView(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
+      focusedKey: _detailKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 16,
@@ -99,13 +106,14 @@ class _ApplyPropertyAddressScreenState extends ConsumerState<ApplyPropertyAddres
             ),
           ),
           AppTextField(
+            key: _detailKey,
             viewState: const AppTextFieldViewState(
               status: AppTextFieldStatus.normal,
               title: '상세 주소',
               placeholder: 'ex) 101호',
             ),
             controller: _detailController,
-            onChanged: (detailAddress) =>
+            onChange: (detailAddress) =>
                 viewModel.action(ApplyPropertyAddressAction.inputDetail(detailAddress)),
           ),
           Column(
@@ -140,27 +148,45 @@ class _ApplyPropertyAddressScreenState extends ConsumerState<ApplyPropertyAddres
   }
 
   Widget _header(ApplyPropertyAddressViewState state, ApplyPropertyAddressVM viewModel) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+    return AnimatedPadding(
+      duration: _focusDuration,
+      curve: _focusCurve,
+      padding: EdgeInsets.fromLTRB(20, _isFocus ? 16 : 0, 20, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 40,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 100, bottom: 16),
-            child: AppFontStyle.header1.text(
-              state.isNotFound ? '주소를 찾을 수 없어요.' : '주소지가 어디인가요?',
-              TextColor.dark,
+          TweenAnimationBuilder<double>(
+            duration: _focusDuration,
+            curve: _focusCurve,
+            tween: Tween(end: _isFocus ? 0 : 1),
+            builder: (context, progress, child) => ClipRect(
+              child: Align(
+                alignment: Alignment.topLeft,
+                heightFactor: progress,
+                child: Opacity(opacity: progress, child: child),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(top: 100, bottom: 56),
+              child: AppFontStyle.header1.text(
+                state.isNotFound ? '주소를 찾을 수 없어요.' : '주소지가 어디인가요?',
+                TextColor.dark,
+              ),
             ),
           ),
-          AppTextField(
-            viewState: const AppTextFieldViewState(
-              status: AppTextFieldStatus.normal,
-              title: '주소',
-              placeholder: '주소를 검색하세요.',
+          Focus(
+            canRequestFocus: false,
+            skipTraversal: true,
+            onFocusChange: (hasFocus) => setState(() => _isFocus = hasFocus),
+            child: AppTextField(
+              viewState: const AppTextFieldViewState(
+                status: AppTextFieldStatus.normal,
+                title: '주소',
+                placeholder: '주소를 검색하세요.',
+              ),
+              controller: _controller,
+              onChange: (query) => viewModel.action(ApplyPropertyAddressAction.search(query)),
             ),
-            controller: _controller,
-            onChanged: (query) => viewModel.action(ApplyPropertyAddressAction.search(query)),
           ),
         ],
       ),

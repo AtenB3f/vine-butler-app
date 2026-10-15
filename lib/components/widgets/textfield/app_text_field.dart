@@ -6,12 +6,14 @@ class AppTextField extends StatefulWidget {
     super.key,
     required this.viewState,
     required this.controller,
-    this.onChanged,
+    this.onChange,
+    this.onFocus,
   });
 
   final AppTextFieldViewState viewState;
   final TextEditingController controller;
-  final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onChange;
+  final ValueChanged<bool>? onFocus;
 
   @override
   State<AppTextField> createState() => _AppTextFieldState();
@@ -27,10 +29,13 @@ class _AppTextFieldState extends State<AppTextField> {
   void initState() {
     super.initState();
     _focusNode.addListener(_onChange);
+    _focusNode.addListener(_onFocus);
     widget.controller.addListener(_onChange);
   }
 
   void _onChange() => setState(() {});
+
+  void _onFocus() => widget.onFocus?.call(_focusNode.hasFocus);
 
   @override
   void didUpdateWidget(covariant AppTextField oldWidget) {
@@ -44,6 +49,7 @@ class _AppTextFieldState extends State<AppTextField> {
   @override
   void dispose() {
     _focusNode.removeListener(_onChange);
+    _focusNode.removeListener(_onFocus);
     _focusNode.dispose();
     widget.controller.removeListener(_onChange);
     super.dispose();
@@ -51,7 +57,7 @@ class _AppTextFieldState extends State<AppTextField> {
 
   void _clear() {
     widget.controller.clear();
-    widget.onChanged?.call('');
+    widget.onChange?.call('');
   }
 
   // MARK: - Widget
@@ -79,7 +85,7 @@ class _AppTextFieldState extends State<AppTextField> {
                   focusNode: _focusNode,
                   keyboardType: viewState.keyboardType == AppTextFieldKeyboardType.number ? TextInputType.number : null,
                   style: AppFontStyle.body2.style(TextColor.dark),
-                  onChanged: widget.onChanged,
+                  onChanged: widget.onChange,
                   decoration: InputDecoration(
                     isDense: true,
                     contentPadding: EdgeInsets.zero,

@@ -17,6 +17,7 @@ class ApplyPropertyExtraScreen extends ConsumerStatefulWidget {
 class _ApplyPropertyExtraScreenState extends ConsumerState<ApplyPropertyExtraScreen> {
   late final TextEditingController _memoController =
       TextEditingController(text: ref.read(applyPropertyExtraVMProvider).memo);
+  final GlobalKey _memoKey = GlobalKey();
 
   @override
   void dispose() {
@@ -55,9 +56,9 @@ class _ApplyPropertyExtraScreenState extends ConsumerState<ApplyPropertyExtraScr
       body: Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            child: AppKeyboardScrollView(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
+              focusedKey: _memoKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 spacing: 40,
@@ -123,13 +124,14 @@ class _ApplyPropertyExtraScreenState extends ConsumerState<ApplyPropertyExtraScr
         _group('방 개수', _roomCount(state, viewModel)),
         _group('가구 옵션', _furnitures(state, viewModel)),
         AppTextField(
+          key: _memoKey,
           viewState: const AppTextFieldViewState(
             status: AppTextFieldStatus.normal,
             title: '메모',
             placeholder: '추가 정보를 입력하세요.',
           ),
           controller: _memoController,
-          onChanged: (memo) => viewModel.action(ApplyPropertyExtraAction.changeMemo(memo)),
+          onChange: (memo) => viewModel.action(ApplyPropertyExtraAction.changeMemo(memo)),
         ),
       ],
     );

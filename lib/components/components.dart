@@ -44,6 +44,7 @@ export 'widgets/toggle/app_toggle_switch.dart';
 export 'widgets/toggle/app_toggle_switch_view_state.dart';
 export 'widgets/tag/gray_tag.dart';
 export 'widgets/tag/line_tag.dart';
+export 'widgets/layout/app_keyboard_scroll_view.dart';
 export 'widgets/layout/app_scaffold.dart';
 export 'widgets/textfield/app_text_field.dart';
 export 'widgets/textfield/app_text_field_view_state.dart';

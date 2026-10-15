@@ -43,7 +43,13 @@ class AppScaffold extends StatelessWidget {
                 ],
               ),
             ),
-            Expanded(child: body),
+            Expanded(
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+                child: body,
+              ),
+            ),
           ],
         ),
       ),
