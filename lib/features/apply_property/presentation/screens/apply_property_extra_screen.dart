@@ -18,6 +18,7 @@ class _ApplyPropertyExtraScreenState extends ConsumerState<ApplyPropertyExtraScr
   late final TextEditingController _memoController =
       TextEditingController(text: ref.read(applyPropertyExtraVMProvider).memo);
   final GlobalKey _memoKey = GlobalKey();
+  GlobalKey? _focusedKey;
 
   @override
   void dispose() {
@@ -58,7 +59,7 @@ class _ApplyPropertyExtraScreenState extends ConsumerState<ApplyPropertyExtraScr
           Expanded(
             child: AppKeyboardScrollView(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
-              focusedKey: _memoKey,
+              focusedKey: _focusedKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 spacing: 40,
@@ -77,7 +78,7 @@ class _ApplyPropertyExtraScreenState extends ConsumerState<ApplyPropertyExtraScr
 
   Widget _title() {
     return Padding(
-      padding: const EdgeInsets.only(top: 100, bottom: 16),
+      padding: const EdgeInsets.only(top: 64),
       child: AppFontStyle.header1.text('추가 정보를 입력해주세요.', TextColor.dark),
     );
   }
@@ -132,6 +133,7 @@ class _ApplyPropertyExtraScreenState extends ConsumerState<ApplyPropertyExtraScr
           ),
           controller: _memoController,
           onChange: (memo) => viewModel.action(ApplyPropertyExtraAction.changeMemo(memo)),
+          onFocus: (hasFocus) => setState(() => _focusedKey = hasFocus ? _memoKey : null),
         ),
       ],
     );

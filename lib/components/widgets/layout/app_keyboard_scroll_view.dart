@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 class AppKeyboardScrollView extends StatefulWidget {
@@ -18,54 +16,40 @@ class AppKeyboardScrollView extends StatefulWidget {
   State<AppKeyboardScrollView> createState() => _AppKeyboardScrollViewState();
 }
 
-class _AppKeyboardScrollViewState extends State<AppKeyboardScrollView> with WidgetsBindingObserver {
+class _AppKeyboardScrollViewState extends State<AppKeyboardScrollView> {
   static const Duration _scrollDuration = Duration(milliseconds: 500);
   static const Curve _scrollCurve = Curves.easeOutCubic;
   static const Duration _spaceDuration = Duration(milliseconds: 250);
-  static const Duration _keyboardSettleDelay = Duration(milliseconds: 200);
-
-  Timer? _keyboardSettleTimer;
-  bool _isKeyboardVisible = false;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-  }
 
   @override
   void didUpdateWidget(covariant AppKeyboardScrollView oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.focusedKey != oldWidget.focusedKey && _isKeyboardVisible) {
+    if (widget.focusedKey != null && widget.focusedKey != oldWidget.focusedKey) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToFocused());
     }
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    _keyboardSettleTimer?.cancel();
-    super.dispose();
-  }
-
-  /// 키보드 높이 변화 감지
-  @override
-  void didChangeMetrics() {
-    final isKeyboardVisible = View.of(context).viewInsets.bottom > 0;
-
-    if (isKeyboardVisible != _isKeyboardVisible) { setState(() => _isKeyboardVisible = isKeyboardVisible); }
-
-    _keyboardSettleTimer?.cancel();
-    _keyboardSettleTimer = Timer(_keyboardSettleDelay, _scrollToFocused);
   }
 
   void _scrollToFocused() {
     final focusedContext = widget.focusedKey?.currentContext;
 
-    if (!mounted || !_isKeyboardVisible || focusedContext == null) { return; }
+    if (!mounted || focusedContext == null) { return; }
 
     Scrollable.ensureVisible(focusedContext, alignment: 0, duration: _scrollDuration, curve: _scrollCurve);
+  }
+
+  /// 포커스된 입력란을 맨 위로 올릴 수 있게 콘텐츠 끝에 붙이는 여유 공간
+  ///
+  /// - 포커스 순간에는 애니메이션 없이 바로 붙임 (스크롤 시작 시점에 스크롤 가능 거리가 있어야 끝까지 올라감)
+  /// - 포커스가 풀리면 `_spaceDuration` 동안 줄어듦
+  Widget _focusSpace(double viewportHeight) {
+    final hasFocus = widget.focusedKey != null;
+
+    return AnimatedContainer(
+      duration: hasFocus ? Duration.zero : _spaceDuration,
+      curve: _scrollCurve,
+      height: hasFocus ? viewportHeight : 0,
+    );
   }
 
   @override
@@ -78,11 +62,7 @@ class _AppKeyboardScrollViewState extends State<AppKeyboardScrollView> with Widg
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             widget.child,
-            AnimatedContainer(
-              duration: _spaceDuration,
-              curve: _scrollCurve,
-              height: _isKeyboardVisible ? constraints.maxHeight : 0,
-            ),
+            _focusSpace(constraints.maxHeight),
           ],
         ),
       ),

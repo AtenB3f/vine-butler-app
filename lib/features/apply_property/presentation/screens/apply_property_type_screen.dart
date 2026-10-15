@@ -84,7 +84,7 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
 
   Widget _title() {
     return Padding(
-      padding: const EdgeInsets.only(top: 100, bottom: 16),
+      padding: const EdgeInsets.only(top: 64),
       child: AppFontStyle.header1.text('이 집을 맡길게요.', TextColor.dark),
     );
   }
