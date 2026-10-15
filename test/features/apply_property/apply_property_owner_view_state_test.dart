@@ -2,8 +2,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:vine_butler/features/apply_property/presentation/apply_property_owner_view_state.dart';
 
 void main() {
-  test('전화번호가 비어 있으면 에러가 없다', () {
-    expect(const ApplyPropertyOwnerViewState().hasPhoneError, isFalse);
+  test('전화번호 기본값은 010이고 에러가 없다', () {
+    const state = ApplyPropertyOwnerViewState();
+
+    expect(state.phone, '010');
+    expect(state.hasPhoneError, isFalse);
+  });
+
+  test('전화번호를 모두 지우면 에러가 없다', () {
+    expect(const ApplyPropertyOwnerViewState(phone: '').hasPhoneError, isFalse);
   });
 
   test('입력 중인 전화번호는 형식이 맞지 않아 에러가 있다', () {
