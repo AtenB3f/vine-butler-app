@@ -1,4 +1,4 @@
-package com.example.vine_butler
+package com.atenb.vinebutler
 
 import io.flutter.embedding.android.FlutterActivity
 
