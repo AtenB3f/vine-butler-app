@@ -1,8 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vine_butler/core/router/app_router.dart';
 import 'package:vine_butler/features/apply_property/presentation/apply_property_extra_view_state.dart';
-import 'package:vine_butler/features/property_list/property_list_event_vm.dart';
-import 'package:vine_butler/features/property_list/property_list_vm.dart';
 
 final applyPropertyExtraVMProvider =
     NotifierProvider<ApplyPropertyExtraVM, ApplyPropertyExtraViewState>(ApplyPropertyExtraVM.new);
@@ -130,9 +128,6 @@ class ApplyPropertyExtraVM extends Notifier<ApplyPropertyExtraViewState> {
         state = state.copyWith(memo: memo);
 
       case _Save():
-        final mockPropertyId = ref.read(propertyListVMProvider).items.length;
-
-        ref.read(propertyListEventVMProvider.notifier).action(PropertyListEventAction.register(mockPropertyId));
         state = state.copyWith(navigateTo: () => const PropertyListRoute().location);
 
       case _PopNavigation():
