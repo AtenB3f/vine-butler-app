@@ -20,19 +20,18 @@ class GeocodeApi {
       'page': page,
       'count': count,
     };
-    if (kDebugMode) {
-      debugPrint('[API] → GET $path $queryParameters');
-    }
+
+    if (kDebugMode) { debugPrint('[API] → GET $path $queryParameters'); }
+
     try {
       final response = await _dio.get<Map<String, dynamic>>(path, queryParameters: queryParameters);
-      if (kDebugMode) {
-        debugPrint('[API] ← ${response.statusCode} $path ${response.data}');
-      }
+
+      if (kDebugMode) { debugPrint('[API] ← ${response.statusCode} $path ${response.data}'); }
+
       return GeocodeResponseDto.fromJson(response.data ?? const {});
     } on DioException catch (e) {
-      if (kDebugMode) {
-        debugPrint('[API] ✗ ${e.response?.statusCode ?? e.type.name} $path ${e.response?.data ?? e.message}');
-      }
+      if (kDebugMode) { debugPrint('[API] ✗ ${e.response?.statusCode ?? e.type.name} $path ${e.response?.data ?? e.message}'); }
+
       rethrow;
     }
   }

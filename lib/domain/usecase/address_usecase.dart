@@ -10,17 +10,17 @@ class AddressUseCase {
 
   Future<AddressPage> search(String query, {int page = 1}) async {
     final keyword = query.trim();
-    if (keyword.isEmpty) {
-      return const AddressPage(addresses: [], totalCount: 0);
-    }
+
+    if (keyword.isEmpty) { return const AddressPage(addresses: [], totalCount: 0); }
+
     return _repository.search(keyword, page: page);
   }
 
   Future<Address?> locate(AddressCandidate candidate) async {
     final coordinate = await _repository.locate(candidate.baseRoadAddress);
-    if (coordinate == null) {
-      return null;
-    }
+
+    if (coordinate == null) { return null; }
+
     return candidate.toAddress(latitude: coordinate.latitude, longitude: coordinate.longitude);
   }
 }

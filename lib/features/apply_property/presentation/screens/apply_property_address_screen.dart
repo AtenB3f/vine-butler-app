@@ -163,9 +163,8 @@ class _ApplyPropertyAddressScreenState extends ConsumerState<ApplyPropertyAddres
 
     return NotificationListener<ScrollNotification>(
       onNotification: (notification) {
-        if (notification.metrics.extentAfter < 200) {
-          viewModel.action(const ApplyPropertyAddressAction.loadMore());
-        }
+        if (notification.metrics.extentAfter < 200) { viewModel.action(const ApplyPropertyAddressAction.loadMore()); }
+
         return false;
       },
       child: ListView.separated(

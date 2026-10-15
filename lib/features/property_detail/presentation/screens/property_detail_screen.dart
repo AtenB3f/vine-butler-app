@@ -152,9 +152,7 @@ class PropertyDetailScreen extends ConsumerWidget {
       ],
     );
 
-    if (!context.isMobile) {
-      return address;
-    }
+    if (!context.isMobile) { return address; }
 
     return Pressable(
       onTap: () => ref.read(propertyDetailVMProvider(id).notifier).action(PropertyDetailAction.toggleMap),
@@ -288,9 +286,7 @@ class PropertyDetailScreen extends ConsumerWidget {
   }
 
   Widget _furnitures(PropertyDetailData data) {
-    if (data.furnitureOptions.isEmpty) {
-      return const SizedBox.shrink();
-    }
+    if (data.furnitureOptions.isEmpty) { return const SizedBox.shrink(); }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

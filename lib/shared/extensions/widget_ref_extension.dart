@@ -9,13 +9,11 @@ extension WidgetRefEventExtension on WidgetRef {
     required void Function(T event) onEvent,
   }) {
     void handle(T? value) {
-      if (value == null) {
-        return;
-      }
+      if (value == null) { return; }
+
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!context.mounted || read(event) != value) {
-          return;
-        }
+        if (!context.mounted || read(event) != value) { return; }
+
         consume();
         onEvent(value);
       });

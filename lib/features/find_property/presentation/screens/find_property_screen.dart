@@ -38,9 +38,7 @@ class _FindPropertyScreenState extends ConsumerState<FindPropertyScreen> {
     final viewModel = ref.read(findPropertyVMProvider.notifier);
 
     ref.listen(findPropertyVMProvider.select((state) => state.price), (_, price) {
-      if (_priceController.value != price) {
-        _priceController.value = price;
-      }
+      if (_priceController.value != price) { _priceController.value = price; }
     });
 
     return AppScaffold(

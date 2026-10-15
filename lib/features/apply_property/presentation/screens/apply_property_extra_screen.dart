@@ -33,9 +33,8 @@ class _ApplyPropertyExtraScreenState extends ConsumerState<ApplyPropertyExtraScr
       firstDate: today,
       lastDate: DateTime(today.year + 5, today.month, today.day),
     );
-    if (date != null) {
-      viewModel.action(ApplyPropertyExtraAction.changeMoveInDate(date));
-    }
+
+    if (date != null) { viewModel.action(ApplyPropertyExtraAction.changeMoveInDate(date)); }
   }
 
   @override

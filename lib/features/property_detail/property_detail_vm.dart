@@ -85,6 +85,7 @@ class PropertyDetailVM extends Notifier<PropertyDetailViewState> {
     switch (action) {
       case PropertyDetailAction.fetch:
         break;
+
       case PropertyDetailAction.toggleMap:
         state = state.copyWith(isMapVisible: !state.isMapVisible);
     }

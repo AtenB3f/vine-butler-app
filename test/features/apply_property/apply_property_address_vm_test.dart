@@ -35,6 +35,7 @@ class _FakeAddressRepository implements AddressRepository {
     queries.add(query);
     pages.add(page);
     final addresses = await respond(query, page);
+
     return AddressPage(addresses: addresses, totalCount: totalCount ?? addresses.length);
   }
 
@@ -84,6 +85,7 @@ void main() {
     await Future<void>.delayed(_afterDebounce);
 
     final result = state().results.single;
+
     expect(state().isSearching, isFalse);
     expect(result.zipCode, '13561');
     expect(result.address, _address.roadAddress);
@@ -153,6 +155,7 @@ void main() {
 
   test('먼저 보낸 요청의 응답이 늦게 오면 무시한다', () async {
     final slow = Completer<List<AddressCandidate>>();
+
     repository.respond = (query, _) => query == '불정로' ? slow.future : Future.value(const [_address]);
 
     action(const ApplyPropertyAddressAction.search('불정로'));
@@ -168,6 +171,7 @@ void main() {
 
   test('주소를 선택한 뒤 도착한 응답은 무시한다', () async {
     final slow = Completer<List<AddressCandidate>>();
+
     repository.respond = (_, _) => slow.future;
     final selected = AddressResultViewState.fromDomain(_address);
 
@@ -236,6 +240,7 @@ void main() {
 
     test('다음 페이지 응답 전에 새로 검색하면 늦게 온 응답은 버린다', () async {
       final slow = Completer<List<AddressCandidate>>();
+
       await searchFirstPage();
       repository.respond = (_, page) => page == 2 ? slow.future : Future.value(pageOf(10));
 
@@ -348,6 +353,7 @@ void main() {
 
     test('조회 중에 다시 입력하기를 누르면 늦게 온 좌표는 버린다', () async {
       final slow = Completer<({double latitude, double longitude})?>();
+
       repository.respondLocate = (_) => slow.future;
 
       action(ApplyPropertyAddressAction.select(selected));

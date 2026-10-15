@@ -42,13 +42,15 @@ class ApplyPropertyOwnerVM extends Notifier<ApplyPropertyOwnerViewState> {
     switch (action) {
       case _ChangeName(:final name):
         state = state.copyWith(name: name);
+
       case _ChangePhone(:final phone):
         state = state.copyWith(phone: phone);
+
       case _Next():
-        if (!state.isCompleted) {
-          return;
-        }
+        if (!state.isCompleted) { return; }
+
         state = state.copyWith(navigateTo: () => const ApplyPropertyExtraRoute().location);
+
       case _PopNavigation():
         state = state.copyWith(navigateTo: () => null);
     }

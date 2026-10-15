@@ -32,9 +32,7 @@ class PropertyListViewState {
   bool get isOverlayVisible => filter.isFilterOpen || isSearchResultVisible;
 
   List<PropertyListItemViewState> get searchResults {
-    if (query.isEmpty) {
-      return const [];
-    }
+    if (query.isEmpty) { return const []; }
 
     return items
         .where((item) => item.roadAddress.contains(query) || item.jibunAddress.contains(query))
@@ -43,9 +41,8 @@ class PropertyListViewState {
   }
 
   AppBndSearchStatus get bndStatus {
-    if (query.isNotEmpty) {
-      return isSearchCommitted ? AppBndSearchStatus.search : AppBndSearchStatus.enable;
-    }
+    if (query.isNotEmpty) { return isSearchCommitted ? AppBndSearchStatus.search : AppBndSearchStatus.enable; }
+
     return filter.data.isApplied ? AppBndSearchStatus.filter : AppBndSearchStatus.disable;
   }
 
@@ -315,11 +312,13 @@ class PropertyListVM extends Notifier<PropertyListViewState> {
     switch (action) {
       case _Search(:final query):
         state = state.copyWith(query: query, isSearchCommitted: false);
+
       case _ChangeFocus(:final hasFocus):
         state = state.copyWith(
           isSearchFocused: hasFocus,
           filter: hasFocus ? state.filter.copyWith(isFilterOpen: true) : null,
         );
+
       case _SelectSearchResult(:final id):
         state = state.copyWith(
           isSearchCommitted: true,
@@ -327,8 +326,10 @@ class PropertyListVM extends Notifier<PropertyListViewState> {
           filter: state.filter.copyWith(isFilterOpen: false),
           navigateTo: PropertyDetailRoute(id: id).location,
         );
+
       case _PushFilter(:final isPresented):
         state = state.copyWith(filter: state.filter.copyWith(isFilterOpen: isPresented));
+
       case _Filtering(:final data):
         state = state.copyWith(filter: state.filter.copyWith(data: data));
     }

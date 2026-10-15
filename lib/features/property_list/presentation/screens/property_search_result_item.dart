@@ -47,11 +47,10 @@ class PropertySearchResultItem extends StatelessWidget {
     final normalStyle = AppFontStyle.body2.style(TextColor.dark);
     final matchIndex = query.isEmpty ? -1 : text.indexOf(query);
 
-    if (matchIndex < 0) {
-      return [TextSpan(text: text, style: normalStyle)];
-    }
+    if (matchIndex < 0) { return [TextSpan(text: text, style: normalStyle)]; }
 
     final matchEnd = matchIndex + query.length;
+
     return [
       TextSpan(text: text.substring(0, matchIndex), style: normalStyle),
       TextSpan(text: text.substring(matchIndex, matchEnd), style: normalStyle.copyWith(fontWeight: FontWeight.w700)),

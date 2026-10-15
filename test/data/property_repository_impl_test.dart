@@ -124,11 +124,13 @@ void main() {
 
   test('동기화된 매물을 다시 저장하면 동기화 필요 상태가 된다', () async {
     final synced = _property('a').copyWith(updatedAt: DateTime(2020), syncedAt: DateTime(2020));
+
     expect(synced.needsSync, isFalse);
 
     await repository.save(synced);
 
     final saved = await repository.getById('a');
+
     expect(saved!.syncedAt, DateTime(2020));
     expect(saved.needsSync, isTrue);
   });
@@ -141,6 +143,7 @@ void main() {
     await repository.delete('a');
 
     final row = await db.select(db.propertyTable).getSingle();
+
     expect(row.deletedAt, isNotNull);
     expect(row.updatedAt.isAfter(row.syncedAt!), isTrue);
   });

@@ -7,8 +7,10 @@ extension PropertyTransactionTypeExtension on PropertyTransactionType {
     switch (this) {
       case PropertyTransactionType.buy:
         return '매매';
+
       case PropertyTransactionType.depositOnly:
         return '전세';
+
       case PropertyTransactionType.rent:
         return '월세';
     }
@@ -18,8 +20,10 @@ extension PropertyTransactionTypeExtension on PropertyTransactionType {
     switch (this) {
       case PropertyTransactionType.rent:
         return OutlineButtonType.primary;
+
       case PropertyTransactionType.depositOnly:
         return OutlineButtonType.secondary;
+
       case PropertyTransactionType.buy:
         return OutlineButtonType.tertiary;
     }
@@ -29,8 +33,10 @@ extension PropertyTransactionTypeExtension on PropertyTransactionType {
     switch (this) {
       case PropertyTransactionType.buy:
         return LineTagType.tertiary;
+
       case PropertyTransactionType.depositOnly:
         return LineTagType.secondary;
+
       case PropertyTransactionType.rent:
         return LineTagType.primary;
     }
@@ -42,14 +48,19 @@ extension PropertyTypeFilterOptionExtension on PropertyTypeFilterOption {
     switch (this) {
       case PropertyTypeFilterOption.oneRoom:
         return '원룸';
+
       case PropertyTypeFilterOption.twoRoom:
         return '투룸';
+
       case PropertyTypeFilterOption.villa:
         return '빌라';
+
       case PropertyTypeFilterOption.apartment:
         return '아파트';
+
       case PropertyTypeFilterOption.singleMulti:
         return '단독/다가구';
+
       case PropertyTypeFilterOption.commercialBuilding:
         return '상가';
     }

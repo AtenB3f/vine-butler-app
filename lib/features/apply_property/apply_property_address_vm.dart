@@ -67,14 +67,17 @@ class ApplyPropertyAddressVM extends Notifier<ApplyPropertyAddressViewState> {
     switch (action) {
       case _Search(:final query):
         final requestId = _cancelSearch();
+
         if (query.trim().isEmpty) {
           state = ApplyPropertyAddressViewState(query: query);
           return;
         }
         state = state.copyWith(query: query, isSearching: true, isLoading: false);
         _debounce = Timer(_debounceDuration, () => _fetch(query, requestId));
+
       case _Select(:final address):
         final requestId = _cancelSearch();
+
         state = state.copyWith(
           results: const [],
           isSearching: false,
@@ -86,20 +89,22 @@ class ApplyPropertyAddressVM extends Notifier<ApplyPropertyAddressViewState> {
           isLocating: true,
         );
         _locate(address, requestId);
+
       case _Next():
-        if (!state.canProceed) {
-          return;
-        }
+        if (!state.canProceed) { return; }
+
         state = state.copyWith(navigateTo: () => const ApplyPropertyOwnerRoute().location);
+
       case _Reset():
         _cancelSearch();
         state = const ApplyPropertyAddressViewState();
+
       case _ClearError():
         state = state.copyWith(errorMessage: () => null);
+
       case _LoadMore():
-        if (state.isSearching || state.isLoading || !state.hasMore) {
-          return;
-        }
+        if (state.isSearching || state.isLoading || !state.hasMore) { return; }
+
         state = state.copyWith(isLoading: true);
         _fetchNextPage(state.query, state.page + 1, _requestId);
     }
@@ -117,9 +122,9 @@ class ApplyPropertyAddressVM extends Notifier<ApplyPropertyAddressViewState> {
   Future<void> _fetch(String query, int requestId) async {
     try {
       final result = await ref.read(addressUseCaseProvider).search(query);
-      if (requestId != _requestId) {
-        return;
-      }
+
+      if (requestId != _requestId) { return; }
+
       state = state.copyWith(
         results: [for (final address in result.addresses) AddressResultViewState.fromDomain(address)],
         isSearching: false,
@@ -127,9 +132,8 @@ class ApplyPropertyAddressVM extends Notifier<ApplyPropertyAddressViewState> {
         totalCount: result.totalCount,
       );
     } on ApiException {
-      if (requestId != _requestId) {
-        return;
-      }
+      if (requestId != _requestId) { return; }
+
       state = state.copyWith(
         results: const [],
         isSearching: false,
@@ -143,9 +147,9 @@ class ApplyPropertyAddressVM extends Notifier<ApplyPropertyAddressViewState> {
   Future<void> _fetchNextPage(String query, int page, int requestId) async {
     try {
       final result = await ref.read(addressUseCaseProvider).search(query, page: page);
-      if (requestId != _requestId) {
-        return;
-      }
+
+      if (requestId != _requestId) { return; }
+
       state = state.copyWith(
         results: [...state.results, for (final address in result.addresses) AddressResultViewState.fromDomain(address)],
         isLoading: false,
@@ -153,9 +157,8 @@ class ApplyPropertyAddressVM extends Notifier<ApplyPropertyAddressViewState> {
         totalCount: result.addresses.isEmpty ? state.results.length : result.totalCount,
       );
     } on ApiException {
-      if (requestId != _requestId) {
-        return;
-      }
+      if (requestId != _requestId) { return; }
+
       state = state.copyWith(isLoading: false, errorMessage: () => _errorMessage);
     }
   }
@@ -163,18 +166,17 @@ class ApplyPropertyAddressVM extends Notifier<ApplyPropertyAddressViewState> {
   Future<void> _locate(AddressResultViewState address, int requestId) async {
     try {
       final located = await ref.read(addressUseCaseProvider).locate(address.source);
-      if (requestId != _requestId) {
-        return;
-      }
+
+      if (requestId != _requestId) { return; }
+
       state = state.copyWith(
         located: () => located,
         isLocating: false,
         errorMessage: located == null ? () => _locateErrorMessage : null,
       );
     } on ApiException {
-      if (requestId != _requestId) {
-        return;
-      }
+      if (requestId != _requestId) { return; }
+
       state = state.copyWith(isLocating: false, errorMessage: () => _locateErrorMessage);
     }
   }

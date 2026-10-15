@@ -33,6 +33,7 @@ class PropertyUseCase {
     List<PropertyImage> images = const [],
   }) async {
     final id = _uuid.v4();
+
     await _repository.save(
       Property(
         id: id,

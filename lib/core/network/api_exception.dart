@@ -14,12 +14,14 @@ sealed class ApiException implements Exception {
 
   factory ApiException.fromDio(DioException exception) {
     final message = exception.message;
+
     switch (exception.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
       case DioExceptionType.connectionError:
         return ApiException.network(message);
+
       case DioExceptionType.badResponse:
         return switch (exception.response?.statusCode) {
           400 || 404 || 413 => ApiException.badRequest(message),
@@ -28,6 +30,7 @@ sealed class ApiException implements Exception {
           final int code when code >= 500 => ApiException.server(message),
           _ => ApiException.unknown(message),
         };
+
       case DioExceptionType.transformTimeout:
       case DioExceptionType.badCertificate:
       case DioExceptionType.cancel:

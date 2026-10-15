@@ -113,6 +113,7 @@ void main() {
       await repository().search('불정로 6', page: 3);
 
       final request = jusoAdapter.lastRequest;
+
       expect(request.uri.toString(), startsWith('https://business.juso.go.kr/addrlink/addrLinkApi.do'));
       expect(request.queryParameters['confmKey'], 'juso-key');
       expect(request.queryParameters['resultType'], 'json');
@@ -125,6 +126,7 @@ void main() {
       final result = await repository(juso: (_) => _json(_jusoBody(totalCount: '25'))).search('불정로 6');
 
       final candidate = result.addresses.single;
+
       expect(result.totalCount, 25);
       expect(candidate.zipCode, '13561');
       expect(candidate.roadAddress, '경기도 성남시 분당구 불정로 6 (정자동)');

@@ -7,6 +7,7 @@ class PhoneNumberEditingController extends TextEditingController {
   @override
   set value(TextEditingValue newValue) {
     final text = newValue.text.formattedPhoneNumber;
+
     super.value = newValue.copyWith(
       text: text,
       selection: TextSelection.collapsed(offset: text.length),

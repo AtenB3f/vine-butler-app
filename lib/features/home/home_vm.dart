@@ -12,6 +12,7 @@ class HomeVM extends Notifier<HomeViewState> {
       case HomeViewAction.find:
         state = HomeViewState(navigateTo: const FindPropertyRoute().location);
         break;
+
       case HomeViewAction.apply:
         state = HomeViewState(navigateTo: const ApplyPropertyRoute().location);
         break;

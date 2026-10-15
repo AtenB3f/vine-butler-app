@@ -29,6 +29,7 @@ class PropertyListEventVM extends Notifier<PropertyListEventViewState> {
     switch (action) {
       case _Register(:final id):
         state = state.copyWith(registerId: () => id);
+
       case _ClearRegistration():
         state = state.copyWith(registerId: () => null);
     }

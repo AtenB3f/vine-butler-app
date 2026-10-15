@@ -8,6 +8,7 @@ class GeocodeResponseDto {
 
   factory GeocodeResponseDto.fromJson(Map<String, dynamic> json) {
     final meta = json['meta'] as Map<String, dynamic>?;
+
     return GeocodeResponseDto(
       status: json['status'] as String? ?? '',
       totalCount: (meta?['totalCount'] as num?)?.toInt() ?? 0,
@@ -61,6 +62,7 @@ class AddressElementDto {
 
   factory AddressElementDto.fromJson(Map<String, dynamic> json) {
     final types = json['types'] ?? json['type'];
+
     return AddressElementDto(
       types: switch (types) {
         final List<dynamic> list => [for (final type in list) type as String],

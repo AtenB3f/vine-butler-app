@@ -38,7 +38,7 @@ class PropertyDetailData {
   final String? agentName;  // 공인중개사 이름
   final String? agentPhone; // 공인중개사 핸드폰 번호
   final List<String> vicinity;  // 인근 교통편
-  final bool isAvailableParking;  // 주차 가능 여부 
+  final bool isAvailableParking;  // 주차 가능 여부
   final bool isAvailableLoan; // 융자 여부
   final bool isAvailableSuretyInsurance; // 보증보험 가입 가능 여부
   final DateTime? moveInDate; // 입주일

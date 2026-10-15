@@ -48,6 +48,7 @@ class _PropertyFilterPanelState extends ConsumerState<PropertyFilterPanel> {
 
   Widget _contents() {
     final filter = ref.watch(propertyListVMProvider.select((state) => state.filter.data));
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -149,7 +150,7 @@ class _PropertyFilterPanelState extends ConsumerState<PropertyFilterPanel> {
       spacing: 10,
       children: [
         _item(
-          title: '금액', 
+          title: '금액',
           children: [
             Text(
                 filter.price.formattedKRW,

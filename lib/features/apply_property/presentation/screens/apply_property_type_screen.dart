@@ -52,9 +52,7 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
     );
 
     ref.listen(applyPropertyTypeVMProvider.select((state) => state.price), (_, price) {
-      if (_priceController.value != price) {
-        _priceController.value = price;
-      }
+      if (_priceController.value != price) { _priceController.value = price; }
     });
 
     return AppScaffold(

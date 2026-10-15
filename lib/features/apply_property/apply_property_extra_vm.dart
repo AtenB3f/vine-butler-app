@@ -103,28 +103,38 @@ class ApplyPropertyExtraVM extends Notifier<ApplyPropertyExtraViewState> {
         state = state.copyWith(
           isAvailableSuretyInsurance: () => state.isAvailableSuretyInsurance == isAvailable ? null : isAvailable,
         );
+
       case _SelectLoan(:final hasLoan):
         state = state.copyWith(hasLoan: () => state.hasLoan == hasLoan ? null : hasLoan);
+
       case _SelectParking(:final isAvailable):
         state = state.copyWith(isAvailableParking: () => state.isAvailableParking == isAvailable ? null : isAvailable);
+
       case _ChangeMoveInDate(:final date):
         state = state.copyWith(moveInDate: date);
+
       case _ToggleNegotiable():
         state = state.copyWith(isMoveInDateNegotiable: !state.isMoveInDateNegotiable);
+
       case _SelectRoomCount(:final count):
         state = state.copyWith(roomCount: () => state.roomCount == count ? null : count);
+
       case _ToggleFurniture(:final option):
         final options = {...state.furnitureOptions};
-        if (!options.remove(option)) {
-          options.add(option);
-        }
+
+        if (!options.remove(option)) { options.add(option); }
+
         state = state.copyWith(furnitureOptions: options);
+
       case _ChangeMemo(:final memo):
         state = state.copyWith(memo: memo);
+
       case _Save():
         final mockPropertyId = ref.read(propertyListVMProvider).items.length;
+
         ref.read(propertyListEventVMProvider.notifier).action(PropertyListEventAction.register(mockPropertyId));
         state = state.copyWith(navigateTo: () => const PropertyListRoute().location);
+
       case _PopNavigation():
         state = state.copyWith(navigateTo: () => null);
     }

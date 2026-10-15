@@ -73,19 +73,23 @@ class ApplyPropertyTypeVM extends Notifier<ApplyPropertyTypeViewState> {
         final selected = state.copyWith(
           transactionType: () => state.transactionType == type ? null : type,
         );
+
         state = selected.copyWith(price: selected.midPrice);
+
       case _SelectPropertyType(:final option):
         state = state.copyWith(
           propertyType: () => state.propertyType == option ? null : option,
         );
+
       case _ChangePrice(:final price):
         state = state.copyWith(price: price);
+
       case _ChangeMonthlyRent(:final monthlyRent):
         state = state.copyWith(monthlyRent: monthlyRent);
+
       case _Next():
-        if (!state.isCompleted) {
-          return;
-        }
+        if (!state.isCompleted) { return; }
+
         state = state.copyWith(navigateTo: () => const ApplyPropertyAddressRoute().location);
     }
   }

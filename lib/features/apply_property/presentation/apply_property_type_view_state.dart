@@ -23,6 +23,7 @@ class ApplyPropertyTypeViewState {
 
   factory ApplyPropertyTypeViewState.initial() {
     const empty = ApplyPropertyTypeViewState(price: 0, monthlyRent: 0);
+
     return empty.copyWith(
       price: empty.midPrice,
       monthlyRent: minMonthlyRent +
@@ -41,6 +42,7 @@ class ApplyPropertyTypeViewState {
       case PropertyTransactionType.rent:
       case PropertyTransactionType.depositOnly:
         return '보증금';
+
       case PropertyTransactionType.buy:
       case null:
         return '금액';
@@ -51,6 +53,7 @@ class ApplyPropertyTypeViewState {
     switch (transactionType) {
       case PropertyTransactionType.buy:
         return 100000000;
+
       case PropertyTransactionType.rent:
       case PropertyTransactionType.depositOnly:
       case null:
@@ -62,8 +65,10 @@ class ApplyPropertyTypeViewState {
     switch (transactionType) {
       case PropertyTransactionType.rent:
         return 500000000;
+
       case PropertyTransactionType.depositOnly:
         return 1500000000;
+
       case PropertyTransactionType.buy:
       case null:
         return 3000000000;

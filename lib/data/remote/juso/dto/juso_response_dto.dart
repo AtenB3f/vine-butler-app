@@ -9,6 +9,7 @@ class JusoResponseDto {
   factory JusoResponseDto.fromJson(Map<String, dynamic> json) {
     final results = json['results'] as Map<String, dynamic>? ?? const {};
     final common = results['common'] as Map<String, dynamic>? ?? const {};
+
     return JusoResponseDto(
       errorCode: '${common['errorCode'] ?? ''}',
       errorMessage: '${common['errorMessage'] ?? ''}',
