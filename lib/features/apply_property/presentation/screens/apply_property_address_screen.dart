@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vine_butler/components/components.dart';
+import 'package:vine_butler/core/network/api_env.dart';
 import 'package:vine_butler/features/apply_property/apply_property_address_vm.dart';
 import 'package:vine_butler/features/apply_property/presentation/apply_property_address_view_state.dart';
 import 'package:vine_butler/shared/extensions/extensions.dart';
@@ -81,6 +82,7 @@ class _ApplyPropertyAddressScreenState extends ConsumerState<ApplyPropertyAddres
 
   Widget _mapPage(ApplyPropertyAddressViewState state, ApplyPropertyAddressVM viewModel) {
     final address = state.selected!;
+    final located = state.located;
     final detail = state.hasDetailAddress ? ', ${state.detailAddress.trim()}' : '';
 
     return SingleChildScrollView(
@@ -109,12 +111,21 @@ class _ApplyPropertyAddressScreenState extends ConsumerState<ApplyPropertyAddres
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: double.infinity,
-                height: 240,
-                decoration: BoxDecoration(
-                  color: BaseColor.light,
-                  borderRadius: BorderRadius.circular(4),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 240,
+                  child: located == null
+                      ? const ColoredBox(color: BaseColor.light)
+                      : AppMapView(
+                          viewState: AppMapViewViewState(
+                            latitude: located.latitude,
+                            longitude: located.longitude,
+                            clientId: ApiEnv.naverMapsClientId,
+                            webServiceUrl: ApiEnv.naverMapsWebServiceUrl,
+                          ),
+                        ),
                 ),
               ),
               const SizedBox(height: 8),

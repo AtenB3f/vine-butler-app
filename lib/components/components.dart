@@ -48,3 +48,5 @@ export 'widgets/layout/app_scaffold.dart';
 export 'widgets/textfield/app_text_field.dart';
 export 'widgets/textfield/app_text_field_view_state.dart';
 
+export 'widgets/map/app_map_view.dart';
+export 'widgets/map/app_map_view_view_state.dart';
