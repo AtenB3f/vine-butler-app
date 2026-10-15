@@ -366,4 +366,49 @@ void main() {
       expect(state().isLocating, isFalse);
     });
   });
+
+  group('상세 주소', () {
+    final selected = AddressResultViewState.fromDomain(_address);
+
+    test('입력하면 상세 주소가 바뀌고 공백만 있으면 입력되지 않은 것으로 본다', () {
+      action(ApplyPropertyAddressAction.select(selected));
+
+      action(const ApplyPropertyAddressAction.inputDetail('202호'));
+
+      expect(state().detailAddress, '202호');
+      expect(state().hasDetailAddress, isTrue);
+
+      action(const ApplyPropertyAddressAction.inputDetail('   '));
+
+      expect(state().hasDetailAddress, isFalse);
+    });
+
+    test('다른 주소를 선택하면 상세 주소를 비운다', () {
+      action(ApplyPropertyAddressAction.select(selected));
+      action(const ApplyPropertyAddressAction.inputDetail('202호'));
+
+      action(ApplyPropertyAddressAction.select(selected));
+
+      expect(state().detailAddress, isEmpty);
+    });
+
+    test('다시 입력하면 상세 주소를 비운다', () {
+      action(ApplyPropertyAddressAction.select(selected));
+      action(const ApplyPropertyAddressAction.inputDetail('202호'));
+
+      action(const ApplyPropertyAddressAction.reset());
+
+      expect(state().detailAddress, isEmpty);
+    });
+
+    test('상세 주소가 없어도 좌표를 얻으면 다음으로 이동한다', () async {
+      action(ApplyPropertyAddressAction.select(selected));
+      await Future<void>.delayed(Duration.zero);
+
+      action(const ApplyPropertyAddressAction.next());
+
+      expect(state().hasDetailAddress, isFalse);
+      expect(state().navigateTo, isNotNull);
+    });
+  });
 }

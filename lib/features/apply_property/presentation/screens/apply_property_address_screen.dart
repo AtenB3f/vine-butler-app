@@ -15,10 +15,12 @@ class ApplyPropertyAddressScreen extends ConsumerStatefulWidget {
 
 class _ApplyPropertyAddressScreenState extends ConsumerState<ApplyPropertyAddressScreen> {
   final TextEditingController _controller = TextEditingController();
+  final TextEditingController _detailController = TextEditingController();
 
   @override
   void dispose() {
     _controller.dispose();
+    _detailController.dispose();
     super.dispose();
   }
 
@@ -47,6 +49,7 @@ class _ApplyPropertyAddressScreenState extends ConsumerState<ApplyPropertyAddres
     ref.listen(applyPropertyAddressVMProvider.select((state) => state.selected), (_, selected) {
       if (selected == null) {
         _controller.clear();
+        _detailController.clear();
       } else {
         FocusManager.instance.primaryFocus?.unfocus();
       }
@@ -59,7 +62,7 @@ class _ApplyPropertyAddressScreenState extends ConsumerState<ApplyPropertyAddres
       body: Column(
         children: [
           Expanded(
-            child: state.isMapVisible ? _mapPage(state.selected!) : _inputPage(state, viewModel),
+            child: state.isMapVisible ? _mapPage(state, viewModel) : _inputPage(state, viewModel),
           ),
           _buttons(state, viewModel),
         ],
@@ -76,7 +79,10 @@ class _ApplyPropertyAddressScreenState extends ConsumerState<ApplyPropertyAddres
     );
   }
 
-  Widget _mapPage(AddressResultViewState address) {
+  Widget _mapPage(ApplyPropertyAddressViewState state, ApplyPropertyAddressVM viewModel) {
+    final address = state.selected!;
+    final detail = state.hasDetailAddress ? ', ${state.detailAddress.trim()}' : '';
+
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
       child: Column(
@@ -84,23 +90,37 @@ class _ApplyPropertyAddressScreenState extends ConsumerState<ApplyPropertyAddres
         spacing: 16,
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 100, bottom: 16),
-            child: AppFontStyle.header1.text('이 주소가 맞으신가요?', TextColor.dark),
-          ),
-          Container(
-            width: double.infinity,
-            height: 335,
-            decoration: BoxDecoration(
-              color: BaseColor.light,
-              borderRadius: BorderRadius.circular(4),
+            padding: const EdgeInsets.only(top: 80, bottom: 16),
+            child: AppFontStyle.header1.text(
+              state.hasDetailAddress ? '이 주소가 맞으신가요?' : '상세 주소를 입력해주세요.',
+              TextColor.dark,
             ),
+          ),
+          AppTextField(
+            viewState: const AppTextFieldViewState(
+              status: AppTextFieldStatus.normal,
+              title: '상세 주소',
+              placeholder: 'ex) 101호',
+            ),
+            controller: _detailController,
+            onChanged: (detailAddress) =>
+                viewModel.action(ApplyPropertyAddressAction.inputDetail(detailAddress)),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 4,
             children: [
-              AppFontStyle.sub2.text(address.address, TextColor.dark),
-              AppFontStyle.body2.text(address.lotAddress, TextColor.medium),
+              Container(
+                width: double.infinity,
+                height: 240,
+                decoration: BoxDecoration(
+                  color: BaseColor.light,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              const SizedBox(height: 8),
+              AppFontStyle.sub2.text('${address.address}$detail', TextColor.dark),
+              const SizedBox(height: 4),
+              AppFontStyle.body2.text('${address.lotAddress}$detail', TextColor.medium),
             ],
           ),
         ],
@@ -213,7 +233,7 @@ class _ApplyPropertyAddressScreenState extends ConsumerState<ApplyPropertyAddres
             FillButton(
               type: FillButtonType.gray,
               size: BoxButtonSize.large,
-              text: '다시 입력하기',
+              text: '다시 입력',
               onTap: () => viewModel.action(const ApplyPropertyAddressAction.reset()),
             ),
           FillButton(

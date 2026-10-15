@@ -6,6 +6,7 @@ class ApplyPropertyAddressViewState {
   final List<AddressResultViewState> results;
   final AddressResultViewState? selected;
   final Address? located;
+  final String detailAddress;
   final bool isLocating;
   final bool isSearching;
   final bool isLoading;
@@ -19,6 +20,7 @@ class ApplyPropertyAddressViewState {
     this.results = const [],
     this.selected,
     this.located,
+    this.detailAddress = '',
     this.isLocating = false,
     this.isSearching = false,
     this.isLoading = false,
@@ -36,11 +38,14 @@ class ApplyPropertyAddressViewState {
 
   bool get canProceed => located != null;
 
+  bool get hasDetailAddress => detailAddress.trim().isNotEmpty;
+
   ApplyPropertyAddressViewState copyWith({
     String? query,
     List<AddressResultViewState>? results,
     AddressResultViewState? Function()? selected,
     Address? Function()? located,
+    String? detailAddress,
     bool? isLocating,
     bool? isSearching,
     bool? isLoading,
@@ -54,6 +59,7 @@ class ApplyPropertyAddressViewState {
       results: results ?? this.results,
       selected: selected != null ? selected() : this.selected,
       located: located != null ? located() : this.located,
+      detailAddress: detailAddress ?? this.detailAddress,
       isLocating: isLocating ?? this.isLocating,
       isSearching: isSearching ?? this.isSearching,
       isLoading: isLoading ?? this.isLoading,

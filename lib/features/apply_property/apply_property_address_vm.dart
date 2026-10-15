@@ -19,6 +19,7 @@ sealed class ApplyPropertyAddressAction {
   const factory ApplyPropertyAddressAction.reset() = _Reset;
   const factory ApplyPropertyAddressAction.clearError() = _ClearError;
   const factory ApplyPropertyAddressAction.loadMore() = _LoadMore;
+  const factory ApplyPropertyAddressAction.inputDetail(String detailAddress) = _InputDetail;
 }
 
 class _Search extends ApplyPropertyAddressAction {
@@ -47,6 +48,12 @@ class _ClearError extends ApplyPropertyAddressAction {
 
 class _LoadMore extends ApplyPropertyAddressAction {
   const _LoadMore();
+}
+
+class _InputDetail extends ApplyPropertyAddressAction {
+  final String detailAddress;
+
+  const _InputDetail(this.detailAddress);
 }
 
 class ApplyPropertyAddressVM extends Notifier<ApplyPropertyAddressViewState> {
@@ -86,6 +93,7 @@ class ApplyPropertyAddressVM extends Notifier<ApplyPropertyAddressViewState> {
           totalCount: 0,
           selected: () => address,
           located: () => null,
+          detailAddress: '',
           isLocating: true,
         );
         _locate(address, requestId);
@@ -107,6 +115,9 @@ class ApplyPropertyAddressVM extends Notifier<ApplyPropertyAddressViewState> {
 
         state = state.copyWith(isLoading: true);
         _fetchNextPage(state.query, state.page + 1, _requestId);
+
+      case _InputDetail(:final detailAddress):
+        state = state.copyWith(detailAddress: detailAddress);
     }
   }
 
