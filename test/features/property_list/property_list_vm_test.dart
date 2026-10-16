@@ -27,7 +27,7 @@ class _FakePropertyRepository implements PropertyRepository {
   Future<void> delete(String id) async {}
 }
 
-Property _property({String detailAddress = '', int? roomCount}) {
+Property _property({String detailAddress = '', int? roomCount, bool? isParkingAvailable, bool? isSuretyInsuranceAvailable}) {
   return Property(
     id: 'a',
     owner: const Owner(name: '홍길동', phone: '010-1234-5678'),
@@ -45,6 +45,8 @@ Property _property({String detailAddress = '', int? roomCount}) {
       longitude: 127.0364,
     ),
     roomCount: roomCount,
+    isParkingAvailable: isParkingAvailable,
+    isSuretyInsuranceAvailable: isSuretyInsuranceAvailable,
     updatedAt: DateTime(2020),
   );
 }
@@ -85,6 +87,18 @@ void main() {
     await emit([_property()]);
 
     expect(state().items.single.roadAddress, '서울 강남구 테헤란로 1');
+    expect(state().items.single.tag, isEmpty);
+  });
+
+  test('주차 가능과 보증보험 가입 가능이면 태그로 보여준다', () async {
+    await emit([_property(roomCount: 1, isParkingAvailable: true, isSuretyInsuranceAvailable: true)]);
+
+    expect(state().items.single.tag, ['방 1개', '주차가능', '보증보험가입']);
+  });
+
+  test('주차 불가와 보증보험 가입 불가면 태그가 없다', () async {
+    await emit([_property(isParkingAvailable: false, isSuretyInsuranceAvailable: false)]);
+
     expect(state().items.single.tag, isEmpty);
   });
 

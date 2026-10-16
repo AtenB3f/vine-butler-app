@@ -34,7 +34,11 @@ class PropertyListItemViewState {
       jibunAddress: address.lotAddress,
       transactionType: property.deal.transactionType,
       propertyType: property.propertyType,
-      tag: [if (roomCount != null) '방 $roomCount개'],
+      tag: [
+        if (roomCount != null) '방 $roomCount개',
+        if (property.isParkingAvailable == true) '주차가능',
+        if (property.isSuretyInsuranceAvailable == true) '보증보험가입',
+      ],
     );
   }
 }

@@ -59,14 +59,7 @@ class PropertyListItem extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 8,
       children: [
-        Text(
-          viewState.roadAddress,
-          style: AppFontStyle.sub3.style(TextColor.dark),
-          textAlign: TextAlign.right,
-          maxLines: 1,
-          softWrap: false,
-          overflow: TextOverflow.clip,
-        ),
+        _LeadingEllipsisText(text: viewState.roadAddress, style: AppFontStyle.sub3.style(TextColor.dark)),
         Row(
           spacing: 4,
           children: [
@@ -90,5 +83,59 @@ class PropertyListItem extends StatelessWidget {
         for (final tag in viewState.tag) GrayTag(text: tag, size: GrayTagSize.small),
       ],
     );
+  }
+}
+
+class _LeadingEllipsisText extends StatelessWidget {
+  final String text;
+  final TextStyle style;
+
+  const _LeadingEllipsisText({required this.text, required this.style});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) => Text(
+        _fit(context, constraints.maxWidth),
+        style: style,
+        maxLines: 1,
+        softWrap: false,
+      ),
+    );
+  }
+
+  String _fit(BuildContext context, double maxWidth) {
+    const ellipsis = '...';
+    final textDirection = Directionality.of(context);
+    final textScaler = MediaQuery.textScalerOf(context);
+
+    bool fits(String value) {
+      final painter = TextPainter(
+        text: TextSpan(text: value, style: style),
+        textDirection: textDirection,
+        textScaler: textScaler,
+        maxLines: 1,
+      )..layout();
+      final width = painter.width;
+
+      painter.dispose();
+      return width <= maxWidth;
+    }
+
+    if (fits(text)) { return text; }
+
+    var low = 0;
+    var high = text.length;
+
+    while (low < high) {
+      final mid = (low + high) ~/ 2;
+
+      if (fits('$ellipsis${text.substring(mid)}')) {
+        high = mid;
+      } else {
+        low = mid + 1;
+      }
+    }
+    return '$ellipsis${text.substring(low)}';
   }
 }
