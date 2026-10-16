@@ -171,7 +171,7 @@ class PropertyListScreen extends ConsumerWidget {
               query: state.query,
               onTap: () {
                 FocusManager.instance.primaryFocus?.unfocus();
-                ref.read(propertyListVMProvider.notifier).action(PropertyListAction.selectSearchResult(item.id));
+                ref.read(propertyListVMProvider.notifier).action(PropertyListAction.select(item.id));
               },
             ),
         ],
@@ -181,7 +181,7 @@ class PropertyListScreen extends ConsumerWidget {
 
   void _dismissOverlay(WidgetRef ref) {
     FocusManager.instance.primaryFocus?.unfocus();
-    ref.read(propertyListVMProvider.notifier).action(const PropertyListAction.pushFilter(false));
+    ref.read(propertyListVMProvider.notifier).action(const PropertyListAction.panel(false));
   }
 }
 
@@ -212,8 +212,8 @@ class _HomeBannerState extends ConsumerState<_HomeBanner> {
       viewState: AppBndSearchViewState(status: widget.status, placeholder: '매물 찾기'),
       controller: _controller,
       onChanged: (query) => vm.action(PropertyListAction.search(query)),
-      onFocusChanged: (hasFocus) => vm.action(PropertyListAction.changeFocus(hasFocus)),
-      onSearchTap: () => vm.action(PropertyListAction.pushFilter(!widget.isFilterOpen)),
+      onFocusChanged: (hasFocus) => vm.action(PropertyListAction.focus(hasFocus)),
+      onSearchTap: () => vm.action(PropertyListAction.panel(!widget.isFilterOpen)),
     );
   }
 }

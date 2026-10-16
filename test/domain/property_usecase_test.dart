@@ -3,6 +3,7 @@ import 'package:vine_butler/domain/model/address.dart';
 import 'package:vine_butler/domain/model/owner.dart';
 import 'package:vine_butler/domain/model/property.dart';
 import 'package:vine_butler/domain/model/property_deal.dart';
+import 'package:vine_butler/domain/model/property_search_condition.dart';
 import 'package:vine_butler/domain/model/property_image.dart';
 import 'package:vine_butler/domain/property_type.dart';
 import 'package:vine_butler/domain/repository/property_repository.dart';
@@ -15,7 +16,10 @@ class _FakePropertyRepository implements PropertyRepository {
   Future<void> save(Property property) async => saved.add(property);
 
   @override
-  Stream<List<Property>> watchAll() => Stream.value(saved);
+  Stream<List<Property>> watchList() => Stream.value(saved);
+
+  @override
+  Stream<List<Property>> watchFilter(PropertySearchCondition condition) => watchList();
 
   @override
   Future<Property?> getById(String id) async => null;

@@ -7,15 +7,25 @@ import 'package:vine_butler/domain/model/address.dart';
 import 'package:vine_butler/domain/model/owner.dart';
 import 'package:vine_butler/domain/model/property.dart';
 import 'package:vine_butler/domain/model/property_deal.dart';
+import 'package:vine_butler/domain/model/property_search_condition.dart';
 import 'package:vine_butler/domain/property_type.dart';
 import 'package:vine_butler/domain/repository/property_repository.dart';
+import 'package:vine_butler/features/property_list/presentation/property_filter_view_state.dart';
 import 'package:vine_butler/features/property_list/property_list_vm.dart';
 
 class _FakePropertyRepository implements PropertyRepository {
-  final StreamController<List<Property>> controller = StreamController<List<Property>>();
+  final List<PropertySearchCondition> requests = [];
+  StreamController<List<Property>> controller = StreamController<List<Property>>();
 
   @override
-  Stream<List<Property>> watchAll() => controller.stream;
+  Stream<List<Property>> watchList() => controller.stream;
+
+  @override
+  Stream<List<Property>> watchFilter(PropertySearchCondition condition) {
+    requests.add(condition);
+    controller = StreamController<List<Property>>();
+    return controller.stream;
+  }
 
   @override
   Future<void> save(Property property) async {}
@@ -56,6 +66,7 @@ void main() {
   late ProviderContainer container;
 
   PropertyListViewState state() => container.read(propertyListVMProvider);
+  void action(PropertyListAction action) => container.read(propertyListVMProvider.notifier).action(action);
 
   Future<void> emit(List<Property> properties) async {
     repository.controller.add(properties);
@@ -103,11 +114,50 @@ void main() {
   });
 
   test('목록이 바뀌어도 검색어를 유지한다', () async {
-    container.read(propertyListVMProvider.notifier).action(const PropertyListAction.search('테헤란'));
+    action(const PropertyListAction.search('테헤란'));
 
     await emit([_property()]);
 
     expect(state().query, '테헤란');
     expect(state().searchResults, hasLength(1));
+  });
+
+  group('검색 조건', () {
+    test('처음에는 조건 없이 요청한다', () {
+      expect(repository.requests.single, const PropertySearchCondition());
+    });
+
+    test('검색어가 바뀌면 검색어로 다시 요청한다', () {
+      action(const PropertyListAction.search(' 테헤란 '));
+
+      expect(repository.requests.last.keyword, '테헤란');
+    });
+
+    test('필터가 바뀌면 필터 조건으로 다시 요청한다', () {
+      action(
+        const PropertyListAction.filtering(
+          PropertyFilterData(
+            transactionType: PropertyTransactionType.rent,
+            propertyTypes: {PropertyType.villa},
+            price: 100000000,
+          ),
+        ),
+      );
+
+      expect(
+        repository.requests.last,
+        const PropertySearchCondition(
+          transactionType: PropertyTransactionType.rent,
+          propertyTypes: {PropertyType.villa},
+          price: 100000000,
+        ),
+      );
+    });
+
+    test('금액이 최댓값이면 금액 정렬을 하지 않는다', () {
+      action(const PropertyListAction.filtering(PropertyFilterData(transactionType: PropertyTransactionType.buy)));
+
+      expect(repository.requests.last.price, isNull);
+    });
   });
 }

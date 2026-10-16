@@ -38,7 +38,7 @@ class _PropertyFilterPanelState extends ConsumerState<PropertyFilterPanel> {
 
   void _onCollapseTap() {
     FocusManager.instance.primaryFocus?.unfocus();
-    _viewModel.action(const PropertyListAction.pushFilter(false));
+    _viewModel.action(const PropertyListAction.panel(false));
   }
 
   @override

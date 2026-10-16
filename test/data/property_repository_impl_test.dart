@@ -8,6 +8,7 @@ import 'package:vine_butler/domain/model/owner.dart';
 import 'package:vine_butler/domain/model/property.dart';
 import 'package:vine_butler/domain/model/property_deal.dart';
 import 'package:vine_butler/domain/model/property_image.dart';
+import 'package:vine_butler/domain/model/property_search_condition.dart';
 import 'package:vine_butler/domain/property_type.dart';
 
 PropertyImage _image(String id, int order) {
@@ -89,7 +90,7 @@ void main() {
     await repository.save(_property('a'));
     await repository.save(_property('a').copyWith(memo: '수정'));
 
-    final all = await repository.watchAll().first;
+    final all = await repository.watchList().first;
 
     expect(all, hasLength(1));
     expect(all.single.memo, '수정');
@@ -102,7 +103,7 @@ void main() {
     await repository.delete('a');
 
     expect(await repository.getById('a'), isNull);
-    expect((await repository.watchAll().first).map((p) => p.id), ['b']);
+    expect((await repository.watchList().first).map((p) => p.id), ['b']);
     expect(await db.select(db.propertyTable).get(), hasLength(2));
   });
 
@@ -110,7 +111,7 @@ void main() {
     await repository.save(_property('a', images: [_image('i2', 1), _image('i1', 0)]));
     await repository.save(_property('b'));
 
-    final all = await repository.watchAll().first;
+    final all = await repository.watchList().first;
     final a = all.firstWhere((p) => p.id == 'a');
     final b = all.firstWhere((p) => p.id == 'b');
 
@@ -162,5 +163,84 @@ void main() {
 
     expect(row.deletedAt, isNotNull);
     expect(row.updatedAt.isAfter(row.syncedAt!), isTrue);
+  });
+
+  group('watchFilter', () {
+    Property listed(
+      String id, {
+      PropertyTransactionType transactionType = PropertyTransactionType.rent,
+      PropertyType propertyType = PropertyType.apartment,
+      int price = 10000000,
+      String roadAddress = '서울 강남구 테헤란로 1',
+      String lotAddress = '역삼동 1-1',
+      String detailAddress = '',
+    }) {
+      final property = _property(id);
+
+      return property.copyWith(
+        propertyType: propertyType,
+        deal: PropertyDeal(transactionType: transactionType, price: price),
+        address: property.address.copyWith(roadAddress: roadAddress, lotAddress: lotAddress, detailAddress: detailAddress),
+      );
+    }
+
+    Future<List<String>> ids(PropertySearchCondition condition) async {
+      final properties = await repository.watchFilter(condition).first;
+
+      return properties.map((property) => property.id).toList();
+    }
+
+    test('이미지가 여러 장이어도 매물은 한 번만 나오고 이미지를 순서대로 붙인다', () async {
+      await repository.save(listed('a').copyWith(images: [_image('i2', 1), _image('i1', 0), _image('i3', 2)]));
+      await repository.save(listed('b'));
+
+      final properties = await repository.watchFilter(const PropertySearchCondition()).first;
+
+      expect(properties.map((property) => property.id), unorderedEquals(['a', 'b']));
+      expect(properties.firstWhere((property) => property.id == 'a').images.map((image) => image.id), ['i1', 'i2', 'i3']);
+    });
+
+    test('삭제한 매물은 제외한다', () async {
+      await repository.save(listed('a'));
+      await repository.save(listed('b'));
+      await repository.delete('a');
+
+      expect(await ids(const PropertySearchCondition()), ['b']);
+    });
+
+    test('거래 유형과 건물 유형이 일치하는 매물만 가져온다', () async {
+      await repository.save(listed('rentVilla', propertyType: PropertyType.villa));
+      await repository.save(listed('buyVilla', transactionType: PropertyTransactionType.buy, propertyType: PropertyType.villa));
+      await repository.save(listed('rentApartment'));
+
+      expect(
+        await ids(const PropertySearchCondition(transactionType: PropertyTransactionType.rent, propertyTypes: {PropertyType.villa})),
+        ['rentVilla'],
+      );
+    });
+
+    test('검색어가 도로명·지번·상세 주소 중 하나에 포함되면 가져온다', () async {
+      await repository.save(listed('road', roadAddress: '서울 마포구 월드컵로 1'));
+      await repository.save(listed('lot', lotAddress: '마포동 1-1'));
+      await repository.save(listed('detail', detailAddress: '마포아파트 101호'));
+      await repository.save(listed('none'));
+
+      expect(await ids(const PropertySearchCondition(keyword: '마포')), unorderedEquals(['detail', 'lot', 'road']));
+    });
+
+    test('검색어의 %와 _는 문자 그대로 찾는다', () async {
+      await repository.save(listed('percent', detailAddress: '100%'));
+      await repository.save(listed('plain', detailAddress: '1000'));
+
+      expect(await ids(const PropertySearchCondition(keyword: '0%')), ['percent']);
+    });
+
+    test('금액 기준이 있으면 금액이 가까운 순으로 정렬한다', () async {
+      await repository.save(listed('far', price: 100000000));
+      await repository.save(listed('near', price: 52000000));
+      await repository.save(listed('middle', price: 30000000));
+
+      expect(await ids(const PropertySearchCondition(price: 50000000)), ['near', 'middle', 'far']);
+    });
   });
 }

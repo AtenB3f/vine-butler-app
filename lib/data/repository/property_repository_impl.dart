@@ -4,6 +4,7 @@ import 'package:vine_butler/data/mapper/property_image_mapper.dart';
 import 'package:vine_butler/data/mapper/property_mapper.dart';
 import 'package:vine_butler/domain/model/property.dart';
 import 'package:vine_butler/domain/model/property_image.dart';
+import 'package:vine_butler/domain/model/property_search_condition.dart';
 import 'package:vine_butler/domain/repository/property_repository.dart';
 
 class PropertyRepositoryImpl implements PropertyRepository {
@@ -38,7 +39,7 @@ class PropertyRepositoryImpl implements PropertyRepository {
   }
 
   @override
-  Stream<List<Property>> watchAll() {
+  Stream<List<Property>> watchList() {
     final query = _propertiesWithImages()
       ..where(_db.propertyTable.deletedAt.isNull())
       ..orderBy([
@@ -47,6 +48,52 @@ class PropertyRepositoryImpl implements PropertyRepository {
       ]);
 
     return query.watch().map(_toProperties);
+  }
+
+  @override
+  Stream<List<Property>> watchFilter(PropertySearchCondition condition) {
+    final transactionType = condition.transactionType;
+    final price = condition.price;
+    final keyword = condition.keyword.trim();
+    final query = _db.select(_db.propertyTable)..where((t) => t.deletedAt.isNull());
+
+    if (transactionType != null) { query.where((t) => t.transactionType.equalsValue(transactionType)); }
+    if (condition.propertyTypes.isNotEmpty) { query.where((t) => t.propertyType.isInValues(condition.propertyTypes)); }
+
+    if (keyword.isNotEmpty) {
+      const escape = r'\';
+      final escaped = keyword.replaceAll(escape, '$escape$escape').replaceAll('%', '$escape%').replaceAll('_', '${escape}_');
+      final pattern = '%$escaped%';
+
+      query.where(
+        (t) =>
+            t.roadAddress.like(pattern, escapeChar: escape) |
+            t.lotAddress.like(pattern, escapeChar: escape) |
+            t.detailAddress.like(pattern, escapeChar: escape),
+      );
+    }
+    query.orderBy([
+      if (price != null) (t) => OrderingTerm.asc((t.price - Variable(price)).abs()),
+      (t) => OrderingTerm.desc(t.updatedAt),
+      (t) => OrderingTerm.asc(t.id),
+    ]);
+
+    return query.watch().asyncMap(_withImages);
+  }
+
+  Future<List<Property>> _withImages(List<PropertyTableData> rows) async {
+    final imageRows = await (_db.select(_db.propertyImageTable)
+          ..where((t) => t.propertyId.isIn(rows.map((row) => row.id)))
+          ..orderBy([(t) => OrderingTerm.asc(t.order)]))
+        .get();
+    final images = <String, List<PropertyImage>>{};
+
+    for (final image in imageRows) {
+      (images[image.propertyId] ??= []).add(image.toDomain());
+    }
+    return [
+      for (final row in rows) row.toDomain(images: images[row.id] ?? const []),
+    ];
   }
 
   @override

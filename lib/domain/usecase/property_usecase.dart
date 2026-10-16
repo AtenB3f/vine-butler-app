@@ -4,6 +4,7 @@ import 'package:vine_butler/domain/model/owner.dart';
 import 'package:vine_butler/domain/model/property.dart';
 import 'package:vine_butler/domain/model/property_deal.dart';
 import 'package:vine_butler/domain/model/property_image.dart';
+import 'package:vine_butler/domain/model/property_search_condition.dart';
 import 'package:vine_butler/domain/property_type.dart';
 import 'package:vine_butler/domain/repository/property_repository.dart';
 
@@ -13,7 +14,9 @@ class PropertyUseCase {
   final PropertyRepository _repository;
   final Uuid _uuid;
 
-  Stream<List<Property>> watchAll() => _repository.watchAll();
+  Stream<List<Property>> watchList() => _repository.watchList();
+
+  Stream<List<Property>> watchFilter(PropertySearchCondition condition) => _repository.watchFilter(condition);
 
   Future<Property?> get(String id) => _repository.getById(id);
 
