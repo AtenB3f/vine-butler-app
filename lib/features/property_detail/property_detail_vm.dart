@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vine_butler/core/di/providers.dart';
 import 'package:vine_butler/features/property_detail/presentation/property_detail_view_state.dart';
 
 final propertyDetailVMProvider =
@@ -10,12 +11,15 @@ class PropertyDetailVM extends Notifier<PropertyDetailViewState> {
   final String id;
 
   @override
-  PropertyDetailViewState build() => const PropertyDetailViewState();
+  PropertyDetailViewState build() {
+    _fetch();
+    return const PropertyDetailViewState();
+  }
 
   void action(PropertyDetailAction action) {
     switch (action) {
       case PropertyDetailAction.fetch:
-        break;
+        _fetch();
 
       case PropertyDetailAction.toggleMap:
         state = state.copyWith(isMapVisible: !state.isMapVisible);
@@ -28,5 +32,15 @@ class PropertyDetailVM extends Notifier<PropertyDetailViewState> {
 
   void pushNavigation(String path) {
     state = state.copyWith(navigateTo: () => path);
+  }
+
+  Future<void> _fetch() async {
+    final property = await ref.read(propertyUseCaseProvider).get(id);
+
+    if (!ref.mounted) { return; }
+
+    state = property == null
+        ? state.copyWith(isLoading: false, isNotFound: true)
+        : state.copyWith(data: PropertyDetailData.fromDomain(property), isLoading: false, isNotFound: false);
   }
 }

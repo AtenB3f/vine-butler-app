@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vine_butler/components/components.dart';
+import 'package:vine_butler/core/network/api_env.dart';
 import 'package:vine_butler/features/property_detail/presentation/property_detail_view_state.dart';
 import 'package:vine_butler/features/property_detail/property_detail_vm.dart';
 import 'package:vine_butler/shared/extensions/extensions.dart';
@@ -49,9 +50,7 @@ class PropertyDetailScreen extends ConsumerWidget {
           selectedIndex: -1,
         ),
       ),
-      body: state.data == null
-          ? const Center(child: CircularProgressIndicator())
-          : _contents(context, ref, state.data!, state.isMapVisible),
+      body: _body(context, ref, state),
     );
   }
 
@@ -69,10 +68,22 @@ class PropertyDetailScreen extends ConsumerWidget {
         ),
         topRight: Offset(context.screenWidth - 16, MediaQuery.paddingOf(context).top + 58),
       ),
-      body: state.data == null
-          ? const Center(child: CircularProgressIndicator())
-          : _contents(context, ref, state.data!, state.isMapVisible),
+      body: _body(context, ref, state),
     );
+  }
+
+  Widget _body(BuildContext context, WidgetRef ref, PropertyDetailViewState state) {
+    final data = state.data;
+
+    if (state.isLoading) {
+      return const Center(
+        child: AppLoadingSpinner(viewState: AppLoadingSpinnerViewState(size: AppLoadingSpinnerSize.large)),
+      );
+    }
+
+    if (data == null) { return Center(child: AppFontStyle.body3.text('매물을 찾을 수 없습니다.', TextColor.medium)); }
+
+    return _contents(context, ref, data, state.isMapVisible);
   }
 
   Widget _contents(BuildContext context, WidgetRef ref, PropertyDetailData data, bool isMapVisible) {
@@ -104,9 +115,11 @@ class PropertyDetailScreen extends ConsumerWidget {
         SizedBox(
           height: context.isMobile ? 246 : 240,
           width: double.infinity,
-          child: context.isMobile
-              ? _imageMap(data, isMapVisible)
-              : AppImagePage(viewState: AppImagePageViewState.urls(data.imageUrls)),
+          child: !data.hasImages
+              ? _map(data)
+              : context.isMobile
+                  ? _imageMap(data, isMapVisible)
+                  : AppImagePage(viewState: AppImagePageViewState.urls(data.imageUrls)),
         ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,16 +134,18 @@ class PropertyDetailScreen extends ConsumerWidget {
   }
 
   Widget _address(BuildContext context, WidgetRef ref, PropertyDetailData data, bool isMapVisible) {
+    final isToggleable = context.isMobile && data.hasImages;
     final address = Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 4,
       children: [
-        Text(
-          data.unitAddress,
-          style: AppFontStyle.header1.style(TextColor.dark),
-        ),
-        if (context.isMobile)
+        if (data.unitAddress.isNotEmpty)
+          Text(
+            data.unitAddress,
+            style: AppFontStyle.header1.style(TextColor.dark),
+          ),
+        if (isToggleable)
           Row(
             mainAxisSize: MainAxisSize.min,
             spacing: 6,
@@ -152,7 +167,7 @@ class PropertyDetailScreen extends ConsumerWidget {
       ],
     );
 
-    if (!context.isMobile) { return address; }
+    if (!isToggleable) { return address; }
 
     return Pressable(
       onTap: () => ref.read(propertyDetailVMProvider(id).notifier).action(PropertyDetailAction.toggleMap),
@@ -187,14 +202,15 @@ class PropertyDetailScreen extends ConsumerWidget {
               AppFontStyle.header3.text(maintenanceCost.formattedKRW, TextColor.dark),
             ],
           ),
-        Row(
-          spacing: 6,
-          children: [
-            AppFontStyle.sub1.text('${calculatePyeong(data.areaExclusive)}평', TextColor.medium),
-            const Circle(size: 2, color: BaseColor.medium),
-            AppFontStyle.sub1.text('${data.areaExclusive}m²', TextColor.medium),
-          ],
-        ),
+        if (data.areaExclusive case final areaExclusive?)
+          Row(
+            spacing: 6,
+            children: [
+              AppFontStyle.sub1.text('${calculatePyeong(areaExclusive)}평', TextColor.medium),
+              const Circle(size: 2, color: BaseColor.medium),
+              AppFontStyle.sub1.text('${areaExclusive}m²', TextColor.medium),
+            ],
+          ),
       ],
     );
   }
@@ -238,7 +254,7 @@ class PropertyDetailScreen extends ConsumerWidget {
       children: [
         if (data.vicinity.isNotEmpty) _optionItem('교통', data.vicinity.join(', ')),
         if (data.isAvailableParking) _optionItem('주차', '주차 가능'),
-        _optionItem('융자', data.isAvailableLoan ? '융자 있음' : '융자 없음'),
+        if (data.isAvailableLoan case final isAvailableLoan?) _optionItem('융자', isAvailableLoan ? '융자 있음' : '융자 없음'),
         if (data.isAvailableSuretyInsurance) _optionItem('보증보험', '보증보험 가입 가능'),
         _moveInRow(data),
       ],
@@ -316,8 +332,17 @@ class PropertyDetailScreen extends ConsumerWidget {
   }
 
   Widget _imageMap(PropertyDetailData data, bool isMapVisible) {
-    return isMapVisible
-        ? Container(color: BaseColor.light)
-        : AppImagePage(viewState: AppImagePageViewState.urls(data.imageUrls));
+    return isMapVisible ? _map(data) : AppImagePage(viewState: AppImagePageViewState.urls(data.imageUrls));
+  }
+
+  Widget _map(PropertyDetailData data) {
+    return AppMapView(
+      viewState: AppMapViewViewState(
+        latitude: data.latitude,
+        longitude: data.longitude,
+        clientId: ApiEnv.naverMapsClientId,
+        webServiceUrl: ApiEnv.naverMapsWebServiceUrl,
+      ),
+    );
   }
 }
