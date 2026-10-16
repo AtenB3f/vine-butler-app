@@ -8,7 +8,7 @@ import 'package:vine_butler/shared/extensions/extensions.dart';
 import 'package:vine_butler/shared/utils/utils.dart';
 
 class PropertyDetailScreen extends ConsumerWidget {
-  final int id;
+  final String id;
 
   const PropertyDetailScreen({super.key, required this.id});
 

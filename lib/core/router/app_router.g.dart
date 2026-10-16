@@ -258,14 +258,13 @@ RouteBase get $propertyDetailRoute => GoRouteData.$route(
 
 mixin $PropertyDetailRoute on GoRouteData {
   static PropertyDetailRoute _fromState(GoRouterState state) =>
-      PropertyDetailRoute(id: int.parse(state.pathParameters['id']!));
+      PropertyDetailRoute(id: state.pathParameters['id']!);
 
   PropertyDetailRoute get _self => this as PropertyDetailRoute;
 
   @override
-  String get location => GoRouteData.$location(
-    '/property/${Uri.encodeComponent(_self.id.toString())}',
-  );
+  String get location =>
+      GoRouteData.$location('/property/${Uri.encodeComponent(_self.id)}');
 
   @override
   void go(BuildContext context) => context.go(location);

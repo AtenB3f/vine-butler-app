@@ -1,6 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vine_butler/core/di/providers.dart';
 import 'package:vine_butler/core/router/app_router.dart';
+import 'package:vine_butler/domain/model/owner.dart';
+import 'package:vine_butler/domain/model/property_deal.dart';
+import 'package:vine_butler/features/apply_property/apply_property_address_vm.dart';
+import 'package:vine_butler/features/apply_property/apply_property_owner_vm.dart';
+import 'package:vine_butler/features/apply_property/apply_property_type_vm.dart';
 import 'package:vine_butler/features/apply_property/presentation/apply_property_extra_view_state.dart';
+import 'package:vine_butler/features/property_list/property_list_event_vm.dart';
 
 final applyPropertyExtraVMProvider =
     NotifierProvider<ApplyPropertyExtraVM, ApplyPropertyExtraViewState>(ApplyPropertyExtraVM.new);
@@ -17,6 +24,7 @@ sealed class ApplyPropertyExtraAction {
   const factory ApplyPropertyExtraAction.toggleFurniture(String option) = _ToggleFurniture;
   const factory ApplyPropertyExtraAction.changeMemo(String memo) = _ChangeMemo;
   const factory ApplyPropertyExtraAction.save() = _Save;
+  const factory ApplyPropertyExtraAction.clearError() = _ClearError;
   const factory ApplyPropertyExtraAction.popNavigation() = _PopNavigation;
 }
 
@@ -68,6 +76,10 @@ class _ChangeMemo extends ApplyPropertyExtraAction {
 
 class _Save extends ApplyPropertyExtraAction {
   const _Save();
+}
+
+class _ClearError extends ApplyPropertyExtraAction {
+  const _ClearError();
 }
 
 class _PopNavigation extends ApplyPropertyExtraAction {
@@ -128,10 +140,56 @@ class ApplyPropertyExtraVM extends Notifier<ApplyPropertyExtraViewState> {
         state = state.copyWith(memo: memo);
 
       case _Save():
-        state = state.copyWith(navigateTo: () => const PropertyListRoute().location);
+        _save();
+
+      case _ClearError():
+        state = state.copyWith(errorMessage: () => null);
 
       case _PopNavigation():
         state = state.copyWith(navigateTo: () => null);
+    }
+  }
+
+  Future<void> _save() async {
+    final type = ref.read(applyPropertyTypeVMProvider);
+    final address = ref.read(applyPropertyAddressVMProvider);
+    final owner = ref.read(applyPropertyOwnerVMProvider);
+    final transactionType = type.transactionType;
+    final propertyType = type.propertyType;
+    final located = address.located;
+
+    if (state.isSaving) { return; }
+    if (transactionType == null || propertyType == null || located == null || !owner.isCompleted) { return; }
+
+    state = state.copyWith(isSaving: true);
+
+    try {
+      final id = await ref.read(propertyUseCaseProvider).create(
+        owner: Owner(name: owner.name.trim(), phone: owner.phone),
+        propertyType: propertyType.types.single,
+        deal: PropertyDeal(
+          transactionType: transactionType,
+          price: type.price.round(),
+          monthlyRent: type.isMonthlyRentVisible ? type.monthlyRent.round() : null,
+        ),
+        address: located.copyWith(detailAddress: address.detailAddress.trim()),
+        isSuretyInsuranceAvailable: state.isAvailableSuretyInsurance,
+        hasLoan: state.hasLoan,
+        isParkingAvailable: state.isAvailableParking,
+        moveInDate: state.moveInDate,
+        isFlexibleMoveInDate: state.isMoveInDateNegotiable,
+        roomCount: state.roomCount,
+        furnitureOptions: state.furnitureOptions.toList(),
+        memo: state.memo.trim(),
+      );
+
+      ref.read(propertyListEventVMProvider.notifier).action(PropertyListEventAction.register(id));
+      ref.invalidate(applyPropertyTypeVMProvider);
+      ref.invalidate(applyPropertyAddressVMProvider);
+      ref.invalidate(applyPropertyOwnerVMProvider);
+      state = ApplyPropertyExtraViewState(navigateTo: const PropertyListRoute().location);
+    } catch (_) {
+      state = state.copyWith(isSaving: false, errorMessage: () => '매물을 저장하지 못했습니다. 다시 시도해주세요.');
     }
   }
 }

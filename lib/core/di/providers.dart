@@ -9,6 +9,7 @@ import 'package:vine_butler/data/repository/property_repository_impl.dart';
 import 'package:vine_butler/domain/repository/address_repository.dart';
 import 'package:vine_butler/domain/repository/property_repository.dart';
 import 'package:vine_butler/domain/usecase/address_usecase.dart';
+import 'package:vine_butler/domain/usecase/property_usecase.dart';
 
 final appDatabaseProvider = Provider<AppDatabase>((ref) {
   final db = AppDatabase();
@@ -19,6 +20,8 @@ final appDatabaseProvider = Provider<AppDatabase>((ref) {
 final propertyRepositoryProvider = Provider<PropertyRepository>(
   (ref) => PropertyRepositoryImpl(ref.watch(appDatabaseProvider)),
 );
+
+final propertyUseCaseProvider = Provider<PropertyUseCase>((ref) => PropertyUseCase(ref.watch(propertyRepositoryProvider)));
 
 final naverMapsDioProvider = Provider<Dio>((ref) {
   final dio = createNaverMapsDio();

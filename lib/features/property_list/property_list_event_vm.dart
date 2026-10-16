@@ -7,12 +7,12 @@ final propertyListEventVMProvider =
 sealed class PropertyListEventAction {
   const PropertyListEventAction();
 
-  const factory PropertyListEventAction.register(int id) = _Register;
+  const factory PropertyListEventAction.register(String id) = _Register;
   const factory PropertyListEventAction.clearRegistration() = _ClearRegistration;
 }
 
 class _Register extends PropertyListEventAction {
-  final int id;
+  final String id;
 
   const _Register(this.id);
 }

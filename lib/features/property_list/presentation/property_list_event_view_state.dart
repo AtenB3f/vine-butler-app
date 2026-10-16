@@ -1,10 +1,10 @@
 class PropertyListEventViewState {
-  final int? registerId;
+  final String? registerId;
 
   const PropertyListEventViewState({this.registerId});
 
   PropertyListEventViewState copyWith({
-    int? Function()? registerId,
+    String? Function()? registerId,
   }) {
     return PropertyListEventViewState(
       registerId: registerId != null ? registerId() : this.registerId,

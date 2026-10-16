@@ -1,7 +1,8 @@
+import 'package:vine_butler/domain/model/property.dart';
 import 'package:vine_butler/domain/property_type.dart';
 
 class PropertyListItemViewState {
-  final int id;
+  final String id;
   final int amount;
   final int? monthlyAmount;
   final String roadAddress;
@@ -20,4 +21,20 @@ class PropertyListItemViewState {
     required this.propertyType,
     required this.tag,
   });
+
+  factory PropertyListItemViewState.fromDomain(Property property) {
+    final address = property.address;
+    final roomCount = property.roomCount;
+
+    return PropertyListItemViewState(
+      id: property.id,
+      amount: property.deal.price,
+      monthlyAmount: property.deal.monthlyRent,
+      roadAddress: address.detailAddress.isEmpty ? address.roadAddress : '${address.roadAddress}, ${address.detailAddress}',
+      jibunAddress: address.lotAddress,
+      transactionType: property.deal.transactionType,
+      propertyType: property.propertyType,
+      tag: [if (roomCount != null) '방 $roomCount개'],
+    );
+  }
 }

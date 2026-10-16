@@ -50,6 +50,15 @@ class _ApplyPropertyExtraScreenState extends ConsumerState<ApplyPropertyExtraScr
       onEvent: (location) => context.go(location),
     );
 
+    ref.handleEvent(
+      applyPropertyExtraVMProvider.select((state) => state.errorMessage),
+      consume: () => viewModel.action(const ApplyPropertyExtraAction.clearError()),
+      onEvent: (message) => showAppToast(
+        context,
+        AppToastViewState(type: AppToastType.warning, text: message, hasLink: false),
+      ),
+    );
+
     return AppScaffold(
       title: '매물 등록',
       leftIcon: AppIcons.chevronLeftMD,

@@ -2,12 +2,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vine_butler/features/property_detail/presentation/property_detail_view_state.dart';
 
 final propertyDetailVMProvider =
-    NotifierProvider.family<PropertyDetailVM, PropertyDetailViewState, int>(PropertyDetailVM.new);
+    NotifierProvider.family<PropertyDetailVM, PropertyDetailViewState, String>(PropertyDetailVM.new);
 
 class PropertyDetailVM extends Notifier<PropertyDetailViewState> {
   PropertyDetailVM(this.id);
 
-  final int id;
+  final String id;
 
   @override
   PropertyDetailViewState build() => const PropertyDetailViewState();

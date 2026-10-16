@@ -127,7 +127,7 @@ class ApplyPropertyExtraRoute extends GoRouteData with $ApplyPropertyExtraRoute 
 class PropertyDetailRoute extends GoRouteData with $PropertyDetailRoute {
   const PropertyDetailRoute({required this.id});
 
-  final int id;
+  final String id;
 
   @override
   Widget build(BuildContext context, GoRouterState state) => PropertyDetailScreen(id: id);

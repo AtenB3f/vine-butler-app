@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vine_butler/components/components.dart';
+import 'package:vine_butler/core/di/providers.dart';
 import 'package:vine_butler/core/router/app_router.dart';
 import 'package:vine_butler/domain/property_type.dart';
 import 'package:vine_butler/features/property_list/presentation/property_filter_view_state.dart';
@@ -47,6 +48,7 @@ class PropertyListViewState {
   }
 
   PropertyListViewState copyWith({
+    List<PropertyListItemViewState>? items,
     String? query,
     bool? isSearchFocused,
     bool? isSearchCommitted,
@@ -54,7 +56,7 @@ class PropertyListViewState {
     String? navigateTo,
   }) {
     return PropertyListViewState(
-      items: items,
+      items: items ?? this.items,
       query: query ?? this.query,
       isSearchFocused: isSearchFocused ?? this.isSearchFocused,
       isSearchCommitted: isSearchCommitted ?? this.isSearchCommitted,
@@ -69,7 +71,7 @@ sealed class PropertyListAction {
 
   const factory PropertyListAction.search(String query) = _Search;
   const factory PropertyListAction.changeFocus(bool hasFocus) = _ChangeFocus;
-  const factory PropertyListAction.selectSearchResult(int id) = _SelectSearchResult;
+  const factory PropertyListAction.selectSearchResult(String id) = _SelectSearchResult;
   const factory PropertyListAction.pushFilter(bool isPresented) = _PushFilter;
   const factory PropertyListAction.filtering(PropertyFilterData data) = _Filtering;
 }
@@ -87,7 +89,7 @@ class _ChangeFocus extends PropertyListAction {
 }
 
 class _SelectSearchResult extends PropertyListAction {
-  final int id;
+  final String id;
 
   const _SelectSearchResult(this.id);
 }
@@ -117,7 +119,17 @@ class PropertyListVM extends Notifier<PropertyListViewState> {
   ];
 
   @override
-  PropertyListViewState build() => const PropertyListViewState(items: []);
+  PropertyListViewState build() {
+    final subscription = ref.read(propertyUseCaseProvider).watchAll().listen((properties) {
+      state = state.copyWith(
+        items: properties.map(PropertyListItemViewState.fromDomain).toList(),
+        navigateTo: state.navigateTo,
+      );
+    });
+
+    ref.onDispose(subscription.cancel);
+    return const PropertyListViewState(items: []);
+  }
 
   void action(PropertyListAction action) {
     switch (action) {

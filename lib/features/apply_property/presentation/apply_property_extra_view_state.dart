@@ -7,6 +7,8 @@ class ApplyPropertyExtraViewState {
   final int? roomCount;
   final Set<String> furnitureOptions;
   final String memo;
+  final bool isSaving;
+  final String? errorMessage;
   final String? navigateTo;
 
   const ApplyPropertyExtraViewState({
@@ -18,6 +20,8 @@ class ApplyPropertyExtraViewState {
     this.roomCount,
     this.furnitureOptions = const {},
     this.memo = '',
+    this.isSaving = false,
+    this.errorMessage,
     this.navigateTo,
   });
 
@@ -30,6 +34,8 @@ class ApplyPropertyExtraViewState {
     int? Function()? roomCount,
     Set<String>? furnitureOptions,
     String? memo,
+    bool? isSaving,
+    String? Function()? errorMessage,
     String? Function()? navigateTo,
   }) {
     return ApplyPropertyExtraViewState(
@@ -42,6 +48,8 @@ class ApplyPropertyExtraViewState {
       roomCount: roomCount != null ? roomCount() : this.roomCount,
       furnitureOptions: furnitureOptions ?? this.furnitureOptions,
       memo: memo ?? this.memo,
+      isSaving: isSaving ?? this.isSaving,
+      errorMessage: errorMessage != null ? errorMessage() : this.errorMessage,
       navigateTo: navigateTo != null ? navigateTo() : this.navigateTo,
     );
   }
