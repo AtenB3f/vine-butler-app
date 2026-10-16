@@ -14,20 +14,22 @@ class ApplyPropertyTypeScreen extends ConsumerStatefulWidget {
 }
 
 class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScreen> {
-  late final ValueNotifier<double> _priceController =
-      ValueNotifier(ref.read(applyPropertyTypeVMProvider).price);
-  late final ValueNotifier<double> _monthlyRentController =
-      ValueNotifier(ref.read(applyPropertyTypeVMProvider).monthlyRent);
-  late final TextEditingController _priceTextController =
-      TextEditingController(text: ref.read(applyPropertyTypeVMProvider).price.formattedKRW);
-  late final TextEditingController _monthlyRentTextController =
-      TextEditingController(text: ref.read(applyPropertyTypeVMProvider).monthlyRent.formattedKRW);
+  late final ValueNotifier<double> _priceController;
+  late final ValueNotifier<double> _monthlyRentController;
+  late final TextEditingController _priceTextController;
+  late final TextEditingController _monthlyRentTextController;
   bool _isPriceEditing = false;
   bool _isMonthlyRentEditing = false;
 
   @override
   void initState() {
     super.initState();
+    final state = ref.read(applyPropertyTypeVMProvider);
+
+    _priceController = ValueNotifier(state.price);
+    _monthlyRentController = ValueNotifier(state.monthlyRent);
+    _priceTextController = TextEditingController(text: state.price.formattedKRW);
+    _monthlyRentTextController = TextEditingController(text: state.monthlyRent.formattedKRW);
     _priceController.addListener(_onPriceChange);
     _monthlyRentController.addListener(_onMonthlyRentChange);
   }
