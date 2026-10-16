@@ -17,6 +17,7 @@ abstract class Property with _$Property {
     required PropertyType propertyType,
     required PropertyDeal deal,
     required Address address,
+    int? maintenanceCost,
     bool? isSuretyInsuranceAvailable,
     bool? hasLoan,
     bool? isParkingAvailable,

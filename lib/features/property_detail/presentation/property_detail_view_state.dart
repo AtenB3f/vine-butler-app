@@ -100,6 +100,7 @@ class PropertyDetailData {
       transactionType: property.deal.transactionType,
       amount: property.deal.price,
       monthlyAmount: property.deal.monthlyRent,
+      maintenanceCost: property.maintenanceCost,
       ownerPhone: property.owner.phone,
       vicinity: const [],
       isAvailableParking: property.isParkingAvailable == true,

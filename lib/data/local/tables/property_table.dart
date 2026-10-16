@@ -12,6 +12,7 @@ class PropertyTable extends Table {
   TextColumn get propertyType => textEnum<PropertyType>()();
   IntColumn get price => integer()();
   IntColumn get monthlyRent => integer().nullable()();
+  IntColumn get maintenanceCost => integer().nullable()();
   TextColumn get zipCode => text()();
   TextColumn get roadAddress => text()();
   TextColumn get lotAddress => text()();

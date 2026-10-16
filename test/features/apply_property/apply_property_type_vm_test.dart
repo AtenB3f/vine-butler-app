@@ -74,4 +74,28 @@ void main() {
       expect(state().price, state().midPrice);
     });
   });
+
+  group('관리비', () {
+    test('기본값은 10만원이다', () {
+      expect(state().maintenanceCost, 100000);
+    });
+
+    test('0원과 범위 밖 값도 입력한 그대로 둔다', () {
+      action(const ApplyPropertyTypeAction.changeMaintenanceCost(0));
+
+      expect(state().maintenanceCost, 0);
+
+      action(const ApplyPropertyTypeAction.changeMaintenanceCost(ApplyPropertyTypeViewState.maxMaintenanceCost + 1));
+
+      expect(state().maintenanceCost, ApplyPropertyTypeViewState.maxMaintenanceCost + 1);
+    });
+
+    test('거래 유형을 바꿔도 유지한다', () {
+      action(const ApplyPropertyTypeAction.changeMaintenanceCost(150000));
+
+      action(const ApplyPropertyTypeAction.selectTransactionType(PropertyTransactionType.buy));
+
+      expect(state().maintenanceCost, 150000);
+    });
+  });
 }

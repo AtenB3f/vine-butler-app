@@ -13,6 +13,7 @@ sealed class ApplyPropertyTypeAction {
   const factory ApplyPropertyTypeAction.selectPropertyType(PropertyTypeFilterOption option) = _SelectPropertyType;
   const factory ApplyPropertyTypeAction.changePrice(double price) = _ChangePrice;
   const factory ApplyPropertyTypeAction.changeMonthlyRent(double monthlyRent) = _ChangeMonthlyRent;
+  const factory ApplyPropertyTypeAction.changeMaintenanceCost(double maintenanceCost) = _ChangeMaintenanceCost;
   const factory ApplyPropertyTypeAction.next() = _Next;
 }
 
@@ -38,6 +39,12 @@ class _ChangeMonthlyRent extends ApplyPropertyTypeAction {
   final double monthlyRent;
 
   const _ChangeMonthlyRent(this.monthlyRent);
+}
+
+class _ChangeMaintenanceCost extends ApplyPropertyTypeAction {
+  final double maintenanceCost;
+
+  const _ChangeMaintenanceCost(this.maintenanceCost);
 }
 
 class _Next extends ApplyPropertyTypeAction {
@@ -88,6 +95,9 @@ class ApplyPropertyTypeVM extends Notifier<ApplyPropertyTypeViewState> {
 
       case _ChangeMonthlyRent(:final monthlyRent):
         state = state.copyWith(monthlyRent: monthlyRent);
+
+      case _ChangeMaintenanceCost(:final maintenanceCost):
+        state = state.copyWith(maintenanceCost: maintenanceCost);
 
       case _Next():
         if (!state.isCompleted) { return; }

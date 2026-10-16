@@ -173,6 +173,7 @@ class ApplyPropertyExtraVM extends Notifier<ApplyPropertyExtraViewState> {
           monthlyRent: type.isMonthlyRentVisible ? type.monthlyRent.round() : null,
         ),
         address: located.copyWith(detailAddress: address.detailAddress.trim()),
+        maintenanceCost: type.maintenanceCost.round(),
         isSuretyInsuranceAvailable: state.isAvailableSuretyInsurance,
         hasLoan: state.hasLoan,
         isParkingAvailable: state.isAvailableParking,

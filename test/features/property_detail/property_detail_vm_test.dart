@@ -43,6 +43,7 @@ Property _property({
     owner: const Owner(name: '홍길동', phone: '010-1234-5678'),
     propertyType: PropertyType.villa,
     deal: const PropertyDeal(transactionType: PropertyTransactionType.rent, price: 10000000, monthlyRent: 500000),
+    maintenanceCost: 120000,
     address: Address(
       zipCode: '06236',
       roadAddress: '서울 강남구 테헤란로 1',
@@ -105,6 +106,7 @@ void main() {
     expect(data.transactionType, PropertyTransactionType.rent);
     expect(data.amount, 10000000);
     expect(data.monthlyAmount, 500000);
+    expect(data.maintenanceCost, 120000);
     expect(data.ownerPhone, '010-1234-5678');
     expect(data.isAvailableParking, isTrue);
     expect(data.isAvailableSuretyInsurance, isFalse);

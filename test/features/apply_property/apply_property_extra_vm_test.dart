@@ -121,6 +121,7 @@ void main() {
     expect(property.owner, const Owner(name: '홍길동', phone: '010-1234-5678'));
     expect(property.propertyType, PropertyType.detachedHouse);
     expect(property.deal, const PropertyDeal(transactionType: PropertyTransactionType.rent, price: 10000000, monthlyRent: 500000));
+    expect(property.maintenanceCost, 100000);
     expect(property.address.roadAddress, _candidate.roadAddress);
     expect(property.address.detailAddress, '202호');
     expect(property.address.latitude, 37.3595033);
@@ -128,6 +129,15 @@ void main() {
     expect(property.roomCount, 2);
     expect(property.furnitureOptions, ['냉장고']);
     expect(property.memo, '메모');
+  });
+
+  test('관리비 0원은 0으로 저장한다', () async {
+    await fillRequired();
+    container.read(applyPropertyTypeVMProvider.notifier).action(const ApplyPropertyTypeAction.changeMaintenanceCost(0));
+
+    await save();
+
+    expect(repository.saved.single.maintenanceCost, 0);
   });
 
   test('월세가 아니면 월세 금액을 저장하지 않는다', () async {

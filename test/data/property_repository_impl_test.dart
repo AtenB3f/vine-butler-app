@@ -68,11 +68,12 @@ void main() {
     expect(saved.updatedAt.isAfter(DateTime(2020)), isTrue);
   });
 
-  test('상세 주소와 단독/다가구 유형을 저장하고 복원한다', () async {
+  test('상세 주소, 단독/다가구 유형, 관리비를 저장하고 복원한다', () async {
     final property = _property('a');
 
     await repository.save(
       property.copyWith(
+        maintenanceCost: 0,
         propertyType: PropertyType.detachedHouse,
         address: property.address.copyWith(detailAddress: '202호'),
       ),
@@ -82,6 +83,7 @@ void main() {
 
     expect(saved!.propertyType, PropertyType.detachedHouse);
     expect(saved.address.detailAddress, '202호');
+    expect(saved.maintenanceCost, 0);
   });
 
   test('같은 id로 저장하면 덮어쓴다', () async {

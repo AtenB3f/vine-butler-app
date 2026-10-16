@@ -231,7 +231,7 @@ class PropertyDetailScreen extends ConsumerWidget {
             spacing: 6,
             children: [
               AppFontStyle.sub1.text('관리비', TextColor.light),
-              AppFontStyle.header3.text(maintenanceCost.formattedKRW, TextColor.dark),
+              AppFontStyle.header3.text(maintenanceCost == 0 ? '없음' : maintenanceCost.formattedKRW, TextColor.dark),
             ],
           ),
         if (data.areaExclusive case final areaExclusive?)

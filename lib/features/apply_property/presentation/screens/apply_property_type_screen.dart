@@ -18,8 +18,11 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
   late final ValueNotifier<double> _monthlyRentController;
   late final TextEditingController _priceTextController;
   late final TextEditingController _monthlyRentTextController;
+  late final ValueNotifier<double> _maintenanceCostController;
+  late final TextEditingController _maintenanceCostTextController;
   bool _isPriceEditing = false;
   bool _isMonthlyRentEditing = false;
+  bool _isMaintenanceCostEditing = false;
 
   @override
   void initState() {
@@ -30,18 +33,24 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
     _monthlyRentController = ValueNotifier(state.monthlyRent);
     _priceTextController = TextEditingController(text: state.price.formattedKRW);
     _monthlyRentTextController = TextEditingController(text: state.monthlyRent.formattedKRW);
+    _maintenanceCostController = ValueNotifier(state.maintenanceCost);
+    _maintenanceCostTextController = TextEditingController(text: _maintenanceCostText(state.maintenanceCost));
     _priceController.addListener(_onPriceChange);
     _monthlyRentController.addListener(_onMonthlyRentChange);
+    _maintenanceCostController.addListener(_onMaintenanceCostChange);
   }
 
   @override
   void dispose() {
     _priceController.removeListener(_onPriceChange);
     _monthlyRentController.removeListener(_onMonthlyRentChange);
+    _maintenanceCostController.removeListener(_onMaintenanceCostChange);
     _priceController.dispose();
     _monthlyRentController.dispose();
     _priceTextController.dispose();
     _monthlyRentTextController.dispose();
+    _maintenanceCostController.dispose();
+    _maintenanceCostTextController.dispose();
     super.dispose();
   }
 
@@ -49,6 +58,11 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
 
   void _onMonthlyRentChange() =>
       ref.read(applyPropertyTypeVMProvider.notifier).action(ApplyPropertyTypeAction.changeMonthlyRent(_monthlyRentController.value));
+
+  void _onMaintenanceCostChange() =>
+      ref.read(applyPropertyTypeVMProvider.notifier).action(ApplyPropertyTypeAction.changeMaintenanceCost(_maintenanceCostController.value));
+
+  String _maintenanceCostText(double value) => value == 0 ? '관리비 없음' : value.formattedKRW;
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +83,11 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
     ref.listen(applyPropertyTypeVMProvider.select((state) => state.monthlyRent), (_, monthlyRent) {
       if (_monthlyRentController.value != monthlyRent) { _monthlyRentController.value = monthlyRent; }
       if (!_isMonthlyRentEditing) { _monthlyRentTextController.text = monthlyRent.formattedKRW; }
+    });
+
+    ref.listen(applyPropertyTypeVMProvider.select((state) => state.maintenanceCost), (_, maintenanceCost) {
+      if (_maintenanceCostController.value != maintenanceCost) { _maintenanceCostController.value = maintenanceCost; }
+      if (!_isMaintenanceCostEditing) { _maintenanceCostTextController.text = _maintenanceCostText(maintenanceCost); }
     });
 
     return AppScaffold(
@@ -180,6 +199,7 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
               textController: _priceTextController,
               value: () => ref.read(applyPropertyTypeVMProvider).price,
               apply: (amount) => viewModel.action(ApplyPropertyTypeAction.changePrice(amount)),
+              format: (value) => value.formattedKRW,
             );
           },
         ),
@@ -201,9 +221,31 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
                 textController: _monthlyRentTextController,
                 value: () => ref.read(applyPropertyTypeVMProvider).monthlyRent,
                 apply: (amount) => viewModel.action(ApplyPropertyTypeAction.changeMonthlyRent(amount)),
+                format: (value) => value.formattedKRW,
               );
             },
           ),
+        _slider(
+          label: '관리비',
+          viewState: const AppSliderViewState(
+            size: AppSliderSize.medium,
+            min: ApplyPropertyTypeViewState.minMaintenanceCost,
+            max: ApplyPropertyTypeViewState.maxMaintenanceCost,
+            distance: ApplyPropertyTypeViewState.maintenanceCostDistance,
+          ),
+          controller: _maintenanceCostController,
+          textController: _maintenanceCostTextController,
+          onFocus: (hasFocus) {
+            _isMaintenanceCostEditing = hasFocus;
+            _onAmountFocus(
+              hasFocus: hasFocus,
+              textController: _maintenanceCostTextController,
+              value: () => ref.read(applyPropertyTypeVMProvider).maintenanceCost,
+              apply: (amount) => viewModel.action(ApplyPropertyTypeAction.changeMaintenanceCost(amount)),
+              format: _maintenanceCostText,
+            );
+          },
+        ),
       ],
     );
   }
@@ -211,12 +253,13 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
   /// 금액 입력란 포커스 처리
   ///
   /// - 포커스를 얻으면 원 단위 숫자로 바꾸고 전체 선택
-  /// - 포커스가 풀리면 숫자를 반영하고 다시 `○억 ○만원` 형식으로 표시 (숫자가 아니면 원래 금액으로 되돌림)
+  /// - 포커스가 풀리면 숫자를 반영하고 `format` 형식으로 표시 (숫자가 아니면 원래 금액으로 되돌림)
   void _onAmountFocus({
     required bool hasFocus,
     required TextEditingController textController,
     required double Function() value,
     required void Function(double amount) apply,
+    required String Function(double value) format,
   }) {
     if (hasFocus) {
       final digits = '${value().toInt()}';
@@ -232,7 +275,7 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
 
     if (amount != null) { apply(amount); }
 
-    textController.text = value().formattedKRW;
+    textController.text = format(value());
   }
 
   Widget _slider({

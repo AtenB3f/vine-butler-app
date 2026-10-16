@@ -6,11 +6,16 @@ class ApplyPropertyTypeViewState {
   static const double minMonthlyRent = 10000;
   static const double maxMonthlyRent = 1500000;
   static const double monthlyRentDistance = 10000;
+  static const double minMaintenanceCost = 0;
+  static const double maxMaintenanceCost = 500000;
+  static const double maintenanceCostDistance = 10000;
+  static const double defaultMaintenanceCost = 100000;
 
   final PropertyTransactionType? transactionType;
   final PropertyTypeFilterOption? propertyType;
   final double price;
   final double monthlyRent;
+  final double maintenanceCost;
   final String? navigateTo;
 
   const ApplyPropertyTypeViewState({
@@ -18,6 +23,7 @@ class ApplyPropertyTypeViewState {
     this.propertyType,
     required this.price,
     required this.monthlyRent,
+    this.maintenanceCost = defaultMaintenanceCost,
     this.navigateTo,
   });
 
@@ -80,6 +86,7 @@ class ApplyPropertyTypeViewState {
     PropertyTypeFilterOption? Function()? propertyType,
     double? price,
     double? monthlyRent,
+    double? maintenanceCost,
     String? Function()? navigateTo,
   }) {
     return ApplyPropertyTypeViewState(
@@ -87,6 +94,7 @@ class ApplyPropertyTypeViewState {
       propertyType: propertyType != null ? propertyType() : this.propertyType,
       price: price ?? this.price,
       monthlyRent: monthlyRent ?? this.monthlyRent,
+      maintenanceCost: maintenanceCost ?? this.maintenanceCost,
       navigateTo: navigateTo != null ? navigateTo() : this.navigateTo,
     );
   }

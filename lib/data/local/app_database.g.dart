@@ -81,6 +81,17 @@ class $PropertyTableTable extends PropertyTable
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _maintenanceCostMeta = const VerificationMeta(
+    'maintenanceCost',
+  );
+  @override
+  late final GeneratedColumn<int> maintenanceCost = GeneratedColumn<int>(
+    'maintenance_cost',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _zipCodeMeta = const VerificationMeta(
     'zipCode',
   );
@@ -318,6 +329,7 @@ class $PropertyTableTable extends PropertyTable
     propertyType,
     price,
     monthlyRent,
+    maintenanceCost,
     zipCode,
     roadAddress,
     lotAddress,
@@ -386,6 +398,15 @@ class $PropertyTableTable extends PropertyTable
         monthlyRent.isAcceptableOrUnknown(
           data['monthly_rent']!,
           _monthlyRentMeta,
+        ),
+      );
+    }
+    if (data.containsKey('maintenance_cost')) {
+      context.handle(
+        _maintenanceCostMeta,
+        maintenanceCost.isAcceptableOrUnknown(
+          data['maintenance_cost']!,
+          _maintenanceCostMeta,
         ),
       );
     }
@@ -580,6 +601,10 @@ class $PropertyTableTable extends PropertyTable
         DriftSqlType.int,
         data['${effectivePrefix}monthly_rent'],
       ),
+      maintenanceCost: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}maintenance_cost'],
+      ),
       zipCode: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}zip_code'],
@@ -691,6 +716,7 @@ class PropertyTableData extends DataClass
   final PropertyType propertyType;
   final int price;
   final int? monthlyRent;
+  final int? maintenanceCost;
   final String zipCode;
   final String roadAddress;
   final String lotAddress;
@@ -719,6 +745,7 @@ class PropertyTableData extends DataClass
     required this.propertyType,
     required this.price,
     this.monthlyRent,
+    this.maintenanceCost,
     required this.zipCode,
     required this.roadAddress,
     required this.lotAddress,
@@ -759,6 +786,9 @@ class PropertyTableData extends DataClass
     map['price'] = Variable<int>(price);
     if (!nullToAbsent || monthlyRent != null) {
       map['monthly_rent'] = Variable<int>(monthlyRent);
+    }
+    if (!nullToAbsent || maintenanceCost != null) {
+      map['maintenance_cost'] = Variable<int>(maintenanceCost);
     }
     map['zip_code'] = Variable<String>(zipCode);
     map['road_address'] = Variable<String>(roadAddress);
@@ -814,6 +844,9 @@ class PropertyTableData extends DataClass
       monthlyRent: monthlyRent == null && nullToAbsent
           ? const Value.absent()
           : Value(monthlyRent),
+      maintenanceCost: maintenanceCost == null && nullToAbsent
+          ? const Value.absent()
+          : Value(maintenanceCost),
       zipCode: Value(zipCode),
       roadAddress: Value(roadAddress),
       lotAddress: Value(lotAddress),
@@ -869,6 +902,7 @@ class PropertyTableData extends DataClass
       ),
       price: serializer.fromJson<int>(json['price']),
       monthlyRent: serializer.fromJson<int?>(json['monthlyRent']),
+      maintenanceCost: serializer.fromJson<int?>(json['maintenanceCost']),
       zipCode: serializer.fromJson<String>(json['zipCode']),
       roadAddress: serializer.fromJson<String>(json['roadAddress']),
       lotAddress: serializer.fromJson<String>(json['lotAddress']),
@@ -914,6 +948,7 @@ class PropertyTableData extends DataClass
       ),
       'price': serializer.toJson<int>(price),
       'monthlyRent': serializer.toJson<int?>(monthlyRent),
+      'maintenanceCost': serializer.toJson<int?>(maintenanceCost),
       'zipCode': serializer.toJson<String>(zipCode),
       'roadAddress': serializer.toJson<String>(roadAddress),
       'lotAddress': serializer.toJson<String>(lotAddress),
@@ -947,6 +982,7 @@ class PropertyTableData extends DataClass
     PropertyType? propertyType,
     int? price,
     Value<int?> monthlyRent = const Value.absent(),
+    Value<int?> maintenanceCost = const Value.absent(),
     String? zipCode,
     String? roadAddress,
     String? lotAddress,
@@ -975,6 +1011,9 @@ class PropertyTableData extends DataClass
     propertyType: propertyType ?? this.propertyType,
     price: price ?? this.price,
     monthlyRent: monthlyRent.present ? monthlyRent.value : this.monthlyRent,
+    maintenanceCost: maintenanceCost.present
+        ? maintenanceCost.value
+        : this.maintenanceCost,
     zipCode: zipCode ?? this.zipCode,
     roadAddress: roadAddress ?? this.roadAddress,
     lotAddress: lotAddress ?? this.lotAddress,
@@ -1017,6 +1056,9 @@ class PropertyTableData extends DataClass
       monthlyRent: data.monthlyRent.present
           ? data.monthlyRent.value
           : this.monthlyRent,
+      maintenanceCost: data.maintenanceCost.present
+          ? data.maintenanceCost.value
+          : this.maintenanceCost,
       zipCode: data.zipCode.present ? data.zipCode.value : this.zipCode,
       roadAddress: data.roadAddress.present
           ? data.roadAddress.value
@@ -1066,6 +1108,7 @@ class PropertyTableData extends DataClass
           ..write('propertyType: $propertyType, ')
           ..write('price: $price, ')
           ..write('monthlyRent: $monthlyRent, ')
+          ..write('maintenanceCost: $maintenanceCost, ')
           ..write('zipCode: $zipCode, ')
           ..write('roadAddress: $roadAddress, ')
           ..write('lotAddress: $lotAddress, ')
@@ -1099,6 +1142,7 @@ class PropertyTableData extends DataClass
     propertyType,
     price,
     monthlyRent,
+    maintenanceCost,
     zipCode,
     roadAddress,
     lotAddress,
@@ -1131,6 +1175,7 @@ class PropertyTableData extends DataClass
           other.propertyType == this.propertyType &&
           other.price == this.price &&
           other.monthlyRent == this.monthlyRent &&
+          other.maintenanceCost == this.maintenanceCost &&
           other.zipCode == this.zipCode &&
           other.roadAddress == this.roadAddress &&
           other.lotAddress == this.lotAddress &&
@@ -1161,6 +1206,7 @@ class PropertyTableCompanion extends UpdateCompanion<PropertyTableData> {
   final Value<PropertyType> propertyType;
   final Value<int> price;
   final Value<int?> monthlyRent;
+  final Value<int?> maintenanceCost;
   final Value<String> zipCode;
   final Value<String> roadAddress;
   final Value<String> lotAddress;
@@ -1190,6 +1236,7 @@ class PropertyTableCompanion extends UpdateCompanion<PropertyTableData> {
     this.propertyType = const Value.absent(),
     this.price = const Value.absent(),
     this.monthlyRent = const Value.absent(),
+    this.maintenanceCost = const Value.absent(),
     this.zipCode = const Value.absent(),
     this.roadAddress = const Value.absent(),
     this.lotAddress = const Value.absent(),
@@ -1220,6 +1267,7 @@ class PropertyTableCompanion extends UpdateCompanion<PropertyTableData> {
     required PropertyType propertyType,
     required int price,
     this.monthlyRent = const Value.absent(),
+    this.maintenanceCost = const Value.absent(),
     required String zipCode,
     required String roadAddress,
     required String lotAddress,
@@ -1264,6 +1312,7 @@ class PropertyTableCompanion extends UpdateCompanion<PropertyTableData> {
     Expression<String>? propertyType,
     Expression<int>? price,
     Expression<int>? monthlyRent,
+    Expression<int>? maintenanceCost,
     Expression<String>? zipCode,
     Expression<String>? roadAddress,
     Expression<String>? lotAddress,
@@ -1294,6 +1343,7 @@ class PropertyTableCompanion extends UpdateCompanion<PropertyTableData> {
       if (propertyType != null) 'property_type': propertyType,
       if (price != null) 'price': price,
       if (monthlyRent != null) 'monthly_rent': monthlyRent,
+      if (maintenanceCost != null) 'maintenance_cost': maintenanceCost,
       if (zipCode != null) 'zip_code': zipCode,
       if (roadAddress != null) 'road_address': roadAddress,
       if (lotAddress != null) 'lot_address': lotAddress,
@@ -1329,6 +1379,7 @@ class PropertyTableCompanion extends UpdateCompanion<PropertyTableData> {
     Value<PropertyType>? propertyType,
     Value<int>? price,
     Value<int?>? monthlyRent,
+    Value<int?>? maintenanceCost,
     Value<String>? zipCode,
     Value<String>? roadAddress,
     Value<String>? lotAddress,
@@ -1359,6 +1410,7 @@ class PropertyTableCompanion extends UpdateCompanion<PropertyTableData> {
       propertyType: propertyType ?? this.propertyType,
       price: price ?? this.price,
       monthlyRent: monthlyRent ?? this.monthlyRent,
+      maintenanceCost: maintenanceCost ?? this.maintenanceCost,
       zipCode: zipCode ?? this.zipCode,
       roadAddress: roadAddress ?? this.roadAddress,
       lotAddress: lotAddress ?? this.lotAddress,
@@ -1413,6 +1465,9 @@ class PropertyTableCompanion extends UpdateCompanion<PropertyTableData> {
     }
     if (monthlyRent.present) {
       map['monthly_rent'] = Variable<int>(monthlyRent.value);
+    }
+    if (maintenanceCost.present) {
+      map['maintenance_cost'] = Variable<int>(maintenanceCost.value);
     }
     if (zipCode.present) {
       map['zip_code'] = Variable<String>(zipCode.value);
@@ -1498,6 +1553,7 @@ class PropertyTableCompanion extends UpdateCompanion<PropertyTableData> {
           ..write('propertyType: $propertyType, ')
           ..write('price: $price, ')
           ..write('monthlyRent: $monthlyRent, ')
+          ..write('maintenanceCost: $maintenanceCost, ')
           ..write('zipCode: $zipCode, ')
           ..write('roadAddress: $roadAddress, ')
           ..write('lotAddress: $lotAddress, ')
@@ -1921,6 +1977,7 @@ typedef $$PropertyTableTableCreateCompanionBuilder =
       required PropertyType propertyType,
       required int price,
       Value<int?> monthlyRent,
+      Value<int?> maintenanceCost,
       required String zipCode,
       required String roadAddress,
       required String lotAddress,
@@ -1952,6 +2009,7 @@ typedef $$PropertyTableTableUpdateCompanionBuilder =
       Value<PropertyType> propertyType,
       Value<int> price,
       Value<int?> monthlyRent,
+      Value<int?> maintenanceCost,
       Value<String> zipCode,
       Value<String> roadAddress,
       Value<String> lotAddress,
@@ -2056,6 +2114,11 @@ class $$PropertyTableTableFilterComposer
 
   ColumnFilters<int> get monthlyRent => $composableBuilder(
     column: $table.monthlyRent,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get maintenanceCost => $composableBuilder(
+    column: $table.maintenanceCost,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2230,6 +2293,11 @@ class $$PropertyTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get maintenanceCost => $composableBuilder(
+    column: $table.maintenanceCost,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get zipCode => $composableBuilder(
     column: $table.zipCode,
     builder: (column) => ColumnOrderings(column),
@@ -2368,6 +2436,11 @@ class $$PropertyTableTableAnnotationComposer
 
   GeneratedColumn<int> get monthlyRent => $composableBuilder(
     column: $table.monthlyRent,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get maintenanceCost => $composableBuilder(
+    column: $table.maintenanceCost,
     builder: (column) => column,
   );
 
@@ -2511,6 +2584,7 @@ class $$PropertyTableTableTableManager
                 Value<PropertyType> propertyType = const Value.absent(),
                 Value<int> price = const Value.absent(),
                 Value<int?> monthlyRent = const Value.absent(),
+                Value<int?> maintenanceCost = const Value.absent(),
                 Value<String> zipCode = const Value.absent(),
                 Value<String> roadAddress = const Value.absent(),
                 Value<String> lotAddress = const Value.absent(),
@@ -2540,6 +2614,7 @@ class $$PropertyTableTableTableManager
                 propertyType: propertyType,
                 price: price,
                 monthlyRent: monthlyRent,
+                maintenanceCost: maintenanceCost,
                 zipCode: zipCode,
                 roadAddress: roadAddress,
                 lotAddress: lotAddress,
@@ -2571,6 +2646,7 @@ class $$PropertyTableTableTableManager
                 required PropertyType propertyType,
                 required int price,
                 Value<int?> monthlyRent = const Value.absent(),
+                Value<int?> maintenanceCost = const Value.absent(),
                 required String zipCode,
                 required String roadAddress,
                 required String lotAddress,
@@ -2600,6 +2676,7 @@ class $$PropertyTableTableTableManager
                 propertyType: propertyType,
                 price: price,
                 monthlyRent: monthlyRent,
+                maintenanceCost: maintenanceCost,
                 zipCode: zipCode,
                 roadAddress: roadAddress,
                 lotAddress: lotAddress,
