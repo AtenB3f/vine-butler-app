@@ -135,21 +135,6 @@ void main() {
       expect(candidate.sido, '경기도');
       expect(candidate.sigungu, '성남시 분당구');
       expect(candidate.dongMyeon, '정자동');
-      expect(candidate.buildingName, 'NAVER그린팩토리');
-    });
-
-    test('건물명이 비어 있으면 null이다', () async {
-      final result = await repository(
-        juso: (_) => _json(
-          _jusoBody(
-            juso: [
-              {..._jusoItem, 'bdNm': ''},
-            ],
-          ),
-        ),
-      ).search('불정로 6');
-
-      expect(result.addresses.single.buildingName, isNull);
     });
 
     for (final code in ['E0005', 'E0006', 'E0008', 'E0009', 'E0010', 'E0011', 'E0012', 'E0013', 'E0015']) {

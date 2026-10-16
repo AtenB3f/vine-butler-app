@@ -18,7 +18,6 @@ const _address = AddressCandidate(
   sido: '경기도',
   sigungu: '성남시 분당구',
   dongMyeon: '정자동',
-  buildingName: 'NAVER그린팩토리',
 );
 
 class _FakeAddressRepository implements AddressRepository {

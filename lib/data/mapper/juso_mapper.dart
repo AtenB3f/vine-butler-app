@@ -11,7 +11,6 @@ extension JusoAddressMapper on JusoAddressDto {
       sido: siNm,
       sigungu: sggNm,
       dongMyeon: emdNm,
-      buildingName: bdNm.isEmpty ? null : bdNm,
     );
   }
 }

@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Address {
 
- String get zipCode; String get roadAddress; String get lotAddress; String get sido; String get sigungu; String get dongMyeon; String? get buildingName; String get detailAddress; double get latitude; double get longitude;
+ String get zipCode; String get roadAddress; String get lotAddress; String get sido; String get sigungu; String get dongMyeon; String get detailAddress; double get latitude; double get longitude;
 /// Create a copy of Address
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -27,20 +27,20 @@ $AddressCopyWith<Address> get copyWith => _$AddressCopyWithImpl<Address>(this as
 @override
 bool operator ==(Object other) {
   final _this = this as Address;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Address&&(identical(other.zipCode, _this.zipCode) || other.zipCode == _this.zipCode)&&(identical(other.roadAddress, _this.roadAddress) || other.roadAddress == _this.roadAddress)&&(identical(other.lotAddress, _this.lotAddress) || other.lotAddress == _this.lotAddress)&&(identical(other.sido, _this.sido) || other.sido == _this.sido)&&(identical(other.sigungu, _this.sigungu) || other.sigungu == _this.sigungu)&&(identical(other.dongMyeon, _this.dongMyeon) || other.dongMyeon == _this.dongMyeon)&&(identical(other.buildingName, _this.buildingName) || other.buildingName == _this.buildingName)&&(identical(other.detailAddress, _this.detailAddress) || other.detailAddress == _this.detailAddress)&&(identical(other.latitude, _this.latitude) || other.latitude == _this.latitude)&&(identical(other.longitude, _this.longitude) || other.longitude == _this.longitude));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Address&&(identical(other.zipCode, _this.zipCode) || other.zipCode == _this.zipCode)&&(identical(other.roadAddress, _this.roadAddress) || other.roadAddress == _this.roadAddress)&&(identical(other.lotAddress, _this.lotAddress) || other.lotAddress == _this.lotAddress)&&(identical(other.sido, _this.sido) || other.sido == _this.sido)&&(identical(other.sigungu, _this.sigungu) || other.sigungu == _this.sigungu)&&(identical(other.dongMyeon, _this.dongMyeon) || other.dongMyeon == _this.dongMyeon)&&(identical(other.detailAddress, _this.detailAddress) || other.detailAddress == _this.detailAddress)&&(identical(other.latitude, _this.latitude) || other.latitude == _this.latitude)&&(identical(other.longitude, _this.longitude) || other.longitude == _this.longitude));
 }
 
 
 @override
 int get hashCode {
   final _this = this as Address;
-  return Object.hash(runtimeType,_this.zipCode,_this.roadAddress,_this.lotAddress,_this.sido,_this.sigungu,_this.dongMyeon,_this.buildingName,_this.detailAddress,_this.latitude,_this.longitude);
+  return Object.hash(runtimeType,_this.zipCode,_this.roadAddress,_this.lotAddress,_this.sido,_this.sigungu,_this.dongMyeon,_this.detailAddress,_this.latitude,_this.longitude);
 }
 
 @override
 String toString() {
   final _this = this as Address;
-  return 'Address(zipCode: ${_this.zipCode}, roadAddress: ${_this.roadAddress}, lotAddress: ${_this.lotAddress}, sido: ${_this.sido}, sigungu: ${_this.sigungu}, dongMyeon: ${_this.dongMyeon}, buildingName: ${_this.buildingName}, detailAddress: ${_this.detailAddress}, latitude: ${_this.latitude}, longitude: ${_this.longitude})';
+  return 'Address(zipCode: ${_this.zipCode}, roadAddress: ${_this.roadAddress}, lotAddress: ${_this.lotAddress}, sido: ${_this.sido}, sigungu: ${_this.sigungu}, dongMyeon: ${_this.dongMyeon}, detailAddress: ${_this.detailAddress}, latitude: ${_this.latitude}, longitude: ${_this.longitude})';
 }
 
 
@@ -51,7 +51,7 @@ abstract mixin class $AddressCopyWith<$Res>  {
   factory $AddressCopyWith(Address value, $Res Function(Address) _then) = _$AddressCopyWithImpl;
 @useResult
 $Res call({
- String zipCode, String roadAddress, String lotAddress, String sido, String sigungu, String dongMyeon, String? buildingName, String detailAddress, double latitude, double longitude
+ String zipCode, String roadAddress, String lotAddress, String sido, String sigungu, String dongMyeon, String detailAddress, double latitude, double longitude
 });
 
 
@@ -68,7 +68,7 @@ class _$AddressCopyWithImpl<$Res>
 
 /// Create a copy of Address
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? zipCode = null,Object? roadAddress = null,Object? lotAddress = null,Object? sido = null,Object? sigungu = null,Object? dongMyeon = null,Object? buildingName = freezed,Object? detailAddress = null,Object? latitude = null,Object? longitude = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? zipCode = null,Object? roadAddress = null,Object? lotAddress = null,Object? sido = null,Object? sigungu = null,Object? dongMyeon = null,Object? detailAddress = null,Object? latitude = null,Object? longitude = null,}) {
   return _then(Address(
 zipCode: null == zipCode ? _self.zipCode : zipCode // ignore: cast_nullable_to_non_nullable
 as String,roadAddress: null == roadAddress ? _self.roadAddress : roadAddress // ignore: cast_nullable_to_non_nullable
@@ -76,8 +76,7 @@ as String,lotAddress: null == lotAddress ? _self.lotAddress : lotAddress // igno
 as String,sido: null == sido ? _self.sido : sido // ignore: cast_nullable_to_non_nullable
 as String,sigungu: null == sigungu ? _self.sigungu : sigungu // ignore: cast_nullable_to_non_nullable
 as String,dongMyeon: null == dongMyeon ? _self.dongMyeon : dongMyeon // ignore: cast_nullable_to_non_nullable
-as String,buildingName: freezed == buildingName ? _self.buildingName : buildingName // ignore: cast_nullable_to_non_nullable
-as String?,detailAddress: null == detailAddress ? _self.detailAddress : detailAddress // ignore: cast_nullable_to_non_nullable
+as String,detailAddress: null == detailAddress ? _self.detailAddress : detailAddress // ignore: cast_nullable_to_non_nullable
 as String,latitude: null == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
 as double,longitude: null == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
 as double,
@@ -165,10 +164,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String zipCode,  String roadAddress,  String lotAddress,  String sido,  String sigungu,  String dongMyeon,  String? buildingName,  String detailAddress,  double latitude,  double longitude)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String zipCode,  String roadAddress,  String lotAddress,  String sido,  String sigungu,  String dongMyeon,  String detailAddress,  double latitude,  double longitude)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Address() when $default != null:
-return $default(_that.zipCode,_that.roadAddress,_that.lotAddress,_that.sido,_that.sigungu,_that.dongMyeon,_that.buildingName,_that.detailAddress,_that.latitude,_that.longitude);case _:
+return $default(_that.zipCode,_that.roadAddress,_that.lotAddress,_that.sido,_that.sigungu,_that.dongMyeon,_that.detailAddress,_that.latitude,_that.longitude);case _:
   return orElse();
 
 }
@@ -186,10 +185,10 @@ return $default(_that.zipCode,_that.roadAddress,_that.lotAddress,_that.sido,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String zipCode,  String roadAddress,  String lotAddress,  String sido,  String sigungu,  String dongMyeon,  String? buildingName,  String detailAddress,  double latitude,  double longitude)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String zipCode,  String roadAddress,  String lotAddress,  String sido,  String sigungu,  String dongMyeon,  String detailAddress,  double latitude,  double longitude)  $default,) {final _that = this;
 switch (_that) {
 case _Address():
-return $default(_that.zipCode,_that.roadAddress,_that.lotAddress,_that.sido,_that.sigungu,_that.dongMyeon,_that.buildingName,_that.detailAddress,_that.latitude,_that.longitude);case _:
+return $default(_that.zipCode,_that.roadAddress,_that.lotAddress,_that.sido,_that.sigungu,_that.dongMyeon,_that.detailAddress,_that.latitude,_that.longitude);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -206,10 +205,10 @@ return $default(_that.zipCode,_that.roadAddress,_that.lotAddress,_that.sido,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String zipCode,  String roadAddress,  String lotAddress,  String sido,  String sigungu,  String dongMyeon,  String? buildingName,  String detailAddress,  double latitude,  double longitude)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String zipCode,  String roadAddress,  String lotAddress,  String sido,  String sigungu,  String dongMyeon,  String detailAddress,  double latitude,  double longitude)?  $default,) {final _that = this;
 switch (_that) {
 case _Address() when $default != null:
-return $default(_that.zipCode,_that.roadAddress,_that.lotAddress,_that.sido,_that.sigungu,_that.dongMyeon,_that.buildingName,_that.detailAddress,_that.latitude,_that.longitude);case _:
+return $default(_that.zipCode,_that.roadAddress,_that.lotAddress,_that.sido,_that.sigungu,_that.dongMyeon,_that.detailAddress,_that.latitude,_that.longitude);case _:
   return null;
 
 }
@@ -221,7 +220,7 @@ return $default(_that.zipCode,_that.roadAddress,_that.lotAddress,_that.sido,_tha
 
 
 class _Address implements Address {
-  const _Address({required this.zipCode, required this.roadAddress, required this.lotAddress, required this.sido, required this.sigungu, required this.dongMyeon, this.buildingName, this.detailAddress = '', required this.latitude, required this.longitude});
+  const _Address({required this.zipCode, required this.roadAddress, required this.lotAddress, required this.sido, required this.sigungu, required this.dongMyeon, this.detailAddress = '', required this.latitude, required this.longitude});
   
 
 @override final  String zipCode;
@@ -230,7 +229,6 @@ class _Address implements Address {
 @override final  String sido;
 @override final  String sigungu;
 @override final  String dongMyeon;
-@override final  String? buildingName;
 @override@JsonKey() final  String detailAddress;
 @override final  double latitude;
 @override final  double longitude;
@@ -245,18 +243,18 @@ _$AddressCopyWith<_Address> get copyWith => __$AddressCopyWithImpl<_Address>(thi
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Address&&(identical(other.zipCode, zipCode) || other.zipCode == zipCode)&&(identical(other.roadAddress, roadAddress) || other.roadAddress == roadAddress)&&(identical(other.lotAddress, lotAddress) || other.lotAddress == lotAddress)&&(identical(other.sido, sido) || other.sido == sido)&&(identical(other.sigungu, sigungu) || other.sigungu == sigungu)&&(identical(other.dongMyeon, dongMyeon) || other.dongMyeon == dongMyeon)&&(identical(other.buildingName, buildingName) || other.buildingName == buildingName)&&(identical(other.detailAddress, detailAddress) || other.detailAddress == detailAddress)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Address&&(identical(other.zipCode, zipCode) || other.zipCode == zipCode)&&(identical(other.roadAddress, roadAddress) || other.roadAddress == roadAddress)&&(identical(other.lotAddress, lotAddress) || other.lotAddress == lotAddress)&&(identical(other.sido, sido) || other.sido == sido)&&(identical(other.sigungu, sigungu) || other.sigungu == sigungu)&&(identical(other.dongMyeon, dongMyeon) || other.dongMyeon == dongMyeon)&&(identical(other.detailAddress, detailAddress) || other.detailAddress == detailAddress)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,zipCode,roadAddress,lotAddress,sido,sigungu,dongMyeon,buildingName,detailAddress,latitude,longitude);
+    return Object.hash(runtimeType,zipCode,roadAddress,lotAddress,sido,sigungu,dongMyeon,detailAddress,latitude,longitude);
 }
 
 @override
 String toString() {
-    return 'Address(zipCode: $zipCode, roadAddress: $roadAddress, lotAddress: $lotAddress, sido: $sido, sigungu: $sigungu, dongMyeon: $dongMyeon, buildingName: $buildingName, detailAddress: $detailAddress, latitude: $latitude, longitude: $longitude)';
+    return 'Address(zipCode: $zipCode, roadAddress: $roadAddress, lotAddress: $lotAddress, sido: $sido, sigungu: $sigungu, dongMyeon: $dongMyeon, detailAddress: $detailAddress, latitude: $latitude, longitude: $longitude)';
 }
 
 
@@ -267,7 +265,7 @@ abstract mixin class _$AddressCopyWith<$Res> implements $AddressCopyWith<$Res> {
   factory _$AddressCopyWith(_Address value, $Res Function(_Address) _then) = __$AddressCopyWithImpl;
 @override @useResult
 $Res call({
- String zipCode, String roadAddress, String lotAddress, String sido, String sigungu, String dongMyeon, String? buildingName, String detailAddress, double latitude, double longitude
+ String zipCode, String roadAddress, String lotAddress, String sido, String sigungu, String dongMyeon, String detailAddress, double latitude, double longitude
 });
 
 
@@ -284,7 +282,7 @@ class __$AddressCopyWithImpl<$Res>
 
 /// Create a copy of Address
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? zipCode = null,Object? roadAddress = null,Object? lotAddress = null,Object? sido = null,Object? sigungu = null,Object? dongMyeon = null,Object? buildingName = freezed,Object? detailAddress = null,Object? latitude = null,Object? longitude = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? zipCode = null,Object? roadAddress = null,Object? lotAddress = null,Object? sido = null,Object? sigungu = null,Object? dongMyeon = null,Object? detailAddress = null,Object? latitude = null,Object? longitude = null,}) {
   return _then(_Address(
 zipCode: null == zipCode ? _self.zipCode : zipCode // ignore: cast_nullable_to_non_nullable
 as String,roadAddress: null == roadAddress ? _self.roadAddress : roadAddress // ignore: cast_nullable_to_non_nullable
@@ -292,8 +290,7 @@ as String,lotAddress: null == lotAddress ? _self.lotAddress : lotAddress // igno
 as String,sido: null == sido ? _self.sido : sido // ignore: cast_nullable_to_non_nullable
 as String,sigungu: null == sigungu ? _self.sigungu : sigungu // ignore: cast_nullable_to_non_nullable
 as String,dongMyeon: null == dongMyeon ? _self.dongMyeon : dongMyeon // ignore: cast_nullable_to_non_nullable
-as String,buildingName: freezed == buildingName ? _self.buildingName : buildingName // ignore: cast_nullable_to_non_nullable
-as String?,detailAddress: null == detailAddress ? _self.detailAddress : detailAddress // ignore: cast_nullable_to_non_nullable
+as String,detailAddress: null == detailAddress ? _self.detailAddress : detailAddress // ignore: cast_nullable_to_non_nullable
 as String,latitude: null == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
 as double,longitude: null == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
 as double,

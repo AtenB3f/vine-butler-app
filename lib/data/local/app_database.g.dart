@@ -145,17 +145,6 @@ class $PropertyTableTable extends PropertyTable
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _buildingNameMeta = const VerificationMeta(
-    'buildingName',
-  );
-  @override
-  late final GeneratedColumn<String> buildingName = GeneratedColumn<String>(
-    'building_name',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
   static const VerificationMeta _detailAddressMeta = const VerificationMeta(
     'detailAddress',
   );
@@ -335,7 +324,6 @@ class $PropertyTableTable extends PropertyTable
     sido,
     sigungu,
     dongMyeon,
-    buildingName,
     detailAddress,
     latitude,
     longitude,
@@ -451,15 +439,6 @@ class $PropertyTableTable extends PropertyTable
       );
     } else if (isInserting) {
       context.missing(_dongMyeonMeta);
-    }
-    if (data.containsKey('building_name')) {
-      context.handle(
-        _buildingNameMeta,
-        buildingName.isAcceptableOrUnknown(
-          data['building_name']!,
-          _buildingNameMeta,
-        ),
-      );
     }
     if (data.containsKey('detail_address')) {
       context.handle(
@@ -625,10 +604,6 @@ class $PropertyTableTable extends PropertyTable
         DriftSqlType.string,
         data['${effectivePrefix}dong_myeon'],
       )!,
-      buildingName: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}building_name'],
-      ),
       detailAddress: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}detail_address'],
@@ -722,7 +697,6 @@ class PropertyTableData extends DataClass
   final String sido;
   final String sigungu;
   final String dongMyeon;
-  final String? buildingName;
   final String detailAddress;
   final double latitude;
   final double longitude;
@@ -751,7 +725,6 @@ class PropertyTableData extends DataClass
     required this.sido,
     required this.sigungu,
     required this.dongMyeon,
-    this.buildingName,
     required this.detailAddress,
     required this.latitude,
     required this.longitude,
@@ -793,9 +766,6 @@ class PropertyTableData extends DataClass
     map['sido'] = Variable<String>(sido);
     map['sigungu'] = Variable<String>(sigungu);
     map['dong_myeon'] = Variable<String>(dongMyeon);
-    if (!nullToAbsent || buildingName != null) {
-      map['building_name'] = Variable<String>(buildingName);
-    }
     map['detail_address'] = Variable<String>(detailAddress);
     map['latitude'] = Variable<double>(latitude);
     map['longitude'] = Variable<double>(longitude);
@@ -850,9 +820,6 @@ class PropertyTableData extends DataClass
       sido: Value(sido),
       sigungu: Value(sigungu),
       dongMyeon: Value(dongMyeon),
-      buildingName: buildingName == null && nullToAbsent
-          ? const Value.absent()
-          : Value(buildingName),
       detailAddress: Value(detailAddress),
       latitude: Value(latitude),
       longitude: Value(longitude),
@@ -908,7 +875,6 @@ class PropertyTableData extends DataClass
       sido: serializer.fromJson<String>(json['sido']),
       sigungu: serializer.fromJson<String>(json['sigungu']),
       dongMyeon: serializer.fromJson<String>(json['dongMyeon']),
-      buildingName: serializer.fromJson<String?>(json['buildingName']),
       detailAddress: serializer.fromJson<String>(json['detailAddress']),
       latitude: serializer.fromJson<double>(json['latitude']),
       longitude: serializer.fromJson<double>(json['longitude']),
@@ -954,7 +920,6 @@ class PropertyTableData extends DataClass
       'sido': serializer.toJson<String>(sido),
       'sigungu': serializer.toJson<String>(sigungu),
       'dongMyeon': serializer.toJson<String>(dongMyeon),
-      'buildingName': serializer.toJson<String?>(buildingName),
       'detailAddress': serializer.toJson<String>(detailAddress),
       'latitude': serializer.toJson<double>(latitude),
       'longitude': serializer.toJson<double>(longitude),
@@ -988,7 +953,6 @@ class PropertyTableData extends DataClass
     String? sido,
     String? sigungu,
     String? dongMyeon,
-    Value<String?> buildingName = const Value.absent(),
     String? detailAddress,
     double? latitude,
     double? longitude,
@@ -1017,7 +981,6 @@ class PropertyTableData extends DataClass
     sido: sido ?? this.sido,
     sigungu: sigungu ?? this.sigungu,
     dongMyeon: dongMyeon ?? this.dongMyeon,
-    buildingName: buildingName.present ? buildingName.value : this.buildingName,
     detailAddress: detailAddress ?? this.detailAddress,
     latitude: latitude ?? this.latitude,
     longitude: longitude ?? this.longitude,
@@ -1064,9 +1027,6 @@ class PropertyTableData extends DataClass
       sido: data.sido.present ? data.sido.value : this.sido,
       sigungu: data.sigungu.present ? data.sigungu.value : this.sigungu,
       dongMyeon: data.dongMyeon.present ? data.dongMyeon.value : this.dongMyeon,
-      buildingName: data.buildingName.present
-          ? data.buildingName.value
-          : this.buildingName,
       detailAddress: data.detailAddress.present
           ? data.detailAddress.value
           : this.detailAddress,
@@ -1112,7 +1072,6 @@ class PropertyTableData extends DataClass
           ..write('sido: $sido, ')
           ..write('sigungu: $sigungu, ')
           ..write('dongMyeon: $dongMyeon, ')
-          ..write('buildingName: $buildingName, ')
           ..write('detailAddress: $detailAddress, ')
           ..write('latitude: $latitude, ')
           ..write('longitude: $longitude, ')
@@ -1146,7 +1105,6 @@ class PropertyTableData extends DataClass
     sido,
     sigungu,
     dongMyeon,
-    buildingName,
     detailAddress,
     latitude,
     longitude,
@@ -1179,7 +1137,6 @@ class PropertyTableData extends DataClass
           other.sido == this.sido &&
           other.sigungu == this.sigungu &&
           other.dongMyeon == this.dongMyeon &&
-          other.buildingName == this.buildingName &&
           other.detailAddress == this.detailAddress &&
           other.latitude == this.latitude &&
           other.longitude == this.longitude &&
@@ -1210,7 +1167,6 @@ class PropertyTableCompanion extends UpdateCompanion<PropertyTableData> {
   final Value<String> sido;
   final Value<String> sigungu;
   final Value<String> dongMyeon;
-  final Value<String?> buildingName;
   final Value<String> detailAddress;
   final Value<double> latitude;
   final Value<double> longitude;
@@ -1240,7 +1196,6 @@ class PropertyTableCompanion extends UpdateCompanion<PropertyTableData> {
     this.sido = const Value.absent(),
     this.sigungu = const Value.absent(),
     this.dongMyeon = const Value.absent(),
-    this.buildingName = const Value.absent(),
     this.detailAddress = const Value.absent(),
     this.latitude = const Value.absent(),
     this.longitude = const Value.absent(),
@@ -1271,7 +1226,6 @@ class PropertyTableCompanion extends UpdateCompanion<PropertyTableData> {
     required String sido,
     required String sigungu,
     required String dongMyeon,
-    this.buildingName = const Value.absent(),
     this.detailAddress = const Value.absent(),
     required double latitude,
     required double longitude,
@@ -1316,7 +1270,6 @@ class PropertyTableCompanion extends UpdateCompanion<PropertyTableData> {
     Expression<String>? sido,
     Expression<String>? sigungu,
     Expression<String>? dongMyeon,
-    Expression<String>? buildingName,
     Expression<String>? detailAddress,
     Expression<double>? latitude,
     Expression<double>? longitude,
@@ -1347,7 +1300,6 @@ class PropertyTableCompanion extends UpdateCompanion<PropertyTableData> {
       if (sido != null) 'sido': sido,
       if (sigungu != null) 'sigungu': sigungu,
       if (dongMyeon != null) 'dong_myeon': dongMyeon,
-      if (buildingName != null) 'building_name': buildingName,
       if (detailAddress != null) 'detail_address': detailAddress,
       if (latitude != null) 'latitude': latitude,
       if (longitude != null) 'longitude': longitude,
@@ -1383,7 +1335,6 @@ class PropertyTableCompanion extends UpdateCompanion<PropertyTableData> {
     Value<String>? sido,
     Value<String>? sigungu,
     Value<String>? dongMyeon,
-    Value<String?>? buildingName,
     Value<String>? detailAddress,
     Value<double>? latitude,
     Value<double>? longitude,
@@ -1414,7 +1365,6 @@ class PropertyTableCompanion extends UpdateCompanion<PropertyTableData> {
       sido: sido ?? this.sido,
       sigungu: sigungu ?? this.sigungu,
       dongMyeon: dongMyeon ?? this.dongMyeon,
-      buildingName: buildingName ?? this.buildingName,
       detailAddress: detailAddress ?? this.detailAddress,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
@@ -1481,9 +1431,6 @@ class PropertyTableCompanion extends UpdateCompanion<PropertyTableData> {
     }
     if (dongMyeon.present) {
       map['dong_myeon'] = Variable<String>(dongMyeon.value);
-    }
-    if (buildingName.present) {
-      map['building_name'] = Variable<String>(buildingName.value);
     }
     if (detailAddress.present) {
       map['detail_address'] = Variable<String>(detailAddress.value);
@@ -1557,7 +1504,6 @@ class PropertyTableCompanion extends UpdateCompanion<PropertyTableData> {
           ..write('sido: $sido, ')
           ..write('sigungu: $sigungu, ')
           ..write('dongMyeon: $dongMyeon, ')
-          ..write('buildingName: $buildingName, ')
           ..write('detailAddress: $detailAddress, ')
           ..write('latitude: $latitude, ')
           ..write('longitude: $longitude, ')
@@ -1981,7 +1927,6 @@ typedef $$PropertyTableTableCreateCompanionBuilder =
       required String sido,
       required String sigungu,
       required String dongMyeon,
-      Value<String?> buildingName,
       Value<String> detailAddress,
       required double latitude,
       required double longitude,
@@ -2013,7 +1958,6 @@ typedef $$PropertyTableTableUpdateCompanionBuilder =
       Value<String> sido,
       Value<String> sigungu,
       Value<String> dongMyeon,
-      Value<String?> buildingName,
       Value<String> detailAddress,
       Value<double> latitude,
       Value<double> longitude,
@@ -2142,11 +2086,6 @@ class $$PropertyTableTableFilterComposer
 
   ColumnFilters<String> get dongMyeon => $composableBuilder(
     column: $table.dongMyeon,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get buildingName => $composableBuilder(
-    column: $table.buildingName,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2321,11 +2260,6 @@ class $$PropertyTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get buildingName => $composableBuilder(
-    column: $table.buildingName,
-    builder: (column) => ColumnOrderings(column),
-  );
-
   ColumnOrderings<String> get detailAddress => $composableBuilder(
     column: $table.detailAddress,
     builder: (column) => ColumnOrderings(column),
@@ -2459,11 +2393,6 @@ class $$PropertyTableTableAnnotationComposer
   GeneratedColumn<String> get dongMyeon =>
       $composableBuilder(column: $table.dongMyeon, builder: (column) => column);
 
-  GeneratedColumn<String> get buildingName => $composableBuilder(
-    column: $table.buildingName,
-    builder: (column) => column,
-  );
-
   GeneratedColumn<String> get detailAddress => $composableBuilder(
     column: $table.detailAddress,
     builder: (column) => column,
@@ -2588,7 +2517,6 @@ class $$PropertyTableTableTableManager
                 Value<String> sido = const Value.absent(),
                 Value<String> sigungu = const Value.absent(),
                 Value<String> dongMyeon = const Value.absent(),
-                Value<String?> buildingName = const Value.absent(),
                 Value<String> detailAddress = const Value.absent(),
                 Value<double> latitude = const Value.absent(),
                 Value<double> longitude = const Value.absent(),
@@ -2618,7 +2546,6 @@ class $$PropertyTableTableTableManager
                 sido: sido,
                 sigungu: sigungu,
                 dongMyeon: dongMyeon,
-                buildingName: buildingName,
                 detailAddress: detailAddress,
                 latitude: latitude,
                 longitude: longitude,
@@ -2650,7 +2577,6 @@ class $$PropertyTableTableTableManager
                 required String sido,
                 required String sigungu,
                 required String dongMyeon,
-                Value<String?> buildingName = const Value.absent(),
                 Value<String> detailAddress = const Value.absent(),
                 required double latitude,
                 required double longitude,
@@ -2680,7 +2606,6 @@ class $$PropertyTableTableTableManager
                 sido: sido,
                 sigungu: sigungu,
                 dongMyeon: dongMyeon,
-                buildingName: buildingName,
                 detailAddress: detailAddress,
                 latitude: latitude,
                 longitude: longitude,

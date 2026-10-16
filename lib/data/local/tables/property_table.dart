@@ -18,7 +18,6 @@ class PropertyTable extends Table {
   TextColumn get sido => text()();
   TextColumn get sigungu => text()();
   TextColumn get dongMyeon => text()();
-  TextColumn get buildingName => text().nullable()();
   TextColumn get detailAddress => text().withDefault(const Constant(''))();
   RealColumn get latitude => real()();
   RealColumn get longitude => real()();

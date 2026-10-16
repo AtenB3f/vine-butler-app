@@ -32,7 +32,6 @@ const _candidate = AddressCandidate(
   sido: '경기도',
   sigungu: '성남시 분당구',
   dongMyeon: '정자동',
-  buildingName: 'NAVER그린팩토리',
 );
 
 void main() {
@@ -71,7 +70,6 @@ void main() {
     expect(address.sido, '경기도');
     expect(address.sigungu, '성남시 분당구');
     expect(address.dongMyeon, '정자동');
-    expect(address.buildingName, 'NAVER그린팩토리');
     expect(address.latitude, 37.3595033);
     expect(address.longitude, 127.105216);
   });

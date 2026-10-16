@@ -28,7 +28,6 @@ Property _property(String id, {List<PropertyImage> images = const []}) {
       sido: '서울특별시',
       sigungu: '강남구',
       dongMyeon: '역삼동',
-      buildingName: '역삼빌딩',
       latitude: 37.5006,
       longitude: 127.0364,
     ),
@@ -62,7 +61,6 @@ void main() {
     expect(saved.address.sido, '서울특별시');
     expect(saved.address.sigungu, '강남구');
     expect(saved.address.dongMyeon, '역삼동');
-    expect(saved.address.buildingName, '역삼빌딩');
     expect(saved.address.latitude, 37.5006);
     expect(saved.address.longitude, 127.0364);
     expect(saved.syncedAt, isNull);

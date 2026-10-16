@@ -9,7 +9,6 @@ class AddressCandidate {
     required this.sido,
     required this.sigungu,
     required this.dongMyeon,
-    this.buildingName,
   });
 
   final String zipCode;
@@ -19,7 +18,6 @@ class AddressCandidate {
   final String sido;
   final String sigungu;
   final String dongMyeon;
-  final String? buildingName;
 
   Address toAddress({required double latitude, required double longitude}) {
     return Address(
@@ -29,7 +27,6 @@ class AddressCandidate {
       sido: sido,
       sigungu: sigungu,
       dongMyeon: dongMyeon,
-      buildingName: buildingName,
       latitude: latitude,
       longitude: longitude,
     );
