@@ -110,22 +110,14 @@ class PropertyDetailScreen extends ConsumerWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: context.isMobile ? 8 : 14,
+      spacing: 14,
       children: [
-        SizedBox(
-          height: context.isMobile ? 246 : 240,
-          width: double.infinity,
-          child: !data.hasImages
-              ? _map(data)
-              : context.isMobile
-                  ? _imageMap(data, isMapVisible)
-                  : AppImagePage(viewState: AppImagePageViewState.urls(data.imageUrls)),
-        ),
+        _media(context, ref, data, isMapVisible),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 44,
+          spacing: context.isMobile ? 40 : 44,
           children: [
-            _address(context, ref, data, isMapVisible),
+            _address(data),
             _priceInfo(data),
           ],
         ),
@@ -133,9 +125,71 @@ class PropertyDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _address(BuildContext context, WidgetRef ref, PropertyDetailData data, bool isMapVisible) {
-    final isToggleable = context.isMobile && data.hasImages;
-    final address = Column(
+  Widget _media(BuildContext context, WidgetRef ref, PropertyDetailData data, bool isMapVisible) {
+    final height = context.isMobile ? 246.0 : 240.0;
+
+    if (!data.hasImages) { return SizedBox(height: height, width: double.infinity, child: _map(data)); }
+
+    if (!context.isMobile) {
+      return SizedBox(
+        height: height,
+        width: double.infinity,
+        child: AppImagePage(viewState: AppImagePageViewState.urls(data.imageUrls)),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      spacing: 4,
+      children: [
+        _mediaButtons(ref, isMapVisible),
+        SizedBox(height: height, width: double.infinity, child: _imageMap(data, isMapVisible)),
+      ],
+    );
+  }
+
+  Widget _mediaButtons(WidgetRef ref, bool isMapVisible) {
+    void toggle() => ref.read(propertyDetailVMProvider(id).notifier).action(PropertyDetailAction.toggleMap);
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _mediaButton(icon: AppIcons.mapSM, text: '지도', isSelected: isMapVisible, onTap: toggle),
+        _mediaButton(icon: AppIcons.imageSM, text: '이미지', isSelected: !isMapVisible, onTap: toggle),
+      ],
+    );
+  }
+
+  Widget _mediaButton({
+    required Widget Function(Color color) icon,
+    required String text,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    final color = isSelected ? TextColor.dark : GrayColor.light;
+    final button = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        color: StateColor.white,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 6,
+        children: [
+          icon(color),
+          (isSelected ? AppFontStyle.bold2 : AppFontStyle.body2).text(text, color),
+        ],
+      ),
+    );
+
+    if (isSelected) { return button; }
+
+    return Pressable(onTap: onTap, child: button);
+  }
+
+  Widget _address(PropertyDetailData data) {
+    return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 4,
@@ -145,33 +199,11 @@ class PropertyDetailScreen extends ConsumerWidget {
             data.unitAddress,
             style: AppFontStyle.header1.style(TextColor.dark),
           ),
-        if (isToggleable)
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            spacing: 6,
-            children: [
-              Flexible(
-                child: Text(
-                  data.address,
-                  style: AppFontStyle.sub1.style(TextColor.dark),
-                ),
-              ),
-              isMapVisible ? AppIcons.imageMD(TextColor.dark) : AppIcons.mapMD(TextColor.dark),
-            ],
-          )
-        else
-          Text(
-            data.address,
-            style: AppFontStyle.sub1.style(TextColor.dark),
-          ),
+        Text(
+          data.address,
+          style: AppFontStyle.sub1.style(TextColor.dark),
+        ),
       ],
-    );
-
-    if (!isToggleable) { return address; }
-
-    return Pressable(
-      onTap: () => ref.read(propertyDetailVMProvider(id).notifier).action(PropertyDetailAction.toggleMap),
-      child: address,
     );
   }
 
