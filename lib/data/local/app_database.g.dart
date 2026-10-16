@@ -156,6 +156,18 @@ class $PropertyTableTable extends PropertyTable
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _detailAddressMeta = const VerificationMeta(
+    'detailAddress',
+  );
+  @override
+  late final GeneratedColumn<String> detailAddress = GeneratedColumn<String>(
+    'detail_address',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
   static const VerificationMeta _latitudeMeta = const VerificationMeta(
     'latitude',
   );
@@ -324,6 +336,7 @@ class $PropertyTableTable extends PropertyTable
     sigungu,
     dongMyeon,
     buildingName,
+    detailAddress,
     latitude,
     longitude,
     isSuretyInsuranceAvailable,
@@ -445,6 +458,15 @@ class $PropertyTableTable extends PropertyTable
         buildingName.isAcceptableOrUnknown(
           data['building_name']!,
           _buildingNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('detail_address')) {
+      context.handle(
+        _detailAddressMeta,
+        detailAddress.isAcceptableOrUnknown(
+          data['detail_address']!,
+          _detailAddressMeta,
         ),
       );
     }
@@ -607,6 +629,10 @@ class $PropertyTableTable extends PropertyTable
         DriftSqlType.string,
         data['${effectivePrefix}building_name'],
       ),
+      detailAddress: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}detail_address'],
+      )!,
       latitude: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}latitude'],
@@ -697,6 +723,7 @@ class PropertyTableData extends DataClass
   final String sigungu;
   final String dongMyeon;
   final String? buildingName;
+  final String detailAddress;
   final double latitude;
   final double longitude;
   final bool? isSuretyInsuranceAvailable;
@@ -725,6 +752,7 @@ class PropertyTableData extends DataClass
     required this.sigungu,
     required this.dongMyeon,
     this.buildingName,
+    required this.detailAddress,
     required this.latitude,
     required this.longitude,
     this.isSuretyInsuranceAvailable,
@@ -768,6 +796,7 @@ class PropertyTableData extends DataClass
     if (!nullToAbsent || buildingName != null) {
       map['building_name'] = Variable<String>(buildingName);
     }
+    map['detail_address'] = Variable<String>(detailAddress);
     map['latitude'] = Variable<double>(latitude);
     map['longitude'] = Variable<double>(longitude);
     if (!nullToAbsent || isSuretyInsuranceAvailable != null) {
@@ -824,6 +853,7 @@ class PropertyTableData extends DataClass
       buildingName: buildingName == null && nullToAbsent
           ? const Value.absent()
           : Value(buildingName),
+      detailAddress: Value(detailAddress),
       latitude: Value(latitude),
       longitude: Value(longitude),
       isSuretyInsuranceAvailable:
@@ -879,6 +909,7 @@ class PropertyTableData extends DataClass
       sigungu: serializer.fromJson<String>(json['sigungu']),
       dongMyeon: serializer.fromJson<String>(json['dongMyeon']),
       buildingName: serializer.fromJson<String?>(json['buildingName']),
+      detailAddress: serializer.fromJson<String>(json['detailAddress']),
       latitude: serializer.fromJson<double>(json['latitude']),
       longitude: serializer.fromJson<double>(json['longitude']),
       isSuretyInsuranceAvailable: serializer.fromJson<bool?>(
@@ -924,6 +955,7 @@ class PropertyTableData extends DataClass
       'sigungu': serializer.toJson<String>(sigungu),
       'dongMyeon': serializer.toJson<String>(dongMyeon),
       'buildingName': serializer.toJson<String?>(buildingName),
+      'detailAddress': serializer.toJson<String>(detailAddress),
       'latitude': serializer.toJson<double>(latitude),
       'longitude': serializer.toJson<double>(longitude),
       'isSuretyInsuranceAvailable': serializer.toJson<bool?>(
@@ -957,6 +989,7 @@ class PropertyTableData extends DataClass
     String? sigungu,
     String? dongMyeon,
     Value<String?> buildingName = const Value.absent(),
+    String? detailAddress,
     double? latitude,
     double? longitude,
     Value<bool?> isSuretyInsuranceAvailable = const Value.absent(),
@@ -985,6 +1018,7 @@ class PropertyTableData extends DataClass
     sigungu: sigungu ?? this.sigungu,
     dongMyeon: dongMyeon ?? this.dongMyeon,
     buildingName: buildingName.present ? buildingName.value : this.buildingName,
+    detailAddress: detailAddress ?? this.detailAddress,
     latitude: latitude ?? this.latitude,
     longitude: longitude ?? this.longitude,
     isSuretyInsuranceAvailable: isSuretyInsuranceAvailable.present
@@ -1033,6 +1067,9 @@ class PropertyTableData extends DataClass
       buildingName: data.buildingName.present
           ? data.buildingName.value
           : this.buildingName,
+      detailAddress: data.detailAddress.present
+          ? data.detailAddress.value
+          : this.detailAddress,
       latitude: data.latitude.present ? data.latitude.value : this.latitude,
       longitude: data.longitude.present ? data.longitude.value : this.longitude,
       isSuretyInsuranceAvailable: data.isSuretyInsuranceAvailable.present
@@ -1076,6 +1113,7 @@ class PropertyTableData extends DataClass
           ..write('sigungu: $sigungu, ')
           ..write('dongMyeon: $dongMyeon, ')
           ..write('buildingName: $buildingName, ')
+          ..write('detailAddress: $detailAddress, ')
           ..write('latitude: $latitude, ')
           ..write('longitude: $longitude, ')
           ..write('isSuretyInsuranceAvailable: $isSuretyInsuranceAvailable, ')
@@ -1109,6 +1147,7 @@ class PropertyTableData extends DataClass
     sigungu,
     dongMyeon,
     buildingName,
+    detailAddress,
     latitude,
     longitude,
     isSuretyInsuranceAvailable,
@@ -1141,6 +1180,7 @@ class PropertyTableData extends DataClass
           other.sigungu == this.sigungu &&
           other.dongMyeon == this.dongMyeon &&
           other.buildingName == this.buildingName &&
+          other.detailAddress == this.detailAddress &&
           other.latitude == this.latitude &&
           other.longitude == this.longitude &&
           other.isSuretyInsuranceAvailable == this.isSuretyInsuranceAvailable &&
@@ -1171,6 +1211,7 @@ class PropertyTableCompanion extends UpdateCompanion<PropertyTableData> {
   final Value<String> sigungu;
   final Value<String> dongMyeon;
   final Value<String?> buildingName;
+  final Value<String> detailAddress;
   final Value<double> latitude;
   final Value<double> longitude;
   final Value<bool?> isSuretyInsuranceAvailable;
@@ -1200,6 +1241,7 @@ class PropertyTableCompanion extends UpdateCompanion<PropertyTableData> {
     this.sigungu = const Value.absent(),
     this.dongMyeon = const Value.absent(),
     this.buildingName = const Value.absent(),
+    this.detailAddress = const Value.absent(),
     this.latitude = const Value.absent(),
     this.longitude = const Value.absent(),
     this.isSuretyInsuranceAvailable = const Value.absent(),
@@ -1230,6 +1272,7 @@ class PropertyTableCompanion extends UpdateCompanion<PropertyTableData> {
     required String sigungu,
     required String dongMyeon,
     this.buildingName = const Value.absent(),
+    this.detailAddress = const Value.absent(),
     required double latitude,
     required double longitude,
     this.isSuretyInsuranceAvailable = const Value.absent(),
@@ -1274,6 +1317,7 @@ class PropertyTableCompanion extends UpdateCompanion<PropertyTableData> {
     Expression<String>? sigungu,
     Expression<String>? dongMyeon,
     Expression<String>? buildingName,
+    Expression<String>? detailAddress,
     Expression<double>? latitude,
     Expression<double>? longitude,
     Expression<bool>? isSuretyInsuranceAvailable,
@@ -1304,6 +1348,7 @@ class PropertyTableCompanion extends UpdateCompanion<PropertyTableData> {
       if (sigungu != null) 'sigungu': sigungu,
       if (dongMyeon != null) 'dong_myeon': dongMyeon,
       if (buildingName != null) 'building_name': buildingName,
+      if (detailAddress != null) 'detail_address': detailAddress,
       if (latitude != null) 'latitude': latitude,
       if (longitude != null) 'longitude': longitude,
       if (isSuretyInsuranceAvailable != null)
@@ -1339,6 +1384,7 @@ class PropertyTableCompanion extends UpdateCompanion<PropertyTableData> {
     Value<String>? sigungu,
     Value<String>? dongMyeon,
     Value<String?>? buildingName,
+    Value<String>? detailAddress,
     Value<double>? latitude,
     Value<double>? longitude,
     Value<bool?>? isSuretyInsuranceAvailable,
@@ -1369,6 +1415,7 @@ class PropertyTableCompanion extends UpdateCompanion<PropertyTableData> {
       sigungu: sigungu ?? this.sigungu,
       dongMyeon: dongMyeon ?? this.dongMyeon,
       buildingName: buildingName ?? this.buildingName,
+      detailAddress: detailAddress ?? this.detailAddress,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       isSuretyInsuranceAvailable:
@@ -1437,6 +1484,9 @@ class PropertyTableCompanion extends UpdateCompanion<PropertyTableData> {
     }
     if (buildingName.present) {
       map['building_name'] = Variable<String>(buildingName.value);
+    }
+    if (detailAddress.present) {
+      map['detail_address'] = Variable<String>(detailAddress.value);
     }
     if (latitude.present) {
       map['latitude'] = Variable<double>(latitude.value);
@@ -1508,6 +1558,7 @@ class PropertyTableCompanion extends UpdateCompanion<PropertyTableData> {
           ..write('sigungu: $sigungu, ')
           ..write('dongMyeon: $dongMyeon, ')
           ..write('buildingName: $buildingName, ')
+          ..write('detailAddress: $detailAddress, ')
           ..write('latitude: $latitude, ')
           ..write('longitude: $longitude, ')
           ..write('isSuretyInsuranceAvailable: $isSuretyInsuranceAvailable, ')
@@ -1931,6 +1982,7 @@ typedef $$PropertyTableTableCreateCompanionBuilder =
       required String sigungu,
       required String dongMyeon,
       Value<String?> buildingName,
+      Value<String> detailAddress,
       required double latitude,
       required double longitude,
       Value<bool?> isSuretyInsuranceAvailable,
@@ -1962,6 +2014,7 @@ typedef $$PropertyTableTableUpdateCompanionBuilder =
       Value<String> sigungu,
       Value<String> dongMyeon,
       Value<String?> buildingName,
+      Value<String> detailAddress,
       Value<double> latitude,
       Value<double> longitude,
       Value<bool?> isSuretyInsuranceAvailable,
@@ -2094,6 +2147,11 @@ class $$PropertyTableTableFilterComposer
 
   ColumnFilters<String> get buildingName => $composableBuilder(
     column: $table.buildingName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get detailAddress => $composableBuilder(
+    column: $table.detailAddress,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2268,6 +2326,11 @@ class $$PropertyTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get detailAddress => $composableBuilder(
+    column: $table.detailAddress,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<double> get latitude => $composableBuilder(
     column: $table.latitude,
     builder: (column) => ColumnOrderings(column),
@@ -2401,6 +2464,11 @@ class $$PropertyTableTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get detailAddress => $composableBuilder(
+    column: $table.detailAddress,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<double> get latitude =>
       $composableBuilder(column: $table.latitude, builder: (column) => column);
 
@@ -2521,6 +2589,7 @@ class $$PropertyTableTableTableManager
                 Value<String> sigungu = const Value.absent(),
                 Value<String> dongMyeon = const Value.absent(),
                 Value<String?> buildingName = const Value.absent(),
+                Value<String> detailAddress = const Value.absent(),
                 Value<double> latitude = const Value.absent(),
                 Value<double> longitude = const Value.absent(),
                 Value<bool?> isSuretyInsuranceAvailable = const Value.absent(),
@@ -2550,6 +2619,7 @@ class $$PropertyTableTableTableManager
                 sigungu: sigungu,
                 dongMyeon: dongMyeon,
                 buildingName: buildingName,
+                detailAddress: detailAddress,
                 latitude: latitude,
                 longitude: longitude,
                 isSuretyInsuranceAvailable: isSuretyInsuranceAvailable,
@@ -2581,6 +2651,7 @@ class $$PropertyTableTableTableManager
                 required String sigungu,
                 required String dongMyeon,
                 Value<String?> buildingName = const Value.absent(),
+                Value<String> detailAddress = const Value.absent(),
                 required double latitude,
                 required double longitude,
                 Value<bool?> isSuretyInsuranceAvailable = const Value.absent(),
@@ -2610,6 +2681,7 @@ class $$PropertyTableTableTableManager
                 sigungu: sigungu,
                 dongMyeon: dongMyeon,
                 buildingName: buildingName,
+                detailAddress: detailAddress,
                 latitude: latitude,
                 longitude: longitude,
                 isSuretyInsuranceAvailable: isSuretyInsuranceAvailable,

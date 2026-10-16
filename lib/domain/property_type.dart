@@ -9,7 +9,6 @@ enum PropertyType {
   oneRoom,
   twoRoom,
   villa,
-  single,
-  multi,
+  detachedHouse,
   commercialBuilding
 }

@@ -12,6 +12,7 @@ abstract class Address with _$Address {
     required String sigungu,
     required String dongMyeon,
     String? buildingName,
+    @Default('') String detailAddress,
     required double latitude,
     required double longitude,
   }) = _Address;

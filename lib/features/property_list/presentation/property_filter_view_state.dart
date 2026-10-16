@@ -55,7 +55,7 @@ enum PropertyTypeFilterOption {
   twoRoom({PropertyType.twoRoom}),
   villa({PropertyType.villa}),
   apartment({PropertyType.apartment}),
-  singleMulti({PropertyType.single, PropertyType.multi}),
+  singleMulti({PropertyType.detachedHouse}),
   commercialBuilding({PropertyType.commercialBuilding});
 
   const PropertyTypeFilterOption(this.types);

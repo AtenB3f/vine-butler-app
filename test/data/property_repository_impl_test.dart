@@ -69,6 +69,22 @@ void main() {
     expect(saved.updatedAt.isAfter(DateTime(2020)), isTrue);
   });
 
+  test('상세 주소와 단독/다가구 유형을 저장하고 복원한다', () async {
+    final property = _property('a');
+
+    await repository.save(
+      property.copyWith(
+        propertyType: PropertyType.detachedHouse,
+        address: property.address.copyWith(detailAddress: '202호'),
+      ),
+    );
+
+    final saved = await repository.getById('a');
+
+    expect(saved!.propertyType, PropertyType.detachedHouse);
+    expect(saved.address.detailAddress, '202호');
+  });
+
   test('같은 id로 저장하면 덮어쓴다', () async {
     await repository.save(_property('a'));
     await repository.save(_property('a').copyWith(memo: '수정'));
