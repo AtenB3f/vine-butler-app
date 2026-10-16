@@ -23,14 +23,17 @@ class PropertyDetailVM extends Notifier<PropertyDetailViewState> {
 
       case PropertyDetailAction.toggleMap:
         state = state.copyWith(isMapVisible: !state.isMapVisible);
+
+      case PropertyDetailAction.delete:
+        _delete();
     }
   }
 
-  void popNavigation() {
-    state = state.copyWith(navigateTo: () => null);
+  void sendEvent([PropertyDetailEvent? event]) {
+    state = state.copyWith(event: () => event);
   }
 
-  void pushNavigation(String path) {
+  void navigate([String? path]) {
     state = state.copyWith(navigateTo: () => path);
   }
 
@@ -40,7 +43,21 @@ class PropertyDetailVM extends Notifier<PropertyDetailViewState> {
     if (!ref.mounted) { return; }
 
     state = property == null
-        ? state.copyWith(isLoading: false, isNotFound: true)
-        : state.copyWith(data: PropertyDetailData.fromDomain(property), isLoading: false, isNotFound: false);
+        ? state.copyWith(status: PropertyDetailStatus.notFound)
+        : state.copyWith(data: PropertyDetailData.fromDomain(property), status: PropertyDetailStatus.loaded);
+  }
+
+  Future<void> _delete() async {
+    try {
+      await ref.read(propertyUseCaseProvider).delete(id);
+
+      if (!ref.mounted) { return; }
+
+      sendEvent(PropertyDetailEvent.delete);
+    } catch (_) {
+      if (!ref.mounted) { return; }
+
+      sendEvent(PropertyDetailEvent.failDelete);
+    }
   }
 }

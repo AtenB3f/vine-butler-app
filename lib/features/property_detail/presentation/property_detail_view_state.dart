@@ -4,39 +4,51 @@ import 'package:vine_butler/domain/property_type.dart';
 
 class PropertyDetailViewState {
   final PropertyDetailData? data;
-  final bool isLoading;
-  final bool isNotFound;
+  final PropertyDetailStatus status;
+  final PropertyDetailEvent? event;
   final String? navigateTo;
   final bool isMapVisible;
 
   const PropertyDetailViewState({
     this.data,
-    this.isLoading = true,
-    this.isNotFound = false,
+    this.status = PropertyDetailStatus.loading,
+    this.event,
     this.navigateTo,
     this.isMapVisible = false,
   });
 
   PropertyDetailViewState copyWith({
     PropertyDetailData? data,
-    bool? isLoading,
-    bool? isNotFound,
+    PropertyDetailStatus? status,
+    PropertyDetailEvent? Function()? event,
     String? Function()? navigateTo,
     bool? isMapVisible,
   }) {
     return PropertyDetailViewState(
       data: data ?? this.data,
-      isLoading: isLoading ?? this.isLoading,
-      isNotFound: isNotFound ?? this.isNotFound,
+      status: status ?? this.status,
+      event: event != null ? event() : this.event,
       navigateTo: navigateTo != null ? navigateTo() : this.navigateTo,
       isMapVisible: isMapVisible ?? this.isMapVisible,
     );
   }
 }
 
+enum PropertyDetailStatus {
+  loading,
+  loaded,
+  notFound,
+}
+
+enum PropertyDetailEvent {
+  delete,
+  failDelete,
+}
+
 enum PropertyDetailAction {
   fetch,
   toggleMap,
+  delete,
 }
 
 class PropertyDetailData {

@@ -13,6 +13,8 @@ import 'package:vine_butler/features/property_detail/property_detail_vm.dart';
 
 class _FakePropertyRepository implements PropertyRepository {
   Property? property;
+  final List<String> deletedIds = [];
+  bool shouldFailDelete = false;
 
   @override
   Future<Property?> getById(String id) async => property?.id == id ? property : null;
@@ -27,7 +29,11 @@ class _FakePropertyRepository implements PropertyRepository {
   Future<void> save(Property property) async {}
 
   @override
-  Future<void> delete(String id) async {}
+  Future<void> delete(String id) async {
+    if (shouldFailDelete) { throw Exception('delete failed'); }
+
+    deletedIds.add(id);
+  }
 }
 
 Property _property({
@@ -87,7 +93,7 @@ void main() {
   test('불러오기 전에는 로딩 상태다', () {
     repository.property = _property();
 
-    expect(state().isLoading, isTrue);
+    expect(state().status, PropertyDetailStatus.loading);
     expect(state().data, isNull);
   });
 
@@ -98,8 +104,7 @@ void main() {
 
     final data = state().data!;
 
-    expect(state().isLoading, isFalse);
-    expect(state().isNotFound, isFalse);
+    expect(state().status, PropertyDetailStatus.loaded);
     expect(data.unitAddress, '역삼동 1-1 202호');
     expect(data.address, '서울특별시 강남구');
     expect(data.hasImages, isFalse);
@@ -132,8 +137,7 @@ void main() {
   test('매물이 없으면 찾을 수 없음 상태다', () async {
     await load();
 
-    expect(state().isLoading, isFalse);
-    expect(state().isNotFound, isTrue);
+    expect(state().status, PropertyDetailStatus.notFound);
     expect(state().data, isNull);
   });
 
@@ -174,6 +178,34 @@ void main() {
 
       expect(data.unitAddress, '어진동 573 101호');
       expect(data.address, '세종특별자치시');
+    });
+  });
+
+  group('삭제', () {
+    void delete() => container.read(propertyDetailVMProvider('a').notifier).action(PropertyDetailAction.delete);
+
+    test('삭제하면 매물을 지우고 삭제 이벤트를 보낸다', () async {
+      repository.property = _property();
+      await load();
+
+      delete();
+      await Future<void>.delayed(Duration.zero);
+
+      expect(repository.deletedIds, ['a']);
+      expect(state().event, PropertyDetailEvent.delete);
+    });
+
+    test('삭제에 실패하면 삭제 실패 이벤트를 보낸다', () async {
+      repository
+        ..property = _property()
+        ..shouldFailDelete = true;
+      await load();
+
+      delete();
+      await Future<void>.delayed(Duration.zero);
+
+      expect(repository.deletedIds, isEmpty);
+      expect(state().event, PropertyDetailEvent.failDelete);
     });
   });
 }

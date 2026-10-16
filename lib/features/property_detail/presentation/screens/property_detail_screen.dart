@@ -13,19 +13,25 @@ class PropertyDetailScreen extends ConsumerWidget {
 
   const PropertyDetailScreen({super.key, required this.id});
 
-  static final List<({String text, Widget Function(Color color) image})> _menuItems = [
-    (text: '수정', image: AppIcons.editMD),
-    (text: '삭제', image: AppIcons.trashMD),
-    (text: '내보내기', image: AppIcons.linkMD),
-    (text: '동기화', image: AppIcons.reloadMD),
+  static final List<({_DetailMenu menu, String text, Widget Function(Color color) image})> _menuItems = [
+    (menu: _DetailMenu.edit, text: '수정', image: AppIcons.editMD),
+    (menu: _DetailMenu.delete, text: '삭제', image: AppIcons.trashMD),
+    (menu: _DetailMenu.export, text: '내보내기', image: AppIcons.linkMD),
+    (menu: _DetailMenu.sync, text: '동기화', image: AppIcons.reloadMD),
   ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.handleEvent(
       propertyDetailVMProvider(id).select((state) => state.navigateTo),
-      consume: ref.read(propertyDetailVMProvider(id).notifier).popNavigation,
+      consume: ref.read(propertyDetailVMProvider(id).notifier).navigate,
       onEvent: (location) => context.push(location),
+    );
+
+    ref.handleEvent(
+      propertyDetailVMProvider(id).select((state) => state.event),
+      consume: ref.read(propertyDetailVMProvider(id).notifier).sendEvent,
+      onEvent: (event) => _onEvent(context, event),
     );
 
     final state = ref.watch(propertyDetailVMProvider(id));
@@ -43,13 +49,17 @@ class PropertyDetailScreen extends ConsumerWidget {
       leftIcon: AppIcons.chevronLeftMD,
       rightIcon: AppIcons.moreMD,
       onLeftTap: () => context.pop(),
-      onRightTap: () => showAppBottomSheet(
-        context,
-        AppBottomSheetViewState(
-          items: [for (final item in _menuItems) AppSheetItemViewState(text: item.text, image: item.image)],
-          selectedIndex: -1,
-        ),
-      ),
+      onRightTap: () async {
+        final index = await showAppBottomSheet(
+          context,
+          AppBottomSheetViewState(
+            items: [for (final item in _menuItems) AppSheetItemViewState(text: item.text, image: item.image)],
+            selectedIndex: -1,
+          ),
+        );
+
+        if (index != null && context.mounted) { _onMenuSelect(context, ref, index); }
+      },
       body: _body(context, ref, state),
     );
   }
@@ -60,30 +70,67 @@ class PropertyDetailScreen extends ConsumerWidget {
       leftIcon: AppIcons.chevronLeftMD,
       rightIcon: AppIcons.moreMD,
       onLeftTap: () => context.pop(),
-      onRightTap: () => showAppDropdown(
-        context,
-        AppDropdownViewState(
-          items: [for (final item in _menuItems) AppDropdownItemViewState(text: item.text, image: item.image)],
-          selectedIndex: -1,
-        ),
-        topRight: Offset(context.screenWidth - 16, MediaQuery.paddingOf(context).top + 58),
-      ),
+      onRightTap: () async {
+        final index = await showAppDropdown(
+          context,
+          AppDropdownViewState(
+            items: [for (final item in _menuItems) AppDropdownItemViewState(text: item.text, image: item.image)],
+            selectedIndex: -1,
+          ),
+          topRight: Offset(context.screenWidth - 16, MediaQuery.paddingOf(context).top + 58),
+        );
+
+        if (index != null && context.mounted) { _onMenuSelect(context, ref, index); }
+      },
       body: _body(context, ref, state),
     );
   }
 
-  Widget _body(BuildContext context, WidgetRef ref, PropertyDetailViewState state) {
-    final data = state.data;
+  Future<void> _onMenuSelect(BuildContext context, WidgetRef ref, int index) async {
+    if (_menuItems[index].menu != _DetailMenu.delete) { return; }
 
-    if (state.isLoading) {
-      return const Center(
-        child: AppLoadingSpinner(viewState: AppLoadingSpinnerViewState(size: AppLoadingSpinnerSize.large)),
-      );
+    final isConfirmed = await showAppAlertDialog(
+      context,
+      const AppAlertDialogViewState(
+        title: '매물을 삭제하시겠습니까?',
+        message: '삭제된 매물은 복구할 수 없습니다.',
+        primaryText: '삭제',
+        secondaryText: '취소',
+      ),
+    );
+
+    if (isConfirmed != true || !context.mounted) { return; }
+
+    ref.read(propertyDetailVMProvider(id).notifier).action(PropertyDetailAction.delete);
+  }
+
+  void _onEvent(BuildContext context, PropertyDetailEvent event) {
+    switch (event) {
+      case PropertyDetailEvent.delete:
+        showAppToast(context, const AppToastViewState(type: AppToastType.check, text: '매물이 삭제되었습니다.', hasLink: false));
+        context.pop();
+
+      case PropertyDetailEvent.failDelete:
+        showAppToast(
+          context,
+          const AppToastViewState(type: AppToastType.warning, text: '매물을 삭제하지 못했습니다. 다시 시도해주세요.', hasLink: false),
+        );
     }
+  }
 
-    if (data == null) { return Center(child: AppFontStyle.body3.text('매물을 찾을 수 없습니다.', TextColor.medium)); }
+  Widget _body(BuildContext context, WidgetRef ref, PropertyDetailViewState state) {
+    switch (state.status) {
+      case PropertyDetailStatus.loading:
+        return const Center(
+          child: AppLoadingSpinner(viewState: AppLoadingSpinnerViewState(size: AppLoadingSpinnerSize.large)),
+        );
 
-    return _contents(context, ref, data, state.isMapVisible);
+      case PropertyDetailStatus.notFound:
+        return Center(child: AppFontStyle.body3.text('매물을 찾을 수 없습니다.', TextColor.medium));
+
+      case PropertyDetailStatus.loaded:
+        return _contents(context, ref, state.data!, state.isMapVisible);
+    }
   }
 
   Widget _contents(BuildContext context, WidgetRef ref, PropertyDetailData data, bool isMapVisible) {
@@ -377,4 +424,11 @@ class PropertyDetailScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+enum _DetailMenu {
+  edit,
+  delete,
+  export,
+  sync,
 }
