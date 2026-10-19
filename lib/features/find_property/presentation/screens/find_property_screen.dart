@@ -37,6 +37,12 @@ class _FindPropertyScreenState extends ConsumerState<FindPropertyScreen> {
     final state = ref.watch(findPropertyVMProvider);
     final viewModel = ref.read(findPropertyVMProvider.notifier);
 
+    ref.handleEvent(
+      findPropertyVMProvider.select((state) => state.navigateTo),
+      consume: viewModel.navigate,
+      onEvent: (location) => context.go(location),
+    );
+
     ref.listen(findPropertyVMProvider.select((state) => state.price), (_, price) {
       if (_priceController.value != price) { _priceController.value = price; }
     });
@@ -62,7 +68,7 @@ class _FindPropertyScreenState extends ConsumerState<FindPropertyScreen> {
               ),
             ),
           ),
-          _nextButton(),
+          _nextButton(viewModel),
         ],
       ),
     );
@@ -167,7 +173,7 @@ class _FindPropertyScreenState extends ConsumerState<FindPropertyScreen> {
     );
   }
 
-  Widget _nextButton() {
+  Widget _nextButton(FindPropertyVM viewModel) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
       decoration: const BoxDecoration(
@@ -178,7 +184,7 @@ class _FindPropertyScreenState extends ConsumerState<FindPropertyScreen> {
         type: FillButtonType.medium,
         size: BoxButtonSize.large,
         text: '다음',
-        onTap: () {},
+        onTap: () => viewModel.action(const FindPropertyAction.next()),
       ),
     );
   }

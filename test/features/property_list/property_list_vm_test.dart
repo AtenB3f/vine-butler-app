@@ -160,4 +160,27 @@ void main() {
       expect(repository.requests.last.price, isNull);
     });
   });
+
+  test('필터를 바꿔도 검색어와 패널 상태를 유지하고 새 조건으로 다시 요청한다', () {
+    action(const PropertyListAction.search('테헤란'));
+    action(const PropertyListAction.panel(true));
+
+    action(
+      const PropertyListAction.filtering(
+        PropertyFilterData(transactionType: PropertyTransactionType.buy, propertyTypes: {PropertyType.apartment}),
+      ),
+    );
+
+    expect(state().query, '테헤란');
+    expect(state().filter.isFilterOpen, isTrue);
+    expect(state().filter.data.transactionType, PropertyTransactionType.buy);
+    expect(
+      repository.requests.last,
+      const PropertySearchCondition(
+        transactionType: PropertyTransactionType.buy,
+        propertyTypes: {PropertyType.apartment},
+        keyword: '테헤란',
+      ),
+    );
+  });
 }

@@ -208,6 +208,10 @@ class _HomeBannerState extends ConsumerState<_HomeBanner> {
   Widget build(BuildContext context) {
     final vm = ref.read(propertyListVMProvider.notifier);
 
+    ref.listen(propertyListVMProvider.select((state) => state.query), (_, query) {
+      if (_controller.text != query) { _controller.text = query; }
+    });
+
     return AppBndSearch(
       viewState: AppBndSearchViewState(status: widget.status, placeholder: '매물 찾기'),
       controller: _controller,

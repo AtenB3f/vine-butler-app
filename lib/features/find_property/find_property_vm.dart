@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vine_butler/core/router/app_router.dart';
 import 'package:vine_butler/domain/property_type.dart';
 import 'package:vine_butler/features/find_property/presentation/find_property_view_state.dart';
 import 'package:vine_butler/features/property_list/presentation/property_filter_view_state.dart';
+import 'package:vine_butler/features/property_list/property_list_vm.dart';
 
 final findPropertyVMProvider = NotifierProvider<FindPropertyVM, FindPropertyViewState>(FindPropertyVM.new);
 
@@ -11,6 +13,7 @@ sealed class FindPropertyAction {
   const factory FindPropertyAction.selectTransactionType(PropertyTransactionType type) = _SelectTransactionType;
   const factory FindPropertyAction.togglePropertyType(PropertyTypeFilterOption option) = _TogglePropertyType;
   const factory FindPropertyAction.changePrice(double price) = _ChangePrice;
+  const factory FindPropertyAction.next() = _Next;
 }
 
 class _SelectTransactionType extends FindPropertyAction {
@@ -29,6 +32,10 @@ class _ChangePrice extends FindPropertyAction {
   final double price;
 
   const _ChangePrice(this.price);
+}
+
+class _Next extends FindPropertyAction {
+  const _Next();
 }
 
 class FindPropertyVM extends Notifier<FindPropertyViewState> {
@@ -74,6 +81,23 @@ class FindPropertyVM extends Notifier<FindPropertyViewState> {
 
       case _ChangePrice(:final price):
         state = state.copyWith(price: price);
+
+      case _Next():
+        final filter = PropertyFilterData(
+          transactionType: state.transactionType,
+          propertyTypes: state.propertyTypes,
+          price: state.price,
+        );
+
+        ref.read(propertyListVMProvider.notifier)
+          ..action(const PropertyListAction.search(''))
+          ..action(const PropertyListAction.panel(false))
+          ..action(PropertyListAction.filtering(filter));
+        state = FindPropertyViewState.initial().copyWith(navigateTo: () => const PropertyListRoute().location);
     }
+  }
+
+  void navigate([String? path]) {
+    state = state.copyWith(navigateTo: () => path);
   }
 }

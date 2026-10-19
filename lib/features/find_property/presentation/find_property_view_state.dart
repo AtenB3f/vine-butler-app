@@ -6,11 +6,13 @@ class FindPropertyViewState {
   final PropertyTransactionType? transactionType;
   final Set<PropertyType> propertyTypes;
   final double price;
+  final String? navigateTo;
 
   const FindPropertyViewState({
     this.transactionType,
     this.propertyTypes = const {},
     required this.price,
+    this.navigateTo,
   });
 
   factory FindPropertyViewState.initial() {
@@ -51,11 +53,13 @@ class FindPropertyViewState {
     PropertyTransactionType? Function()? transactionType,
     Set<PropertyType>? propertyTypes,
     double? price,
+    String? Function()? navigateTo,
   }) {
     return FindPropertyViewState(
       transactionType: transactionType != null ? transactionType() : this.transactionType,
       propertyTypes: propertyTypes ?? this.propertyTypes,
       price: price ?? this.price,
+      navigateTo: navigateTo != null ? navigateTo() : this.navigateTo,
     );
   }
 }
