@@ -1,5 +1,6 @@
 export 'alignment.dart';
 export 'color.dart';
+export 'extensions/color_extension.dart';
 export 'font.dart';
 export 'image.dart';
 export 'picker.dart';
@@ -51,5 +52,7 @@ export 'widgets/textfield/app_text_field_view_state.dart';
 export 'widgets/textfield/basic_text_field.dart';
 export 'widgets/textfield/basic_text_field_view_state.dart';
 
-export 'widgets/map/app_map_view.dart';
-export 'widgets/map/app_map_view_view_state.dart';
+export 'widgets/map/mac_map.dart';
+export 'widgets/map/native_map.dart';
+export 'widgets/map/windows_map.dart';
+export 'widgets/map/naver_map_view_state.dart';

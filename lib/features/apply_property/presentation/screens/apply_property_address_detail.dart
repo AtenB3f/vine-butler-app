@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vine_butler/components/components.dart';
@@ -71,18 +72,27 @@ class _ApplyPropertyAddressDetailState extends ConsumerState<ApplyPropertyAddres
               aspectRatio: 1,
               child: located == null
                   ? const ColoredBox(color: BaseColor.light)
-                  : AppMapView(
-                      viewState: AppMapViewViewState(
-                        latitude: located.latitude,
-                        longitude: located.longitude,
-                        clientId: ApiEnv.naverMapsClientId,
-                        webServiceUrl: ApiEnv.naverMapsWebServiceUrl,
-                      ),
-                    ),
+                  : _map(located.latitude, located.longitude),
             ),
           ),
         ],
       ),
     );
+  }
+
+  Widget _map(double latitude, double longitude) {
+    final viewState = NaverMapViewState(
+      latitude: latitude,
+      longitude: longitude,
+      clientId: ApiEnv.naverMapsClientId,
+      webServiceUrl: ApiEnv.naverMapsWebServiceUrl,
+    );
+
+    return switch (defaultTargetPlatform) {
+      TargetPlatform.android || TargetPlatform.iOS => NativeMap(viewState: viewState),
+      TargetPlatform.macOS => MacMap(viewState: viewState),
+      TargetPlatform.windows => WindowsMap(viewState: viewState),
+      _ => const ColoredBox(color: BaseColor.light),
+    };
   }
 }

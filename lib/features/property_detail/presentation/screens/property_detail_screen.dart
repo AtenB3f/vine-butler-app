@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -415,14 +416,19 @@ class PropertyDetailScreen extends ConsumerWidget {
   }
 
   Widget _map(PropertyDetailData data) {
-    return AppMapView(
-      viewState: AppMapViewViewState(
-        latitude: data.latitude,
-        longitude: data.longitude,
-        clientId: ApiEnv.naverMapsClientId,
-        webServiceUrl: ApiEnv.naverMapsWebServiceUrl,
-      ),
+    final viewState = NaverMapViewState(
+      latitude: data.latitude,
+      longitude: data.longitude,
+      clientId: ApiEnv.naverMapsClientId,
+      webServiceUrl: ApiEnv.naverMapsWebServiceUrl,
     );
+
+    return switch (defaultTargetPlatform) {
+      TargetPlatform.android || TargetPlatform.iOS => NativeMap(viewState: viewState),
+      TargetPlatform.macOS => MacMap(viewState: viewState),
+      TargetPlatform.windows => WindowsMap(viewState: viewState),
+      _ => const ColoredBox(color: BaseColor.light),
+    };
   }
 }
 
