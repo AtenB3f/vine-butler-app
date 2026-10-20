@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:vine_butler/components/components.dart';
+import 'package:vine_butler/core/di/providers.dart';
 import 'package:vine_butler/core/network/api_env.dart';
 import 'package:vine_butler/core/router/app_router.dart';
 
@@ -18,7 +22,15 @@ Future<void> main() async {
     );
   }
 
-  runApp(const ProviderScope(child: VineButlerApp()));
+  final supportDirectory = await getApplicationSupportDirectory();
+  final imageDirectory = Directory('${supportDirectory.path}${Platform.pathSeparator}property_images');
+
+  runApp(
+    ProviderScope(
+      overrides: [imageDirectoryProvider.overrideWithValue(imageDirectory)],
+      child: const VineButlerApp(),
+    ),
+  );
 }
 
 class VineButlerApp extends StatelessWidget {

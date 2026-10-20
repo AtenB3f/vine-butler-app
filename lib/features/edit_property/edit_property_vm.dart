@@ -1,14 +1,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
 import 'package:vine_butler/core/di/providers.dart';
 import 'package:vine_butler/domain/model/address.dart';
 import 'package:vine_butler/domain/model/owner.dart';
 import 'package:vine_butler/domain/model/property_deal.dart';
+import 'package:vine_butler/domain/model/property_image.dart';
+import 'package:vine_butler/domain/repository/image_storage.dart';
 import 'package:vine_butler/domain/property_type.dart';
 import 'package:vine_butler/features/edit_property/presentation/edit_property_view_state.dart';
 import 'package:vine_butler/features/property_detail/property_detail_vm.dart';
 
 final editPropertyVMProvider =
-    NotifierProvider.family<EditPropertyVM, EditPropertyViewState, String>(EditPropertyVM.new);
+    NotifierProvider.autoDispose.family<EditPropertyVM, EditPropertyViewState, String>(EditPropertyVM.new);
 
 sealed class EditPropertyAction {
   const EditPropertyAction();
@@ -27,6 +30,8 @@ sealed class EditPropertyAction {
   const factory EditPropertyAction.selectRoomCount(int count) = _SelectRoomCount;
   const factory EditPropertyAction.toggleFurniture(String option) = _ToggleFurniture;
   const factory EditPropertyAction.changeMemo(String memo) = _ChangeMemo;
+  const factory EditPropertyAction.addImages(List<String> paths) = _AddImages;
+  const factory EditPropertyAction.removeImage(String id) = _RemoveImage;
   const factory EditPropertyAction.save() = _Save;
 }
 
@@ -112,6 +117,18 @@ class _ChangeMemo extends EditPropertyAction {
   const _ChangeMemo(this.memo);
 }
 
+class _AddImages extends EditPropertyAction {
+  final List<String> paths;
+
+  const _AddImages(this.paths);
+}
+
+class _RemoveImage extends EditPropertyAction {
+  final String id;
+
+  const _RemoveImage(this.id);
+}
+
 class _Save extends EditPropertyAction {
   const _Save();
 }
@@ -120,9 +137,13 @@ class EditPropertyVM extends Notifier<EditPropertyViewState> {
   EditPropertyVM(this.id);
 
   final String id;
+  final Set<String> _addedFileNames = {};
+  late ImageStorage _imageStorage;
 
   @override
   EditPropertyViewState build() {
+    _imageStorage = ref.read(imageStorageProvider);
+    ref.onDispose(_deleteUnsavedImages);
     _fetch();
     return const EditPropertyViewState();
   }
@@ -180,6 +201,12 @@ class EditPropertyVM extends Notifier<EditPropertyViewState> {
       case _ChangeMemo(:final memo):
         state = state.copyWith(memo: memo);
 
+      case _AddImages(:final paths):
+        _addImages(paths);
+
+      case _RemoveImage(:final id):
+        state = state.copyWith(images: state.images.where((image) => image.id != id).toList());
+
       case _Save():
         _save();
     }
@@ -225,6 +252,7 @@ class EditPropertyVM extends Notifier<EditPropertyViewState> {
   Future<void> _save() async {
     final property = state.property;
     final address = state.address;
+    final images = state.images;
 
     if (property == null || address == null) { return; }
 
@@ -252,8 +280,17 @@ class EditPropertyVM extends Notifier<EditPropertyViewState> {
               roomCount: state.roomCount,
               furnitureOptions: state.furnitureOptions.toList(),
               memo: state.memo.trim(),
+              images: [
+                for (final (index, image) in images.indexed) image.copyWith(order: index),
+              ],
             ),
           );
+
+      _deleteRemovedImages(
+        fileNames: {for (final image in property.images) image.fileName, ..._addedFileNames},
+        keptFileNames: {for (final image in images) image.fileName},
+      );
+      _addedFileNames.clear();
 
       if (!ref.mounted) { return; }
 
@@ -263,6 +300,40 @@ class EditPropertyVM extends Notifier<EditPropertyViewState> {
       if (!ref.mounted) { return; }
 
       sendEvent(EditPropertyEvent.failSave);
+    }
+  }
+
+  Future<void> _addImages(List<String> paths) async {
+    for (final path in paths) {
+      final fileName = await _imageStorage.save(path);
+
+      if (!ref.mounted) {
+        await _imageStorage.delete(fileName);
+        return;
+      }
+
+      _addedFileNames.add(fileName);
+
+      final image = PropertyImage(
+        id: const Uuid().v4(),
+        fileName: fileName,
+        order: state.images.length,
+        createdAt: DateTime.now(),
+      );
+
+      state = state.copyWith(images: [...state.images, image]);
+    }
+  }
+
+  void _deleteRemovedImages({required Set<String> fileNames, required Set<String> keptFileNames}) {
+    for (final fileName in fileNames.difference(keptFileNames)) {
+      _imageStorage.delete(fileName);
+    }
+  }
+
+  void _deleteUnsavedImages() {
+    for (final fileName in _addedFileNames) {
+      _imageStorage.delete(fileName);
     }
   }
 }

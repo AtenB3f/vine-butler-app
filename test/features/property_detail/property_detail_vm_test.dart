@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vine_butler/core/di/providers.dart';
@@ -85,7 +87,12 @@ void main() {
 
   setUp(() {
     repository = _FakePropertyRepository();
-    container = ProviderContainer(overrides: [propertyRepositoryProvider.overrideWithValue(repository)]);
+    container = ProviderContainer(
+      overrides: [
+        propertyRepositoryProvider.overrideWithValue(repository),
+        imageDirectoryProvider.overrideWithValue(Directory('images')),
+      ],
+    );
   });
 
   tearDown(() => container.dispose());

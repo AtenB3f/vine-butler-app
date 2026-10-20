@@ -52,7 +52,7 @@ enum PropertyDetailAction {
 }
 
 class PropertyDetailData {
-  final List<String> imageUrls;
+  final List<String> imagePaths;
   final String unitAddress; // 상세주소
   final String address; // 도로명 or 지번 주소
   final PropertyTransactionType transactionType;
@@ -76,7 +76,7 @@ class PropertyDetailData {
   final double longitude;
 
   const PropertyDetailData({
-    required this.imageUrls,
+    required this.imagePaths,
     required this.unitAddress,
     required this.address,
     required this.transactionType,
@@ -100,13 +100,13 @@ class PropertyDetailData {
     required this.longitude,
   });
 
-  bool get hasImages => imageUrls.isNotEmpty;
+  bool get hasImages => imagePaths.isNotEmpty;
 
-  factory PropertyDetailData.fromDomain(Property property) {
+  factory PropertyDetailData.fromDomain(Property property, {required String Function(String fileName) imagePath}) {
     final address = property.address;
 
     return PropertyDetailData(
-      imageUrls: const [],
+      imagePaths: [for (final image in property.images) imagePath(image.fileName)],
       unitAddress: lotUnitAddress(address),
       address: [address.sido, address.sigungu].where((part) => part.isNotEmpty).join(' '),
       transactionType: property.deal.transactionType,

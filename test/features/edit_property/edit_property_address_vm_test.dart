@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vine_butler/core/di/providers.dart';
@@ -109,6 +111,7 @@ void main() {
       overrides: [
         addressRepositoryProvider.overrideWithValue(addressRepository),
         propertyRepositoryProvider.overrideWithValue(propertyRepository),
+        imageDirectoryProvider.overrideWithValue(Directory('images')),
       ],
     );
     container.listen(editPropertyVMProvider('a'), (_, _) {});

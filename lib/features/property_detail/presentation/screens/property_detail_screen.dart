@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -189,7 +191,7 @@ class PropertyDetailScreen extends ConsumerWidget {
       return SizedBox(
         height: height,
         width: double.infinity,
-        child: AppImagePage(viewState: AppImagePageViewState.urls(data.imageUrls)),
+        child: AppImagePage(viewState: _imagePageViewState(data)),
       );
     }
 
@@ -418,8 +420,12 @@ class PropertyDetailScreen extends ConsumerWidget {
     );
   }
 
+  AppImagePageViewState _imagePageViewState(PropertyDetailData data) {
+    return AppImagePageViewState(images: [for (final path in data.imagePaths) FileImage(File(path))]);
+  }
+
   Widget _imageMap(PropertyDetailData data, bool isMapVisible) {
-    return isMapVisible ? _map(data) : AppImagePage(viewState: AppImagePageViewState.urls(data.imageUrls));
+    return isMapVisible ? _map(data) : AppImagePage(viewState: _imagePageViewState(data));
   }
 
   Widget _map(PropertyDetailData data) {

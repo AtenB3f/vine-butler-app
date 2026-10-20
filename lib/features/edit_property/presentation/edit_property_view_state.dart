@@ -1,5 +1,6 @@
 import 'package:vine_butler/domain/model/address.dart';
 import 'package:vine_butler/domain/model/property.dart';
+import 'package:vine_butler/domain/model/property_image.dart';
 import 'package:vine_butler/domain/property_type.dart';
 import 'package:vine_butler/shared/extensions/extensions.dart';
 import 'package:vine_butler/shared/utils/utils.dart';
@@ -43,6 +44,7 @@ class EditPropertyViewState {
   final int? roomCount;
   final Set<String> furnitureOptions;
   final String memo;
+  final List<PropertyImage> images;
   final EditPropertyEvent? event;
 
   const EditPropertyViewState({
@@ -63,6 +65,7 @@ class EditPropertyViewState {
     this.roomCount,
     this.furnitureOptions = const {},
     this.memo = '',
+    this.images = const [],
     this.event,
   });
 
@@ -87,6 +90,7 @@ class EditPropertyViewState {
       roomCount: property.roomCount,
       furnitureOptions: property.furnitureOptions.toSet(),
       memo: property.memo,
+      images: property.images,
     );
   }
 
@@ -134,6 +138,7 @@ class EditPropertyViewState {
     int? Function()? roomCount,
     Set<String>? furnitureOptions,
     String? memo,
+    List<PropertyImage>? images,
     EditPropertyEvent? Function()? event,
   }) {
     return EditPropertyViewState(
@@ -155,6 +160,7 @@ class EditPropertyViewState {
       roomCount: roomCount != null ? roomCount() : this.roomCount,
       furnitureOptions: furnitureOptions ?? this.furnitureOptions,
       memo: memo ?? this.memo,
+      images: images ?? this.images,
       event: event != null ? event() : this.event,
     );
   }

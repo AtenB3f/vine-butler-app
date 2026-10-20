@@ -5,8 +5,10 @@ import 'package:vine_butler/domain/model/address.dart';
 import 'package:vine_butler/domain/model/owner.dart';
 import 'package:vine_butler/domain/model/property.dart';
 import 'package:vine_butler/domain/model/property_deal.dart';
+import 'package:vine_butler/domain/model/property_image.dart';
 import 'package:vine_butler/domain/model/property_search_condition.dart';
 import 'package:vine_butler/domain/property_type.dart';
+import 'package:vine_butler/domain/repository/image_storage.dart';
 import 'package:vine_butler/domain/repository/property_repository.dart';
 import 'package:vine_butler/features/edit_property/edit_property_vm.dart';
 import 'package:vine_butler/features/edit_property/presentation/edit_property_view_state.dart';
@@ -36,6 +38,20 @@ class _FakePropertyRepository implements PropertyRepository {
   Future<void> delete(String id) async {}
 }
 
+class _FakeImageStorage implements ImageStorage {
+  final List<String> deleted = [];
+  int _count = 0;
+
+  @override
+  Future<String> save(String sourcePath) async => 'new-${_count++}.jpg';
+
+  @override
+  Future<void> delete(String fileName) async => deleted.add(fileName);
+
+  @override
+  String path(String fileName) => 'images/$fileName';
+}
+
 const _address = Address(
   zipCode: '06236',
   roadAddress: '서울 강남구 테헤란로 1',
@@ -61,20 +77,27 @@ Property _property() {
     roomCount: 1,
     furnitureOptions: const ['냉장고'],
     memo: '메모',
+    images: [
+      PropertyImage(id: 'img-0', fileName: 'old-0.jpg', order: 0, createdAt: DateTime(2020)),
+      PropertyImage(id: 'img-1', fileName: 'old-1.jpg', order: 1, createdAt: DateTime(2020)),
+    ],
     updatedAt: DateTime(2020),
   );
 }
 
 void main() {
   late _FakePropertyRepository repository;
+  late _FakeImageStorage imageStorage;
   late ProviderContainer container;
 
   EditPropertyViewState state() => container.read(editPropertyVMProvider('a'));
   void action(EditPropertyAction action) => container.read(editPropertyVMProvider('a').notifier).action(action);
 
-  Future<void> load() async {
-    container.listen(editPropertyVMProvider('a'), (_, _) {});
+  Future<ProviderSubscription<EditPropertyViewState>> load() async {
+    final subscription = container.listen(editPropertyVMProvider('a'), (_, _) {});
+
     await Future<void>.delayed(Duration.zero);
+    return subscription;
   }
 
   Future<void> save() async {
@@ -84,7 +107,13 @@ void main() {
 
   setUp(() {
     repository = _FakePropertyRepository()..property = _property();
-    container = ProviderContainer(overrides: [propertyRepositoryProvider.overrideWithValue(repository)]);
+    imageStorage = _FakeImageStorage();
+    container = ProviderContainer(
+      overrides: [
+        propertyRepositoryProvider.overrideWithValue(repository),
+        imageStorageProvider.overrideWithValue(imageStorage),
+      ],
+    );
   });
 
   tearDown(() => container.dispose());
@@ -223,5 +252,54 @@ void main() {
     await save();
 
     expect(state().event, EditPropertyEvent.failSave);
+  });
+
+  test('추가한 이미지는 뒤에 붙고 저장 시 순서대로 번호를 매긴다', () async {
+    await load();
+    action(const EditPropertyAction.addImages(['/picked/a.jpg', '/picked/b.png']));
+    await Future<void>.delayed(Duration.zero);
+    action(const EditPropertyAction.removeImage('img-0'));
+
+    await save();
+
+    final images = repository.saved.single.images;
+
+    expect([for (final image in images) image.fileName], ['old-1.jpg', 'new-0.jpg', 'new-1.jpg']);
+    expect([for (final image in images) image.order], [0, 1, 2]);
+  });
+
+  test('저장하면 뺀 이미지 파일만 지운다', () async {
+    await load();
+    action(const EditPropertyAction.addImages(['/picked/a.jpg', '/picked/b.jpg']));
+    await Future<void>.delayed(Duration.zero);
+    action(const EditPropertyAction.removeImage('img-1'));
+    action(EditPropertyAction.removeImage(state().images.last.id));
+
+    await save();
+
+    expect(imageStorage.deleted, unorderedEquals(['old-1.jpg', 'new-1.jpg']));
+  });
+
+  test('저장하지 않고 나가면 새로 추가한 이미지 파일을 지운다', () async {
+    final subscription = await load();
+
+    action(const EditPropertyAction.addImages(['/picked/a.jpg']));
+    await Future<void>.delayed(Duration.zero);
+    subscription.close();
+    await Future<void>.delayed(Duration.zero);
+
+    expect(imageStorage.deleted, ['new-0.jpg']);
+  });
+
+  test('저장한 뒤 나가면 이미지 파일을 지우지 않는다', () async {
+    final subscription = await load();
+
+    action(const EditPropertyAction.addImages(['/picked/a.jpg']));
+    await Future<void>.delayed(Duration.zero);
+    await save();
+    subscription.close();
+    await Future<void>.delayed(Duration.zero);
+
+    expect(imageStorage.deleted, isEmpty);
   });
 }

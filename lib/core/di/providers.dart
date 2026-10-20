@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vine_butler/core/network/dio_factory.dart';
@@ -6,7 +8,9 @@ import 'package:vine_butler/data/remote/juso/juso_api.dart';
 import 'package:vine_butler/data/remote/naver/geocode_api.dart';
 import 'package:vine_butler/data/repository/address_repository_impl.dart';
 import 'package:vine_butler/data/repository/property_repository_impl.dart';
+import 'package:vine_butler/data/storage/image_storage_impl.dart';
 import 'package:vine_butler/domain/repository/address_repository.dart';
+import 'package:vine_butler/domain/repository/image_storage.dart';
 import 'package:vine_butler/domain/repository/property_repository.dart';
 import 'package:vine_butler/domain/usecase/address_usecase.dart';
 import 'package:vine_butler/domain/usecase/property_usecase.dart';
@@ -40,3 +44,8 @@ final addressRepositoryProvider = Provider<AddressRepository>(
 );
 
 final addressUseCaseProvider = Provider<AddressUseCase>((ref) => AddressUseCase(ref.watch(addressRepositoryProvider)));
+
+/// 매물 이미지 저장 폴더 (`main()`에서 앱 전용 폴더 아래 경로로 override)
+final imageDirectoryProvider = Provider<Directory>((ref) => throw UnimplementedError());
+
+final imageStorageProvider = Provider<ImageStorage>((ref) => ImageStorageImpl(ref.watch(imageDirectoryProvider)));

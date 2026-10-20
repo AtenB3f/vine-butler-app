@@ -44,7 +44,7 @@ class PropertyDetailVM extends Notifier<PropertyDetailViewState> {
 
     state = property == null
         ? state.copyWith(status: PropertyDetailStatus.notFound)
-        : state.copyWith(data: PropertyDetailData.fromDomain(property), status: PropertyDetailStatus.loaded);
+        : state.copyWith(data: PropertyDetailData.fromDomain(property, imagePath: ref.read(imageStorageProvider).path), status: PropertyDetailStatus.loaded);
   }
 
   Future<void> _delete() async {
