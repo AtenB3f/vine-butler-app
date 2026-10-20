@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vine_butler/components/components.dart';
 import 'package:vine_butler/core/network/api_env.dart';
+import 'package:vine_butler/core/router/app_router.dart';
 import 'package:vine_butler/features/property_detail/presentation/property_detail_view_state.dart';
 import 'package:vine_butler/features/property_detail/property_detail_vm.dart';
 import 'package:vine_butler/shared/extensions/extensions.dart';
@@ -88,7 +89,13 @@ class PropertyDetailScreen extends ConsumerWidget {
   }
 
   Future<void> _onMenuSelect(BuildContext context, WidgetRef ref, int index) async {
-    if (_menuItems[index].menu != _DetailMenu.delete) { return; }
+    final menu = _menuItems[index].menu;
+
+    if (menu == _DetailMenu.edit) {
+      EditPropertyRoute(id: id).push(context);
+      return;
+    }
+    if (menu != _DetailMenu.delete) { return; }
 
     final isConfirmed = await showAppAlertDialog(
       context,

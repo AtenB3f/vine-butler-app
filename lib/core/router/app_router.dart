@@ -5,6 +5,8 @@ import 'package:vine_butler/features/apply_property/presentation/screens/apply_p
 import 'package:vine_butler/features/apply_property/presentation/screens/apply_property_extra_screen.dart';
 import 'package:vine_butler/features/apply_property/presentation/screens/apply_property_owner_screen.dart';
 import 'package:vine_butler/features/apply_property/presentation/screens/apply_property_type_screen.dart';
+import 'package:vine_butler/features/edit_property/presentation/screens/edit_property_address_screen.dart';
+import 'package:vine_butler/features/edit_property/presentation/screens/edit_property_screen.dart';
 import 'package:vine_butler/features/find_property/presentation/screens/find_property_screen.dart';
 import 'package:vine_butler/features/home/presentation/screens/home_screen.dart';
 import 'package:vine_butler/features/map/presentation/screens/map_screen.dart';
@@ -131,4 +133,24 @@ class PropertyDetailRoute extends GoRouteData with $PropertyDetailRoute {
 
   @override
   Widget build(BuildContext context, GoRouterState state) => PropertyDetailScreen(id: id);
+}
+
+@TypedGoRoute<EditPropertyRoute>(path: '/property/:id/edit')
+class EditPropertyRoute extends GoRouteData with $EditPropertyRoute {
+  const EditPropertyRoute({required this.id});
+
+  final String id;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => EditPropertyScreen(id: id);
+}
+
+@TypedGoRoute<EditPropertyAddressRoute>(path: '/property/:id/edit/address')
+class EditPropertyAddressRoute extends GoRouteData with $EditPropertyAddressRoute {
+  const EditPropertyAddressRoute({required this.id});
+
+  final String id;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => EditPropertyAddressScreen(id: id);
 }

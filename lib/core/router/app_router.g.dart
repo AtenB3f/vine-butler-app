@@ -14,6 +14,8 @@ List<RouteBase> get $appRoutes => [
   $applyPropertyOwnerRoute,
   $applyPropertyExtraRoute,
   $propertyDetailRoute,
+  $editPropertyRoute,
+  $editPropertyAddressRoute,
 ];
 
 RouteBase get $mainShellRouteData => StatefulShellRouteData.$route(
@@ -265,6 +267,67 @@ mixin $PropertyDetailRoute on GoRouteData {
   @override
   String get location =>
       GoRouteData.$location('/property/${Uri.encodeComponent(_self.id)}');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $editPropertyRoute => GoRouteData.$route(
+  path: '/property/:id/edit',
+  hasOverriddenOnExit: false,
+  factory: $EditPropertyRoute._fromState,
+);
+
+mixin $EditPropertyRoute on GoRouteData {
+  static EditPropertyRoute _fromState(GoRouterState state) =>
+      EditPropertyRoute(id: state.pathParameters['id']!);
+
+  EditPropertyRoute get _self => this as EditPropertyRoute;
+
+  @override
+  String get location =>
+      GoRouteData.$location('/property/${Uri.encodeComponent(_self.id)}/edit');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $editPropertyAddressRoute => GoRouteData.$route(
+  path: '/property/:id/edit/address',
+  hasOverriddenOnExit: false,
+  factory: $EditPropertyAddressRoute._fromState,
+);
+
+mixin $EditPropertyAddressRoute on GoRouteData {
+  static EditPropertyAddressRoute _fromState(GoRouterState state) =>
+      EditPropertyAddressRoute(id: state.pathParameters['id']!);
+
+  EditPropertyAddressRoute get _self => this as EditPropertyAddressRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/property/${Uri.encodeComponent(_self.id)}/edit/address',
+  );
 
   @override
   void go(BuildContext context) => context.go(location);
