@@ -13,15 +13,21 @@ import 'package:vine_butler/domain/property_type.dart';
 import 'package:vine_butler/domain/repository/property_repository.dart';
 import 'package:vine_butler/features/map/map_vm.dart';
 import 'package:vine_butler/features/map/presentation/map_view_state.dart';
+import 'package:vine_butler/features/property_list/presentation/property_filter_view_state.dart';
 
 class _FakePropertyRepository implements PropertyRepository {
-  final StreamController<List<Property>> controller = StreamController<List<Property>>();
+  final List<PropertySearchCondition> requests = [];
+  StreamController<List<Property>> controller = StreamController<List<Property>>();
 
   @override
   Stream<List<Property>> watchList() => controller.stream;
 
   @override
-  Stream<List<Property>> watchFilter(PropertySearchCondition condition) => const Stream.empty();
+  Stream<List<Property>> watchFilter(PropertySearchCondition condition) {
+    requests.add(condition);
+    controller = StreamController<List<Property>>();
+    return controller.stream;
+  }
 
   @override
   Future<Property?> getById(String id) async => null;
@@ -130,5 +136,65 @@ void main() {
 
     expect(state().selected, isNull);
     expect(state().markers.map((marker) => marker.id), ['buy']);
+  });
+
+  test('검색어와 필터로 조건을 바꿔 다시 구독하고 그 결과로 마커를 바꾼다', () async {
+    await emit([_property('rent', _rent), _property('buy', _buy)]);
+
+    action(const MapAction.search(' 역삼 '));
+    action(const MapAction.filtering(PropertyFilterData(transactionType: PropertyTransactionType.buy, price: 1500000000)));
+    await emit([_property('buy', _buy)]);
+
+    expect(
+      repository.requests.last,
+      const PropertySearchCondition(transactionType: PropertyTransactionType.buy, price: 1500000000, keyword: '역삼'),
+    );
+    expect(state().markers.map((marker) => marker.id), ['buy']);
+    expect(state().bndStatus, AppBndSearchStatus.enable);
+  });
+
+  test('검색 결과는 검색어가 있을 때만 최대 5개까지 만든다', () async {
+    await emit([for (var i = 0; i < 7; i++) _property('$i', _rent)]);
+
+    expect(state().searchResults, isEmpty);
+
+    action(const MapAction.search('역삼'));
+    await emit([for (var i = 0; i < 7; i++) _property('$i', _rent)]);
+
+    expect(state().searchResults.length, MapViewState.maxPanelResultCount);
+  });
+
+  test('검색 결과를 고르면 그 매물을 선택하고 패널을 닫는다', () async {
+    action(const MapAction.search('역삼'));
+    action(const MapAction.panel(true));
+    await emit([_property('rent', _rent), _property('buy', _buy)]);
+
+    action(const MapAction.select('buy'));
+
+    expect(state().selected!.id, 'buy');
+    expect(state().status, PropertySearchStatus.select);
+    expect(state().bndStatus, AppBndSearchStatus.search);
+  });
+
+  test('확정한 뒤 검색어를 바꾸면 확정이 풀린다', () async {
+    action(const MapAction.search('역삼'));
+    await emit([_property('buy', _buy)]);
+    action(const MapAction.select('buy'));
+
+    action(const MapAction.search('역삼동'));
+
+    expect(state().status, PropertySearchStatus.close);
+    expect(state().bndStatus, AppBndSearchStatus.enable);
+  });
+
+  test('필터 결과에서 빠진 선택 매물은 카드를 닫는다', () async {
+    await emit([_property('rent', _rent), _property('buy', _buy)]);
+    action(const MapAction.select('rent'));
+
+    action(const MapAction.filtering(PropertyFilterData(transactionType: PropertyTransactionType.buy)));
+    await emit([_property('buy', _buy)]);
+
+    expect(state().selected, isNull);
+    expect(state().bndStatus, AppBndSearchStatus.filter);
   });
 }
