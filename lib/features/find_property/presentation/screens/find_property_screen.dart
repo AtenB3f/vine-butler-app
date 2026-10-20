@@ -14,23 +14,20 @@ class FindPropertyScreen extends ConsumerStatefulWidget {
 }
 
 class _FindPropertyScreenState extends ConsumerState<FindPropertyScreen> {
-  late final ValueNotifier<double> _priceController =
-      ValueNotifier(ref.read(findPropertyVMProvider).price);
+  late final ValueNotifier<double> _priceController;
 
   @override
   void initState() {
     super.initState();
-    _priceController.addListener(_onPriceChange);
+    _priceController = ValueNotifier(ref.read(findPropertyVMProvider).price)
+      ..addListener(() => ref.read(findPropertyVMProvider.notifier).action(FindPropertyAction.changePrice(_priceController.value)));
   }
 
   @override
   void dispose() {
-    _priceController.removeListener(_onPriceChange);
     _priceController.dispose();
     super.dispose();
   }
-
-  void _onPriceChange() => ref.read(findPropertyVMProvider.notifier).action(FindPropertyAction.changePrice(_priceController.value));
 
   @override
   Widget build(BuildContext context) {

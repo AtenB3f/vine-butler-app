@@ -24,27 +24,26 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
   bool _isMonthlyRentEditing = false;
   bool _isMaintenanceCostEditing = false;
 
+  ApplyPropertyTypeVM get _viewModel => ref.read(applyPropertyTypeVMProvider.notifier);
+
   @override
   void initState() {
     super.initState();
     final state = ref.read(applyPropertyTypeVMProvider);
 
-    _priceController = ValueNotifier(state.price);
-    _monthlyRentController = ValueNotifier(state.monthlyRent);
+    _priceController = ValueNotifier(state.price)
+      ..addListener(() => _viewModel.action(ApplyPropertyTypeAction.changePrice(_priceController.value)));
+    _monthlyRentController = ValueNotifier(state.monthlyRent)
+      ..addListener(() => _viewModel.action(ApplyPropertyTypeAction.changeMonthlyRent(_monthlyRentController.value)));
     _priceTextController = TextEditingController(text: state.price.formattedKRW);
     _monthlyRentTextController = TextEditingController(text: state.monthlyRent.formattedKRW);
-    _maintenanceCostController = ValueNotifier(state.maintenanceCost);
+    _maintenanceCostController = ValueNotifier(state.maintenanceCost)
+      ..addListener(() => _viewModel.action(ApplyPropertyTypeAction.changeMaintenanceCost(_maintenanceCostController.value)));
     _maintenanceCostTextController = TextEditingController(text: _maintenanceCostText(state.maintenanceCost));
-    _priceController.addListener(_onPriceChange);
-    _monthlyRentController.addListener(_onMonthlyRentChange);
-    _maintenanceCostController.addListener(_onMaintenanceCostChange);
   }
 
   @override
   void dispose() {
-    _priceController.removeListener(_onPriceChange);
-    _monthlyRentController.removeListener(_onMonthlyRentChange);
-    _maintenanceCostController.removeListener(_onMaintenanceCostChange);
     _priceController.dispose();
     _monthlyRentController.dispose();
     _priceTextController.dispose();
@@ -53,14 +52,6 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
     _maintenanceCostTextController.dispose();
     super.dispose();
   }
-
-  void _onPriceChange() => ref.read(applyPropertyTypeVMProvider.notifier).action(ApplyPropertyTypeAction.changePrice(_priceController.value));
-
-  void _onMonthlyRentChange() =>
-      ref.read(applyPropertyTypeVMProvider.notifier).action(ApplyPropertyTypeAction.changeMonthlyRent(_monthlyRentController.value));
-
-  void _onMaintenanceCostChange() =>
-      ref.read(applyPropertyTypeVMProvider.notifier).action(ApplyPropertyTypeAction.changeMaintenanceCost(_maintenanceCostController.value));
 
   String _maintenanceCostText(double value) => value == 0 ? '관리비 없음' : value.formattedKRW;
 

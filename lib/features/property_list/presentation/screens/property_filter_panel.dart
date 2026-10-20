@@ -13,7 +13,7 @@ class PropertyFilterPanel extends ConsumerStatefulWidget {
 }
 
 class _PropertyFilterPanelState extends ConsumerState<PropertyFilterPanel> {
-  late final ValueNotifier<double> _priceController = ValueNotifier(_filter.price);
+  late final ValueNotifier<double> _priceController;
 
   PropertyListVM get _viewModel => ref.read(propertyListVMProvider.notifier);
 
@@ -22,17 +22,15 @@ class _PropertyFilterPanelState extends ConsumerState<PropertyFilterPanel> {
   @override
   void initState() {
     super.initState();
-    _priceController.addListener(_onPriceChange);
+    _priceController = ValueNotifier(_filter.price)
+      ..addListener(() => _applyFilter(_filter.copyWith(price: _priceController.value)));
   }
 
   @override
   void dispose() {
-    _priceController.removeListener(_onPriceChange);
     _priceController.dispose();
     super.dispose();
   }
-
-  void _onPriceChange() => _applyFilter(_filter.copyWith(price: _priceController.value));
 
   void _applyFilter(PropertyFilterData filter) => _viewModel.action(PropertyListAction.filtering(filter));
 
