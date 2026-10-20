@@ -49,7 +49,7 @@ class HomeScreen extends ConsumerWidget {
   }
 
   Widget _homeBanner() {
-    return const _HomeBanner();
+    return const AppBndNormal();
   }
 
   Widget _mobileHomeContents(WidgetRef ref) {
@@ -111,35 +111,6 @@ class HomeScreen extends ConsumerWidget {
           onTap: () => ref.read(homeVMProvider.notifier).action(HomeViewAction.apply),
         ),
       ],
-    );
-  }
-}
-class _HomeBanner extends StatefulWidget {
-  const _HomeBanner();
-
-  @override
-  State<_HomeBanner> createState() => _HomeBannerState();
-}
-
-class _HomeBannerState extends State<_HomeBanner> {
-  final TextEditingController _controller = TextEditingController();
-  AppBndSearchStatus _status = AppBndSearchStatus.disable;
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBndSearch(
-      viewState: AppBndSearchViewState(status: _status, placeholder: '매물 찾기'),
-      controller: _controller,
-      onFocus: (hasFocus) => setState(() {
-        _status = hasFocus ? AppBndSearchStatus.enable : AppBndSearchStatus.disable;
-      }),
-      onSearchTap: () {},
     );
   }
 }
