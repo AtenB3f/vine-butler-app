@@ -61,11 +61,11 @@ void main() {
 
     final list = container.read(propertyListVMProvider);
 
-    expect(list.filter.data.transactionType, PropertyTransactionType.rent);
-    expect(list.filter.data.propertyTypes, {PropertyType.villa});
-    expect(list.filter.data.price, 100000000);
+    expect(list.filter.transactionType, PropertyTransactionType.rent);
+    expect(list.filter.propertyTypes, {PropertyType.villa});
+    expect(list.filter.price, 100000000);
     expect(list.query, '');
-    expect(list.filter.isFilterOpen, isFalse);
+    expect(list.status, PropertySearchStatus.close);
     expect(
       repository.requests.last,
       const PropertySearchCondition(

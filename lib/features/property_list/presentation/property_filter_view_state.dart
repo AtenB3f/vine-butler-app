@@ -1,22 +1,21 @@
+import 'package:vine_butler/components/components.dart';
+import 'package:vine_butler/domain/model/property_search_condition.dart';
 import 'package:vine_butler/domain/property_type.dart';
 
-class PropertyFilterViewState {
-  final bool isFilterOpen;
-  final PropertyFilterData data;
+/// 검색 BND 아래 패널 상태
+///
+/// - `close`: 패널 닫힘
+/// - `open`: 패널 열림
+/// - `select`: 검색 결과 선택/마커 선택
+enum PropertySearchStatus {
+  close,
+  open,
+  select;
 
-  const PropertyFilterViewState({
-    this.isFilterOpen = false,
-    this.data = const PropertyFilterData(),
-  });
+  AppBndSearchStatus bndStatus({required String query, required bool isFilterApplied}) {
+    if (query.isNotEmpty) { return this == select ? AppBndSearchStatus.search : AppBndSearchStatus.enable; }
 
-  PropertyFilterViewState copyWith({
-    bool? isFilterOpen,
-    PropertyFilterData? data,
-  }) {
-    return PropertyFilterViewState(
-      isFilterOpen: isFilterOpen ?? this.isFilterOpen,
-      data: data ?? this.data,
-    );
+    return isFilterApplied ? AppBndSearchStatus.filter : AppBndSearchStatus.disable;
   }
 }
 
@@ -36,6 +35,15 @@ class PropertyFilterData {
   });
 
   bool get isApplied => transactionType != null || propertyTypes.isNotEmpty || price != maxPrice;
+
+  PropertySearchCondition toCondition(String query) {
+    return PropertySearchCondition(
+      transactionType: transactionType,
+      propertyTypes: propertyTypes,
+      price: price == maxPrice ? null : price.round(),
+      keyword: query.trim(),
+    );
+  }
 
   PropertyFilterData copyWith({
     PropertyTransactionType? Function()? transactionType,

@@ -171,8 +171,8 @@ void main() {
     );
 
     expect(state().query, '테헤란');
-    expect(state().filter.isFilterOpen, isTrue);
-    expect(state().filter.data.transactionType, PropertyTransactionType.buy);
+    expect(state().status, PropertySearchStatus.open);
+    expect(state().filter.transactionType, PropertyTransactionType.buy);
     expect(
       repository.requests.last,
       const PropertySearchCondition(

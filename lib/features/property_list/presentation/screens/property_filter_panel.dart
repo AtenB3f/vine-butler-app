@@ -1,29 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vine_butler/components/components.dart';
 import 'package:vine_butler/features/property_list/presentation/property_filter_view_state.dart';
 import 'package:vine_butler/features/property_list/property_list_vm.dart';
 import 'package:vine_butler/shared/extensions/extensions.dart';
 
-class PropertyFilterPanel extends ConsumerStatefulWidget {
-  const PropertyFilterPanel({super.key});
+class PropertyFilterPanel extends StatefulWidget {
+  final PropertyFilterData data;
+  final ValueChanged<PropertyFilterData> onFilter;
+  final VoidCallback onCollapse;
+
+  const PropertyFilterPanel({
+    super.key,
+    required this.data,
+    required this.onFilter,
+    required this.onCollapse,
+  });
 
   @override
-  ConsumerState<PropertyFilterPanel> createState() => _PropertyFilterPanelState();
+  State<PropertyFilterPanel> createState() => _PropertyFilterPanelState();
 }
 
-class _PropertyFilterPanelState extends ConsumerState<PropertyFilterPanel> {
+class _PropertyFilterPanelState extends State<PropertyFilterPanel> {
   late final ValueNotifier<double> _priceController;
-
-  PropertyListVM get _viewModel => ref.read(propertyListVMProvider.notifier);
-
-  PropertyFilterData get _filter => ref.read(propertyListVMProvider).filter.data;
 
   @override
   void initState() {
     super.initState();
-    _priceController = ValueNotifier(_filter.price)
-      ..addListener(() => _applyFilter(_filter.copyWith(price: _priceController.value)));
+    _priceController = ValueNotifier(widget.data.price)
+      ..addListener(() => _applyFilter(widget.data.copyWith(price: _priceController.value)));
   }
 
   @override
@@ -32,12 +36,7 @@ class _PropertyFilterPanelState extends ConsumerState<PropertyFilterPanel> {
     super.dispose();
   }
 
-  void _applyFilter(PropertyFilterData filter) => _viewModel.action(PropertyListAction.filtering(filter));
-
-  void _onCollapseTap() {
-    FocusManager.instance.primaryFocus?.unfocus();
-    _viewModel.action(const PropertyListAction.panel(false));
-  }
+  void _applyFilter(PropertyFilterData filter) => widget.onFilter(filter);
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +44,7 @@ class _PropertyFilterPanelState extends ConsumerState<PropertyFilterPanel> {
   }
 
   Widget _contents() {
-    final filter = ref.watch(propertyListVMProvider.select((state) => state.filter.data));
+    final filter = widget.data;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -172,7 +171,7 @@ class _PropertyFilterPanelState extends ConsumerState<PropertyFilterPanel> {
 
   Widget _collapseButton() {
     return Pressable(
-      onTap: _onCollapseTap,
+      onTap: widget.onCollapse,
       child: Container(
         height: 38,
         color: StateColor.white,

@@ -5,7 +5,6 @@ import 'package:vine_butler/components/components.dart';
 import 'package:vine_butler/core/di/providers.dart';
 import 'package:vine_butler/core/router/app_router.dart';
 import 'package:vine_butler/domain/model/property.dart';
-import 'package:vine_butler/domain/model/property_search_condition.dart';
 import 'package:vine_butler/domain/property_type.dart';
 import 'package:vine_butler/features/property_list/presentation/property_filter_view_state.dart';
 import 'package:vine_butler/features/property_list/presentation/property_list_item_view_state.dart';
@@ -17,24 +16,17 @@ class PropertyListViewState {
 
   final List<PropertyListItemViewState> items;
   final String query;
-  final bool isSearchFocused;
-  final bool isSearchCommitted;
-  final PropertyFilterViewState filter;
+  final PropertySearchStatus status;
+  final PropertyFilterData filter;
   final String? navigateTo;
 
   const PropertyListViewState({
     required this.items,
     this.query = '',
-    this.isSearchFocused = false,
-    this.isSearchCommitted = false,
-    this.filter = const PropertyFilterViewState(),
+    this.status = PropertySearchStatus.close,
+    this.filter = const PropertyFilterData(),
     this.navigateTo,
   });
-
-  bool get isSearchResultVisible =>
-      query.isNotEmpty && searchResults.isNotEmpty && (isSearchFocused || filter.isFilterOpen);
-
-  bool get isOverlayVisible => filter.isFilterOpen || isSearchResultVisible;
 
   List<PropertyListItemViewState> get searchResults {
     if (query.isEmpty) { return const []; }
@@ -42,25 +34,19 @@ class PropertyListViewState {
     return items.take(maxPanelResultCount).toList();
   }
 
-  AppBndSearchStatus get bndStatus {
-    if (query.isNotEmpty) { return isSearchCommitted ? AppBndSearchStatus.search : AppBndSearchStatus.enable; }
-
-    return filter.data.isApplied ? AppBndSearchStatus.filter : AppBndSearchStatus.disable;
-  }
+  AppBndSearchStatus get bndStatus => status.bndStatus(query: query, isFilterApplied: filter.isApplied);
 
   PropertyListViewState copyWith({
     List<PropertyListItemViewState>? items,
     String? query,
-    bool? isSearchFocused,
-    bool? isSearchCommitted,
-    PropertyFilterViewState? filter,
+    PropertySearchStatus? status,
+    PropertyFilterData? filter,
     String? navigateTo,
   }) {
     return PropertyListViewState(
       items: items ?? this.items,
       query: query ?? this.query,
-      isSearchFocused: isSearchFocused ?? this.isSearchFocused,
-      isSearchCommitted: isSearchCommitted ?? this.isSearchCommitted,
+      status: status ?? this.status,
       filter: filter ?? this.filter,
       navigateTo: navigateTo,
     );
@@ -71,7 +57,6 @@ sealed class PropertyListAction {
   const PropertyListAction();
 
   const factory PropertyListAction.search(String query) = _Search;
-  const factory PropertyListAction.focus(bool hasFocus) = _Focus;
   const factory PropertyListAction.select(String id) = _Select;
   const factory PropertyListAction.panel(bool isPresented) = _Panel;
   const factory PropertyListAction.filtering(PropertyFilterData data) = _Filtering;
@@ -81,12 +66,6 @@ class _Search extends PropertyListAction {
   final String query;
 
   const _Search(this.query);
-}
-
-class _Focus extends PropertyListAction {
-  final bool hasFocus;
-
-  const _Focus(this.hasFocus);
 }
 
 class _Select extends PropertyListAction {
@@ -133,28 +112,23 @@ class PropertyListVM extends Notifier<PropertyListViewState> {
   void action(PropertyListAction action) {
     switch (action) {
       case _Search(:final query):
-        state = state.copyWith(query: query, isSearchCommitted: false);
-        _filtering(state);
-
-      case _Focus(:final hasFocus):
         state = state.copyWith(
-          isSearchFocused: hasFocus,
-          filter: hasFocus ? state.filter.copyWith(isFilterOpen: true) : null,
+          query: query,
+          status: state.status == PropertySearchStatus.select ? PropertySearchStatus.close : null,
         );
+        _filtering(state);
 
       case _Select(:final id):
         state = state.copyWith(
-          isSearchCommitted: true,
-          isSearchFocused: false,
-          filter: state.filter.copyWith(isFilterOpen: false),
+          status: PropertySearchStatus.select,
           navigateTo: PropertyDetailRoute(id: id).location,
         );
 
       case _Panel(:final isPresented):
-        state = state.copyWith(filter: state.filter.copyWith(isFilterOpen: isPresented));
+        state = state.copyWith(status: isPresented ? PropertySearchStatus.open : PropertySearchStatus.close);
 
       case _Filtering(:final data):
-        state = state.copyWith(filter: state.filter.copyWith(data: data));
+        state = state.copyWith(filter: data);
         _filtering(state);
     }
   }
@@ -164,13 +138,7 @@ class PropertyListVM extends Notifier<PropertyListViewState> {
   }
 
   void _filtering(PropertyListViewState target) {
-    final filter = target.filter.data;
-    final condition = PropertySearchCondition(
-      transactionType: filter.transactionType,
-      propertyTypes: filter.propertyTypes,
-      price: filter.price == PropertyFilterData.maxPrice ? null : filter.price.round(),
-      keyword: target.query.trim(),
-    );
+    final condition = target.filter.toCondition(target.query);
 
     _subscription?.cancel();
     _subscription = ref.read(propertyUseCaseProvider).watchFilter(condition).listen((properties) {

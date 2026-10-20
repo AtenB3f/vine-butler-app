@@ -3,17 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vine_butler/components/components.dart';
 import 'package:vine_butler/core/router/app_router.dart';
+import 'package:vine_butler/features/property_list/presentation/property_filter_view_state.dart';
 import 'package:vine_butler/features/property_list/presentation/screens/property_filter_panel.dart';
 import 'package:vine_butler/features/property_list/presentation/screens/property_list_item.dart';
+import 'package:vine_butler/features/property_list/presentation/screens/property_search_overlay.dart';
 import 'package:vine_butler/features/property_list/presentation/screens/property_search_result_item.dart';
 import 'package:vine_butler/features/property_list/property_list_event_vm.dart';
 import 'package:vine_butler/features/property_list/property_list_vm.dart';
 import 'package:vine_butler/shared/extensions/extensions.dart';
 
 class PropertyListScreen extends ConsumerWidget {
-  static const Duration _duration = Duration(milliseconds: 250);
-  static const Curve _curve = Curves.easeInOut;
-
   const PropertyListScreen({super.key});
 
   @override
@@ -70,126 +69,49 @@ class PropertyListScreen extends ConsumerWidget {
   }
 
   Widget _homeBanner(PropertyListViewState state) {
-    return _HomeBanner(status: state.bndStatus, isFilterOpen: state.filter.isFilterOpen);
+    return _HomeBanner(status: state.bndStatus, isOpen: state.status == PropertySearchStatus.open);
   }
 
   Widget _contents(BuildContext context, WidgetRef ref, PropertyListViewState state) {
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: Scaffold(
-            backgroundColor: Colors.white,
-            body: ListView.separated(
-              padding: const EdgeInsets.only(top: 20, bottom: 20),
-              itemCount: state.items.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 16),
-              itemBuilder: (context, index) => PropertyListItem(
-                viewState: state.items[index],
-                onTap: () => PropertyDetailRoute(id: state.items[index].id).push(context),
-              ),
-            ),
+    final viewModel = ref.read(propertyListVMProvider.notifier);
+
+    return PropertySearchOverlay(
+      isVisible: state.status == PropertySearchStatus.open,
+      onDismiss: () => viewModel.action(const PropertyListAction.panel(false)),
+      searchResults: [
+        for (final item in state.searchResults)
+          PropertySearchResultItem(
+            viewState: item,
+            query: state.query,
+            onTap: () => viewModel.action(PropertyListAction.select(item.id)),
           ),
-        ),
-        Positioned.fill(
-          child: IgnorePointer(
-            ignoring: !state.isOverlayVisible,
-            child: AnimatedOpacity(
-              duration: _duration,
-              curve: _curve,
-              opacity: state.isOverlayVisible ? 1 : 0,
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () => _dismissOverlay(ref),
-                child: const ColoredBox(color: StateColor.overlay),
-              ),
-            ),
-          ),
-        ),
-        Positioned(
-          left: 0,
-          right: 0,
-          top: 0,
-          child: AnimatedSwitcher(
-            duration: _duration,
-            switchInCurve: _curve,
-            switchOutCurve: _curve,
-            layoutBuilder: (currentChild, previousChildren) => Stack(
-              alignment: Alignment.topCenter,
-              children: [...previousChildren, ?currentChild],
-            ),
-            transitionBuilder: (child, animation) => FadeTransition(
-              opacity: animation,
-              child: SizeTransition(
-                sizeFactor: animation,
-                alignment: Alignment.topCenter,
-                child: child,
-              ),
-            ),
-            child: state.isOverlayVisible
-                ? KeyedSubtree(key: const ValueKey('overlayPanel'), child: _overlayPanel(ref, state))
-                : const SizedBox.shrink(key: ValueKey('emptyPanel')),
-          ),
-        ),
       ],
-    );
-  }
-
-  Widget _overlayPanel(WidgetRef ref, PropertyListViewState state) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: StateColor.white,
-        boxShadow: [AppShadow.bottom],
+      filterPanel: PropertyFilterPanel(
+        data: state.filter,
+        onFilter: (data) => viewModel.action(PropertyListAction.filtering(data)),
+        onCollapse: () => viewModel.action(const PropertyListAction.panel(false)),
       ),
-      child: AnimatedSize(
-        duration: _duration,
-        curve: _curve,
-        alignment: Alignment.topCenter,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (state.isSearchResultVisible) _searchResults(ref, state),
-            if (state.filter.isFilterOpen) const PropertyFilterPanel(),
-          ],
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: ListView.separated(
+          padding: const EdgeInsets.only(top: 20, bottom: 20),
+          itemCount: state.items.length,
+          separatorBuilder: (context, index) => const SizedBox(height: 16),
+          itemBuilder: (context, index) => PropertyListItem(
+            viewState: state.items[index],
+            onTap: () => PropertyDetailRoute(id: state.items[index].id).push(context),
+          ),
         ),
       ),
     );
-  }
-
-  Widget _searchResults(WidgetRef ref, PropertyListViewState state) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      decoration: const BoxDecoration(
-        color: StateColor.white,
-        border: Border(bottom: BorderSide(color: BaseColor.light)),
-      ),
-      child: Column(
-        children: [
-          for (final item in state.searchResults)
-            PropertySearchResultItem(
-              viewState: item,
-              query: state.query,
-              onTap: () {
-                FocusManager.instance.primaryFocus?.unfocus();
-                ref.read(propertyListVMProvider.notifier).action(PropertyListAction.select(item.id));
-              },
-            ),
-        ],
-      ),
-    );
-  }
-
-  void _dismissOverlay(WidgetRef ref) {
-    FocusManager.instance.primaryFocus?.unfocus();
-    ref.read(propertyListVMProvider.notifier).action(const PropertyListAction.panel(false));
   }
 }
 
 class _HomeBanner extends ConsumerStatefulWidget {
   final AppBndSearchStatus status;
-  final bool isFilterOpen;
+  final bool isOpen;
 
-  const _HomeBanner({required this.status, required this.isFilterOpen});
+  const _HomeBanner({required this.status, required this.isOpen});
 
   @override
   ConsumerState<_HomeBanner> createState() => _HomeBannerState();
@@ -212,12 +134,18 @@ class _HomeBannerState extends ConsumerState<_HomeBanner> {
       if (_controller.text != query) { _controller.text = query; }
     });
 
+    ref.listen(propertyListVMProvider.select((state) => state.status), (previous, status) {
+      if (previous == PropertySearchStatus.open && status != PropertySearchStatus.open) { FocusManager.instance.primaryFocus?.unfocus(); }
+    });
+
     return AppBndSearch(
       viewState: AppBndSearchViewState(status: widget.status, placeholder: '매물 찾기'),
       controller: _controller,
       onChange: (query) => vm.action(PropertyListAction.search(query)),
-      onFocus: (hasFocus) => vm.action(PropertyListAction.focus(hasFocus)),
-      onSearchTap: () => vm.action(PropertyListAction.panel(!widget.isFilterOpen)),
+      onFocus: (hasFocus) {
+        if (hasFocus) { vm.action(const PropertyListAction.panel(true)); }
+      },
+      onSearchTap: () => vm.action(PropertyListAction.panel(!widget.isOpen)),
     );
   }
 }
