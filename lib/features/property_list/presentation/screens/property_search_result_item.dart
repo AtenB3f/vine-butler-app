@@ -43,7 +43,7 @@ class PropertySearchResultItem extends StatelessWidget {
   }
 
   List<TextSpan> _highlightedSpans() {
-    final text = viewState.roadAddress;
+    final text = viewState.address;
     final normalStyle = AppFontStyle.body2.style(TextColor.dark);
     final matchIndex = query.isEmpty ? -1 : text.indexOf(query);
 

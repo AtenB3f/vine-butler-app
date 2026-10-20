@@ -46,7 +46,7 @@ Property _property({String detailAddress = '', int? roomCount, bool? isParkingAv
     address: Address(
       zipCode: '06236',
       roadAddress: '서울 강남구 테헤란로 1',
-      lotAddress: '역삼동 1-1',
+      lotAddress: '서울특별시 강남구 역삼동 1-1',
       sido: '서울특별시',
       sigungu: '강남구',
       dongMyeon: '역삼동',
@@ -89,15 +89,14 @@ void main() {
     expect(item.id, 'a');
     expect(item.amount, 10000000);
     expect(item.monthlyAmount, 500000);
-    expect(item.roadAddress, '서울 강남구 테헤란로 1, 202호');
-    expect(item.jibunAddress, '역삼동 1-1');
+    expect(item.address, '서울특별시 강남구 역삼동 1-1 202호');
     expect(item.tag, ['방 2개']);
   });
 
-  test('상세 주소와 방 개수가 없으면 도로명 주소만 쓰고 태그가 없다', () async {
+  test('상세 주소와 방 개수가 없으면 지번 주소만 쓰고 태그가 없다', () async {
     await emit([_property()]);
 
-    expect(state().items.single.roadAddress, '서울 강남구 테헤란로 1');
+    expect(state().items.single.address, '서울특별시 강남구 역삼동 1-1');
     expect(state().items.single.tag, isEmpty);
   });
 

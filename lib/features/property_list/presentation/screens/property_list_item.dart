@@ -59,7 +59,7 @@ class PropertyListItem extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 8,
       children: [
-        _LeadingEllipsisText(text: viewState.roadAddress, style: AppFontStyle.sub3.style(TextColor.dark)),
+        _LeadingEllipsisText(text: viewState.address, style: AppFontStyle.sub3.style(TextColor.dark)),
         Row(
           spacing: 4,
           children: [

@@ -1,6 +1,6 @@
-import 'package:vine_butler/domain/model/address.dart';
 import 'package:vine_butler/domain/model/property.dart';
 import 'package:vine_butler/domain/property_type.dart';
+import 'package:vine_butler/shared/utils/utils.dart';
 
 class PropertyDetailViewState {
   final PropertyDetailData? data;
@@ -107,7 +107,7 @@ class PropertyDetailData {
 
     return PropertyDetailData(
       imageUrls: const [],
-      unitAddress: [_lotNumberAddress(address), address.detailAddress].where((part) => part.isNotEmpty).join(' '),
+      unitAddress: lotUnitAddress(address),
       address: [address.sido, address.sigungu].where((part) => part.isNotEmpty).join(' '),
       transactionType: property.deal.transactionType,
       amount: property.deal.price,
@@ -126,18 +126,4 @@ class PropertyDetailData {
       longitude: address.longitude,
     );
   }
-}
-
-/// 지번 주소에서 읍면동과 번지만 남기는 함수
-///
-/// - `lotAddress`: `시/도 시/군/구 읍면동 (리) 번지 (건물명)` 형식 (도로명주소 API의 jibunAddr 기준)
-/// - 번지: 공백 뒤에 오는 `123`, `123-4`, `산12-3` (`을지로3가`처럼 동 이름에 붙은 숫자는 번지가 아님)
-String _lotNumberAddress(Address address) {
-  final lotNumber = RegExp(r'^.*?(?:^|\s)(?:산\s?)?\d+(?:-\d+)?(?=\s|$)');
-  var rest = address.lotAddress.trim();
-
-  for (final prefix in [address.sido, address.sigungu]) {
-    if (prefix.isNotEmpty && rest.startsWith(prefix)) { rest = rest.substring(prefix.length).trim(); }
-  }
-  return lotNumber.firstMatch(rest)?.group(0)?.trim() ?? rest;
 }
