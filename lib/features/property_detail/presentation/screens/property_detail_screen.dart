@@ -374,7 +374,7 @@ class PropertyDetailScreen extends ConsumerWidget {
           spacing: 2,
           children: [
             _optionDescription(valueText),
-            if (data.isAvailableMoveInDate) AppFontStyle.body1.text('협의 가능', TextColor.light),
+            if (data.isFlexibleMoveInDate) AppFontStyle.body1.text('협의 가능', TextColor.light),
           ],
         ),
       ],

@@ -117,7 +117,7 @@ void main() {
     expect(data.isAvailableSuretyInsurance, isFalse);
     expect(data.isAvailableLoan, isTrue);
     expect(data.moveInDate, DateTime(2026, 11, 1));
-    expect(data.isAvailableMoveInDate, isTrue);
+    expect(data.isFlexibleMoveInDate, isTrue);
     expect(data.furnitureOptions, ['냉장고']);
     expect(data.memo, '메모');
     expect(data.latitude, 37.5006);

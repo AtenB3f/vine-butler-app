@@ -19,7 +19,7 @@ sealed class ApplyPropertyExtraAction {
   const factory ApplyPropertyExtraAction.selectLoan(bool hasLoan) = _SelectLoan;
   const factory ApplyPropertyExtraAction.selectParking(bool isAvailable) = _SelectParking;
   const factory ApplyPropertyExtraAction.changeMoveInDate(DateTime date) = _ChangeMoveInDate;
-  const factory ApplyPropertyExtraAction.toggleNegotiable() = _ToggleNegotiable;
+  const factory ApplyPropertyExtraAction.toggleFlexibleMoveInDate() = _ToggleFlexibleMoveInDate;
   const factory ApplyPropertyExtraAction.selectRoomCount(int count) = _SelectRoomCount;
   const factory ApplyPropertyExtraAction.toggleFurniture(String option) = _ToggleFurniture;
   const factory ApplyPropertyExtraAction.changeMemo(String memo) = _ChangeMemo;
@@ -52,8 +52,8 @@ class _ChangeMoveInDate extends ApplyPropertyExtraAction {
   const _ChangeMoveInDate(this.date);
 }
 
-class _ToggleNegotiable extends ApplyPropertyExtraAction {
-  const _ToggleNegotiable();
+class _ToggleFlexibleMoveInDate extends ApplyPropertyExtraAction {
+  const _ToggleFlexibleMoveInDate();
 }
 
 class _SelectRoomCount extends ApplyPropertyExtraAction {
@@ -123,8 +123,8 @@ class ApplyPropertyExtraVM extends Notifier<ApplyPropertyExtraViewState> {
       case _ChangeMoveInDate(:final date):
         state = state.copyWith(moveInDate: date);
 
-      case _ToggleNegotiable():
-        state = state.copyWith(isMoveInDateNegotiable: !state.isMoveInDateNegotiable);
+      case _ToggleFlexibleMoveInDate():
+        state = state.copyWith(isFlexibleMoveInDate: !state.isFlexibleMoveInDate);
 
       case _SelectRoomCount(:final count):
         state = state.copyWith(roomCount: () => state.roomCount == count ? null : count);
@@ -178,7 +178,7 @@ class ApplyPropertyExtraVM extends Notifier<ApplyPropertyExtraViewState> {
         hasLoan: state.hasLoan,
         isParkingAvailable: state.isAvailableParking,
         moveInDate: state.moveInDate,
-        isFlexibleMoveInDate: state.isMoveInDateNegotiable,
+        isFlexibleMoveInDate: state.isFlexibleMoveInDate,
         roomCount: state.roomCount,
         furnitureOptions: state.furnitureOptions.toList(),
         memo: state.memo.trim(),

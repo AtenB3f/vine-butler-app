@@ -3,7 +3,7 @@ class ApplyPropertyExtraViewState {
   final bool? hasLoan;
   final bool? isAvailableParking;
   final DateTime? moveInDate;
-  final bool isMoveInDateNegotiable;
+  final bool isFlexibleMoveInDate;
   final int? roomCount;
   final Set<String> furnitureOptions;
   final String memo;
@@ -16,7 +16,7 @@ class ApplyPropertyExtraViewState {
     this.hasLoan,
     this.isAvailableParking,
     this.moveInDate,
-    this.isMoveInDateNegotiable = false,
+    this.isFlexibleMoveInDate = false,
     this.roomCount,
     this.furnitureOptions = const {},
     this.memo = '',
@@ -30,7 +30,7 @@ class ApplyPropertyExtraViewState {
     bool? Function()? hasLoan,
     bool? Function()? isAvailableParking,
     DateTime? moveInDate,
-    bool? isMoveInDateNegotiable,
+    bool? isFlexibleMoveInDate,
     int? Function()? roomCount,
     Set<String>? furnitureOptions,
     String? memo,
@@ -44,7 +44,7 @@ class ApplyPropertyExtraViewState {
       hasLoan: hasLoan != null ? hasLoan() : this.hasLoan,
       isAvailableParking: isAvailableParking != null ? isAvailableParking() : this.isAvailableParking,
       moveInDate: moveInDate ?? this.moveInDate,
-      isMoveInDateNegotiable: isMoveInDateNegotiable ?? this.isMoveInDateNegotiable,
+      isFlexibleMoveInDate: isFlexibleMoveInDate ?? this.isFlexibleMoveInDate,
       roomCount: roomCount != null ? roomCount() : this.roomCount,
       furnitureOptions: furnitureOptions ?? this.furnitureOptions,
       memo: memo ?? this.memo,

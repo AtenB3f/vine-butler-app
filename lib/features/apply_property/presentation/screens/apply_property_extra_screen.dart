@@ -213,10 +213,10 @@ class _ApplyPropertyExtraScreenState extends ConsumerState<ApplyPropertyExtraScr
         ),
         AppToggleCheck(
           viewState: AppToggleCheckViewState(
-            status: state.isMoveInDateNegotiable ? AppToggleCheckStatus.on : AppToggleCheckStatus.off,
+            status: state.isFlexibleMoveInDate ? AppToggleCheckStatus.on : AppToggleCheckStatus.off,
             text: '협의 가능',
           ),
-          onTap: () => viewModel.action(const ApplyPropertyExtraAction.toggleNegotiable()),
+          onTap: () => viewModel.action(const ApplyPropertyExtraAction.toggleFlexibleMoveInDate()),
         ),
       ],
     );

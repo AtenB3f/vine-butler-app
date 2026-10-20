@@ -69,7 +69,7 @@ class PropertyDetailData {
   final bool? isAvailableLoan; // 융자 여부
   final bool isAvailableSuretyInsurance; // 보증보험 가입 가능 여부
   final DateTime? moveInDate; // 입주일
-  final bool isAvailableMoveInDate; // 입주일 협의 가능 여부
+  final bool isFlexibleMoveInDate; // 입주일 협의 가능 여부
   final List<String> furnitureOptions;  // 가구 옵션
   final String? memo; // 메모
   final double latitude;
@@ -93,7 +93,7 @@ class PropertyDetailData {
     this.isAvailableLoan,
     required this.isAvailableSuretyInsurance,
     this.moveInDate,
-    required this.isAvailableMoveInDate,
+    required this.isFlexibleMoveInDate,
     required this.furnitureOptions,
     this.memo,
     required this.latitude,
@@ -119,7 +119,7 @@ class PropertyDetailData {
       isAvailableLoan: property.hasLoan,
       isAvailableSuretyInsurance: property.isSuretyInsuranceAvailable == true,
       moveInDate: property.moveInDate,
-      isAvailableMoveInDate: property.isFlexibleMoveInDate,
+      isFlexibleMoveInDate: property.isFlexibleMoveInDate,
       furnitureOptions: property.furnitureOptions,
       memo: property.memo.isEmpty ? null : property.memo,
       latitude: address.latitude,
