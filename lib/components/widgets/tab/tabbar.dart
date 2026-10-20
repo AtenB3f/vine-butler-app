@@ -13,7 +13,6 @@ class Tabbar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Container(
-      height: 68,
       decoration: BoxDecoration(
         color: StateColor.white,
         boxShadow: [
@@ -24,17 +23,23 @@ class Tabbar extends ConsumerWidget {
           ),
         ],
       ),
-      child: Row(
-        children: [
-          for (final type in TabItemType.values)
-            Expanded(
-              child: TabItem(
-                type: type,
-                isSelected: currentIndex == type.index,
-                onTap: () => onTap(type.index),
-              ),
-            ),
-        ],
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: 68,
+          child: Row(
+            children: [
+              for (final type in TabItemType.values)
+                Expanded(
+                  child: TabItem(
+                    type: type,
+                    isSelected: currentIndex == type.index,
+                    onTap: () => onTap(type.index),
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -11,7 +11,7 @@ class MainShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: navigationShell,
+      body: SafeArea(bottom: false, child: navigationShell),
       bottomNavigationBar: Tabbar(
         currentIndex: navigationShell.currentIndex,
         onTap: (index) => navigationShell.goBranch(
