@@ -181,6 +181,7 @@ class _PropertyFilterPanelState extends ConsumerState<PropertyFilterPanel> {
         alignment: Alignment.center,
         child: Row(
           mainAxisSize: MainAxisSize.min,
+          spacing: 4,
           children: [
             AppFontStyle.body2.text('접기', TextColor.light),
             AppIcons.chevronUpSM(TextColor.light),
