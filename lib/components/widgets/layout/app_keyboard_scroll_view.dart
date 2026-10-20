@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vine_butler/components/responsive.dart';
 
 class AppKeyboardScrollView extends StatefulWidget {
   const AppKeyboardScrollView({
@@ -21,17 +22,22 @@ class _AppKeyboardScrollViewState extends State<AppKeyboardScrollView> {
   static const Curve _scrollCurve = Curves.easeOutCubic;
   static const Duration _spaceDuration = Duration(milliseconds: 250);
 
+  /// 화면 위로 올릴 입력란의 키
+  ///
+  /// - 모바일에서만 `focusedKey`를 사용 (데스크톱은 키보드가 화면을 가리지 않아 이동하지 않음)
+  GlobalKey? get _focusedKey => context.isMobile ? widget.focusedKey : null;
+
   @override
   void didUpdateWidget(covariant AppKeyboardScrollView oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.focusedKey != null && widget.focusedKey != oldWidget.focusedKey) {
+    if (_focusedKey != null && widget.focusedKey != oldWidget.focusedKey) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToFocused());
     }
   }
 
   void _scrollToFocused() {
-    final focusedContext = widget.focusedKey?.currentContext;
+    final focusedContext = _focusedKey?.currentContext;
 
     if (!mounted || focusedContext == null) { return; }
 
@@ -43,7 +49,7 @@ class _AppKeyboardScrollViewState extends State<AppKeyboardScrollView> {
   /// - 포커스 순간에는 애니메이션 없이 바로 붙임 (스크롤 시작 시점에 스크롤 가능 거리가 있어야 끝까지 올라감)
   /// - 포커스가 풀리면 `_spaceDuration` 동안 줄어듦
   Widget _focusSpace(double viewportHeight) {
-    final hasFocus = widget.focusedKey != null;
+    final hasFocus = _focusedKey != null;
 
     return AnimatedContainer(
       duration: hasFocus ? Duration.zero : _spaceDuration,

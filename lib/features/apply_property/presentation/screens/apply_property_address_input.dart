@@ -68,7 +68,7 @@ class _ApplyPropertyAddressInputState extends ConsumerState<ApplyPropertyAddress
           Focus(
             canRequestFocus: false,
             skipTraversal: true,
-            onFocusChange: (hasFocus) => setState(() => _isFocus = hasFocus),
+            onFocusChange: (hasFocus) => setState(() => _isFocus = hasFocus && context.isMobile),
             child: AppTextField(
               viewState: const AppTextFieldViewState(
                 status: AppTextFieldStatus.normal,
