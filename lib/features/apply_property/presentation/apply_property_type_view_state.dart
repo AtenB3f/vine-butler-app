@@ -1,5 +1,6 @@
 import 'package:vine_butler/domain/property_type.dart';
 import 'package:vine_butler/features/property_list/presentation/property_filter_view_state.dart';
+import 'package:vine_butler/shared/extensions/extensions.dart';
 
 class ApplyPropertyTypeViewState {
   static const double priceDistance = 1000000;
@@ -55,31 +56,9 @@ class ApplyPropertyTypeViewState {
     }
   }
 
-  double get minPrice {
-    switch (transactionType) {
-      case PropertyTransactionType.buy:
-        return 100000000;
+  double get minPrice => transactionType?.minPrice ?? 0;
 
-      case PropertyTransactionType.rent:
-      case PropertyTransactionType.depositOnly:
-      case null:
-        return 0;
-    }
-  }
-
-  double get maxPrice {
-    switch (transactionType) {
-      case PropertyTransactionType.rent:
-        return 500000000;
-
-      case PropertyTransactionType.depositOnly:
-        return 1500000000;
-
-      case PropertyTransactionType.buy:
-      case null:
-        return 3000000000;
-    }
-  }
+  double get maxPrice => transactionType?.maxPrice ?? PropertyTransactionType.buy.maxPrice;
 
   ApplyPropertyTypeViewState copyWith({
     PropertyTransactionType? Function()? transactionType,

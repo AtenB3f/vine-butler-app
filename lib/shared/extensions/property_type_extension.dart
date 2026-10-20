@@ -29,6 +29,30 @@ extension PropertyTransactionTypeExtension on PropertyTransactionType {
     }
   }
 
+  double get minPrice {
+    switch (this) {
+      case PropertyTransactionType.buy:
+        return 100000000;
+
+      case PropertyTransactionType.rent:
+      case PropertyTransactionType.depositOnly:
+        return 0;
+    }
+  }
+
+  double get maxPrice {
+    switch (this) {
+      case PropertyTransactionType.rent:
+        return 500000000;
+
+      case PropertyTransactionType.depositOnly:
+        return 1500000000;
+
+      case PropertyTransactionType.buy:
+        return 3000000000;
+    }
+  }
+
   LineTagType get tagType {
     switch (this) {
       case PropertyTransactionType.buy:
