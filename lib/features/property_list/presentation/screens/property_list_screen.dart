@@ -215,8 +215,8 @@ class _HomeBannerState extends ConsumerState<_HomeBanner> {
     return AppBndSearch(
       viewState: AppBndSearchViewState(status: widget.status, placeholder: '매물 찾기'),
       controller: _controller,
-      onChanged: (query) => vm.action(PropertyListAction.search(query)),
-      onFocusChanged: (hasFocus) => vm.action(PropertyListAction.focus(hasFocus)),
+      onChange: (query) => vm.action(PropertyListAction.search(query)),
+      onFocus: (hasFocus) => vm.action(PropertyListAction.focus(hasFocus)),
       onSearchTap: () => vm.action(PropertyListAction.panel(!widget.isFilterOpen)),
     );
   }

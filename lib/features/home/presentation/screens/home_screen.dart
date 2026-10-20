@@ -136,7 +136,7 @@ class _HomeBannerState extends State<_HomeBanner> {
     return AppBndSearch(
       viewState: AppBndSearchViewState(status: _status, placeholder: '매물 찾기'),
       controller: _controller,
-      onFocusChanged: (hasFocus) => setState(() {
+      onFocus: (hasFocus) => setState(() {
         _status = hasFocus ? AppBndSearchStatus.enable : AppBndSearchStatus.disable;
       }),
       onSearchTap: () {},

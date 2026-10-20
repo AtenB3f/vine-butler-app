@@ -7,15 +7,15 @@ class AppBndSearch extends StatefulWidget {
     required this.viewState,
     required this.controller,
     required this.onSearchTap,
-    this.onChanged,
-    this.onFocusChanged,
+    this.onChange,
+    this.onFocus,
   });
 
   final AppBndSearchViewState viewState;
   final TextEditingController controller;
   final VoidCallback onSearchTap;
-  final ValueChanged<String>? onChanged;
-  final ValueChanged<bool>? onFocusChanged;
+  final ValueChanged<String>? onChange;
+  final ValueChanged<bool>? onFocus;
 
   @override
   State<AppBndSearch> createState() => _AppBndSearchState();
@@ -27,17 +27,17 @@ class _AppBndSearchState extends State<AppBndSearch> {
   @override
   void initState() {
     super.initState();
-    _focusNode.addListener(_onFocusChange);
+    _focusNode.addListener(_onFocus);
   }
 
   @override
   void dispose() {
-    _focusNode.removeListener(_onFocusChange);
+    _focusNode.removeListener(_onFocus);
     _focusNode.dispose();
     super.dispose();
   }
 
-  void _onFocusChange() => widget.onFocusChanged?.call(_focusNode.hasFocus);
+  void _onFocus() => widget.onFocus?.call(_focusNode.hasFocus);
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +73,7 @@ class _AppBndSearchState extends State<AppBndSearch> {
                         controller: widget.controller,
                         focusNode: _focusNode,
                         style: AppFontStyle.body2.style(TextColor.dark),
-                        onChanged: widget.onChanged,
+                        onChanged: widget.onChange,
                         decoration: InputDecoration(
                           isDense: true,
                           contentPadding: EdgeInsets.zero,
