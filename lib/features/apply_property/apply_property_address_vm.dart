@@ -57,7 +57,7 @@ class _InputDetail extends ApplyPropertyAddressAction {
 }
 
 class ApplyPropertyAddressVM extends Notifier<ApplyPropertyAddressViewState> {
-  static const _debounceDuration = Duration(milliseconds: 300);
+  static const _debounceDuration = Duration(milliseconds: 500);
   static const _errorMessage = '주소를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.';
   static const _locateErrorMessage = '주소 위치를 찾지 못했어요. 다시 입력해 주세요.';
 
