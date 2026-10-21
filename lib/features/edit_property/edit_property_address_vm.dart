@@ -98,9 +98,10 @@ class EditPropertyAddressVM extends Notifier<EditPropertyAddressViewState> {
         state = state.copyWith(step: EditPropertyAddressStep.search);
 
       case _Search(:final query):
+        const minQueryLength = 3;
         final requestId = _cancelSearch();
 
-        if (query.trim().isEmpty) {
+        if (query.trim().length < minQueryLength) {
           state = state.copyWith(query: query, results: const [], isSearching: false, isLoading: false, page: 0, totalCount: 0);
           return;
         }

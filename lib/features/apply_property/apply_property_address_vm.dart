@@ -73,9 +73,10 @@ class ApplyPropertyAddressVM extends Notifier<ApplyPropertyAddressViewState> {
   void action(ApplyPropertyAddressAction action) {
     switch (action) {
       case _Search(:final query):
+        const minQueryLength = 3;
         final requestId = _cancelSearch();
 
-        if (query.trim().isEmpty) {
+        if (query.trim().length < minQueryLength) {
           state = ApplyPropertyAddressViewState(query: query);
           return;
         }
