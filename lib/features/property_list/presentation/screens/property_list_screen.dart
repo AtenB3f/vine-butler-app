@@ -5,6 +5,7 @@ import 'package:vine_butler/components/components.dart';
 import 'package:vine_butler/core/router/app_router.dart';
 import 'package:vine_butler/features/property_list/presentation/property_filter_view_state.dart';
 import 'package:vine_butler/features/property_list/presentation/screens/property_filter_panel.dart';
+import 'package:vine_butler/features/property_list/presentation/screens/property_filter_tags.dart';
 import 'package:vine_butler/features/property_list/presentation/screens/property_list_item.dart';
 import 'package:vine_butler/features/property_list/presentation/screens/property_search_overlay.dart';
 import 'package:vine_butler/features/property_list/presentation/screens/property_search_result_item.dart';
@@ -93,14 +94,26 @@ class PropertyListScreen extends ConsumerWidget {
       ),
       child: Scaffold(
         backgroundColor: Colors.white,
-        body: ListView.separated(
-          padding: const EdgeInsets.only(top: 20, bottom: 20),
-          itemCount: state.items.length,
-          separatorBuilder: (context, index) => const SizedBox(height: 16),
-          itemBuilder: (context, index) => PropertyListItem(
-            viewState: state.items[index],
-            onTap: () => PropertyDetailRoute(id: state.items[index].id).push(context),
-          ),
+        body: Column(
+          children: [
+            PropertyFilterTags(
+              query: state.query,
+              filter: state.filter,
+              onFilter: (data) => viewModel.action(PropertyListAction.filtering(data)),
+              onClearQuery: () => viewModel.action(const PropertyListAction.search('')),
+            ),
+            Expanded(
+              child: ListView.separated(
+                padding: const EdgeInsets.only(top: 20, bottom: 20),
+                itemCount: state.items.length,
+                separatorBuilder: (context, index) => const SizedBox(height: 16),
+                itemBuilder: (context, index) => PropertyListItem(
+                  viewState: state.items[index],
+                  onTap: () => PropertyDetailRoute(id: state.items[index].id).push(context),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

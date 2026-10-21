@@ -10,6 +10,7 @@ import 'package:vine_butler/features/map/presentation/map_view_state.dart';
 import 'package:vine_butler/features/map/presentation/screens/map_property_card.dart';
 import 'package:vine_butler/features/property_list/presentation/property_filter_view_state.dart';
 import 'package:vine_butler/features/property_list/presentation/screens/property_filter_panel.dart';
+import 'package:vine_butler/features/property_list/presentation/screens/property_filter_tags.dart';
 import 'package:vine_butler/features/property_list/presentation/screens/property_search_overlay.dart';
 import 'package:vine_butler/features/property_list/presentation/screens/property_search_result_item.dart';
 
@@ -44,16 +45,28 @@ class MapScreen extends ConsumerWidget {
                 onFilter: (data) => viewModel.action(MapAction.filtering(data)),
                 onCollapse: () => viewModel.action(const MapAction.panel(false)),
               ),
-              child: Stack(
+              child: Column(
                 children: [
-                  Positioned.fill(child: _map(state, viewModel)),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    child: _AnimatedCard(
-                      selected: selected,
-                      onTap: (id) => PropertyDetailRoute(id: id).push(context),
+                  PropertyFilterTags(
+                    query: state.query,
+                    filter: state.filter,
+                    onFilter: (data) => viewModel.action(MapAction.filtering(data)),
+                    onClearQuery: () => viewModel.action(const MapAction.search('')),
+                  ),
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        Positioned.fill(child: _map(state, viewModel)),
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          child: _AnimatedCard(
+                            selected: selected,
+                            onTap: (id) => PropertyDetailRoute(id: id).push(context),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -110,6 +123,10 @@ class _MapBannerState extends ConsumerState<_MapBanner> {
   @override
   Widget build(BuildContext context) {
     final viewModel = ref.read(mapVMProvider.notifier);
+
+    ref.listen(mapVMProvider.select((state) => state.query), (_, query) {
+      if (_controller.text != query) { _controller.text = query; }
+    });
 
     ref.listen(mapVMProvider.select((state) => state.status), (previous, status) {
       if (previous == PropertySearchStatus.open && status != PropertySearchStatus.open) { FocusManager.instance.primaryFocus?.unfocus(); }
