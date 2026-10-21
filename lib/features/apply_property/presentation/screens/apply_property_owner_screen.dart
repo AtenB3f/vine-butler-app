@@ -84,6 +84,7 @@ class _ApplyPropertyOwnerScreenState extends ConsumerState<ApplyPropertyOwnerScr
             status: AppTextFieldStatus.normal,
             title: '이름',
             placeholder: '이름을 입력하세요.',
+            inputAction: AppTextFieldInputAction.next,
           ),
           controller: _nameController,
           onChange: (name) => viewModel.action(ApplyPropertyOwnerAction.changeName(name)),
