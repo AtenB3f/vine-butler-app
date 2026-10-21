@@ -9,7 +9,7 @@ class AppBndNormal extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: 62,
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       color: StateColor.white,
       foregroundDecoration: const BoxDecoration(
         border: Border(bottom: BorderSide(color: BaseColor.light)),

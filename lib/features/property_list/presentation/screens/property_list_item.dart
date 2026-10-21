@@ -19,6 +19,7 @@ class PropertyListItem extends StatelessWidget {
     return Pressable(
       onTap: onTap,
       child: Container(
+        padding: const EdgeInsets.only(right: 10),
         color: Colors.white,
         child: Row(
           spacing: 14,
