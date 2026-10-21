@@ -41,6 +41,12 @@ class VineButlerApp extends StatelessWidget {
     return MaterialApp.router(
       theme: ThemeData(
         fontFamily: 'Pretendard',
+        colorScheme: ColorScheme.fromSeed(seedColor: MainColor.medium, primary: MainColor.medium),
+        textSelectionTheme: const TextSelectionThemeData(
+          cursorColor: MainColor.medium,
+          selectionColor: MainColor.light,
+          selectionHandleColor: MainColor.medium,
+        ),
         datePickerTheme: AppPickerTheme.date,
       ),
       routerConfig: appRouter,
