@@ -53,33 +53,35 @@ class HomeScreen extends ConsumerWidget {
   }
 
   Widget _mobileHomeContents(WidgetRef ref) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      spacing: 40,
-      children: [
-        AppFontStyle.header1.text('어떻게 찾아 오셨나요?', TextColor.dark),
-        ImageButton(
-          image: 'Tab_Home_Enable',
-          size: const Size(240, 120),
-          alignment: ContentAlignment.top,
-          spacing: 10,
-          font: AppFontStyle.sub3,
-          fontColor: TextColor.dark,
-          text: '찾아요',
-          onTap: () => ref.read(homeVMProvider.notifier).action(HomeViewAction.find),
-        ),
-        ImageButton(
-          image: 'Tab_Home_Enable',
-          size: const Size(240, 120),
-          alignment: ContentAlignment.top,
-          spacing: 10,
-          font: AppFontStyle.sub3,
-          fontColor: TextColor.dark,
-          text: '맡겨요',
-          onTap: () => ref.read(homeVMProvider.notifier).action(HomeViewAction.apply),
-        ),
-      ],
+    return Expanded(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        spacing: 40,
+        children: [
+          AppFontStyle.header1.text('어떻게 찾아 오셨나요?', TextColor.dark),
+          ImageButton(
+            image: 'Tab_Home_Enable',
+            size: const Size(240, 120),
+            alignment: ContentAlignment.top,
+            spacing: 10,
+            font: AppFontStyle.sub3,
+            fontColor: TextColor.dark,
+            text: '찾아요',
+            onTap: () => ref.read(homeVMProvider.notifier).action(HomeViewAction.find),
+          ),
+          ImageButton(
+            image: 'Tab_Home_Enable',
+            size: const Size(240, 120),
+            alignment: ContentAlignment.top,
+            spacing: 10,
+            font: AppFontStyle.sub3,
+            fontColor: TextColor.dark,
+            text: '맡겨요',
+            onTap: () => ref.read(homeVMProvider.notifier).action(HomeViewAction.apply),
+          ),
+        ],
+      ),
     );
   }
 
