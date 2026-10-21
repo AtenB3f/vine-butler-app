@@ -370,7 +370,7 @@ class PropertyDetailScreen extends ConsumerWidget {
   }
 
   Widget _moveInRow(PropertyDetailData data) {
-    final valueText = data.moveInDate == null ? '즉시 입주' : '${formatDate(data.moveInDate!)} 이후';
+    final valueText = formatMoveInDate(data.moveInDate);
 
     return Row(
       spacing: 8,

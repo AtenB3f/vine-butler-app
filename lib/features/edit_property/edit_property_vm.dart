@@ -172,7 +172,10 @@ class EditPropertyVM extends Notifier<EditPropertyViewState> {
         state = state.copyWith(ownerPhone: phone);
 
       case _ChangeMoveInDate(:final date):
-        state = state.copyWith(moveInDate: date);
+        final now = DateTime.now();
+        final isToday = date.year == now.year && date.month == now.month && date.day == now.day;
+
+        state = state.copyWith(moveInDate: () => isToday ? null : date);
 
       case _ToggleFlexibleMoveInDate():
         state = state.copyWith(isFlexibleMoveInDate: !state.isFlexibleMoveInDate);

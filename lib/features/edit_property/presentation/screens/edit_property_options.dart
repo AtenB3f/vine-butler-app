@@ -133,7 +133,7 @@ class _EditPropertyOptionsState extends ConsumerState<EditPropertyOptions> {
                 AppIcons.calendarMD(TextColor.dark),
                 Expanded(
                   child: AppFontStyle.bold3.text(
-                    moveInDate == null ? '즉시 입주' : '${formatDate(moveInDate)} 이후',
+                    formatMoveInDate(moveInDate),
                     TextColor.dark,
                   ),
                 ),
