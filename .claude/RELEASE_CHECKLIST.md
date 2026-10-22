@@ -7,13 +7,13 @@
 - [x] 앱 아이콘 교체 (1024×1024, 투명 배경 X) — iOS AppIcon / Android mipmap·adaptive icon
 - [x] 스플래시(LaunchScreen / launch_background) 교체
 - [x] 개인정보처리방침 URL 준비 (양 스토어 필수, 웹페이지 호스팅)
-- [ ] 고객 지원 URL·이메일
+- [x] 고객 지원 URL·이메일
 - [ ] 릴리즈 빌드에서 env.json 주입 확인 (`--dart-define-from-file=env.json`)
 - [x] 네이버 지도 콘솔(NCP)에 릴리즈 번들ID/패키지명 등록
 - [ ] 도로명주소 API 키 운영용인지 확인
 - [ ] `flutter analyze` 통과, 실기기 릴리즈 빌드 동작 확인 (지도·주소검색·사진첨부·DB 저장)
-- [ ] 디버그 로그/테스트 데이터 제거 (`kDebugMode` 가드 확인)
-- [ ] `pubspec.yaml` description 수정
+- [x] 디버그 로그/테스트 데이터 제거 (`kDebugMode` 가드 확인)
+- [x] `pubspec.yaml` description 수정
 
 ## 1. iOS / App Store
 - [x] Apple Developer Program 가입
@@ -25,9 +25,9 @@
 - [ ] 스크린샷: 6.9"(또는 6.7") iPhone 필수, iPad 지원 시 13" iPad 필수 (지원 안 하면 iPhone 전용 설정)
 - [x] 앱 설명·키워드·부제·카테고리(비즈니스/생산성)·연령등급 설문
 - [x] 앱 개인정보 라벨(App Privacy) 작성 — 수집 데이터 없음 (도로명주소·Geocode는 실시간 처리, NMapsMap 3.23.0 manifest 수집 항목 없음 확인)
-- [ ] 심사용 메모 (로그인 없음 명시, 기능 설명)
+- [x] 심사용 메모 (로그인 없음 명시, 기능 설명)
 - [ ] `flutter build ipa --release --dart-define-from-file=env.json` → Transporter/Xcode 업로드
-- [ ] TestFlight 내부 테스트 → 심사 제출
+- [x] TestFlight 내부 테스트 → 심사 제출
 
 ## 2. Android / Play Store
 - [x] Google Play Console 개발자 계정
