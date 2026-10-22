@@ -6,6 +6,6 @@
 - [x] iOS `CFBundleDisplayName` → 넝쿨집사
 - [ ] Android 릴리즈 서명: 키스토어 생성 + `key.properties`(gitignore) + `build.gradle.kts` release signingConfig 연결
 - [x] iOS `PrivacyInfo.xcprivacy` 추가
-- [ ] Info.plist에 `ITSAppUsesNonExemptEncryption = NO` 추가
+- [x] Info.plist에 `ITSAppUsesNonExemptEncryption = NO` 추가
 - [ ] `pubspec.yaml` description 수정
 - [x] 앱 아이콘 교체
