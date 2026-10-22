@@ -15,6 +15,7 @@ Future<void> main(List<String> args) async {
   final flutterArgs = switch (command) {
     'ipa' => ['build', 'ipa', '--release', ...extraArgs],
     'aab' => ['build', 'appbundle', '--release', ...extraArgs],
+    'apk' => ['build', 'apk', '--release', ...extraArgs],
     _ => null,
   };
 
@@ -23,7 +24,7 @@ Future<void> main(List<String> args) async {
   Directory.current = File.fromUri(Platform.script).parent.parent;
   _checkEnvFile();
 
-  if (command == 'aab') { _checkAndroidSigning(); }
+  if (command == 'aab' || command == 'apk') { _checkAndroidSigning(); }
 
   final process = await Process.start(
     'flutter',
@@ -67,7 +68,8 @@ Never _exitWithUsage() {
 사용법: dart run tool/build.dart <명령> [flutter 옵션]
 
   ipa   iOS 스토어 업로드용 .ipa 빌드
-  aab   Android 스토어 업로드용 .aab 빌드''');
+  aab   Android 스토어 업로드용 .aab 빌드
+  apk   Android 직접 설치·테스트용 .apk 빌드''');
   exit(64);
 }
 
