@@ -301,3 +301,6 @@ devtools_options.yaml
 
 # API keys (dart-define-from-file)
 env.json
+
+# Android 업로드 키스토어
+/key/
