@@ -10,7 +10,7 @@
 - [x] 고객 지원 URL·이메일
 - [ ] 릴리즈 빌드에서 env.json 주입 확인 (`--dart-define-from-file=env.json`)
 - [x] 네이버 지도 콘솔(NCP)에 릴리즈 번들ID/패키지명 등록
-- [ ] 도로명주소 API 키 운영용인지 확인
+- [x] 도로명주소 API 키 운영용인지 확인
 - [ ] `flutter analyze` 통과, 실기기 릴리즈 빌드 동작 확인 (지도·주소검색·사진첨부·DB 저장)
 - [x] 디버그 로그/테스트 데이터 제거 (`kDebugMode` 가드 확인)
 - [x] `pubspec.yaml` description 수정
@@ -32,12 +32,12 @@
 ## 2. Android / Play Store
 - [x] Google Play Console 개발자 계정
 - [ ] **신규 개인 계정이면 비공개 테스트 12명 이상 × 14일 연속** 후 프로덕션 신청 가능
-- [ ] 업로드 키스토어 생성 (`keytool`) + `android/key.properties` (gitignore) + `build.gradle.kts` release signingConfig 연결
+- [x] 업로드 키스토어 생성 (`keytool`) + `android/key.properties` (gitignore) + `build.gradle.kts` release signingConfig 연결
 - [ ] 키스토어·비밀번호 백업 (분실 시 업데이트 불가)
 - [ ] Play App Signing 사용
-- [ ] **main AndroidManifest에 `INTERNET` 권한 추가**
+- [x] **main AndroidManifest에 `INTERNET` 권한 추가**
 - [x] `android:label`을 "넝쿨집사"로 변경
-- [ ] targetSdk가 Play 요구치(현재 API 35) 이상인지 확인
+- [x] targetSdk가 Play 요구치(2026.8.31부터 API 36) 이상인지 확인 — 현재 36 (매년 상향, 2027년 재확인)
 - [ ] R8 난독화 시 drift/naver map 동작 확인
 - [ ] `flutter build appbundle --release --dart-define-from-file=env.json` (.aab)
 - [ ] 스토어 등록정보: 앱 이름(30자), 간단 설명(80자), 자세한 설명, 아이콘 512×512, 그래픽 이미지 1024×500, 휴대전화 스크린샷 2장 이상
