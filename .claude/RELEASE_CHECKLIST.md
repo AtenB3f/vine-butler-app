@@ -4,8 +4,8 @@
 - [x] 앱 이름 확정: **넝쿨집사** (스토어 노출명 / 홈화면명)
 - [x] iOS `CFBundleDisplayName`(현재 "Vine Butler") → 넝쿨집사
 - [x] 버전 확정: **1.0.0(1)** (`version: 1.0.0+1`), 이후 업로드마다 빌드번호 증가
-- [ ] 앱 아이콘 교체 (1024×1024, 투명 배경 X) — iOS AppIcon / Android mipmap·adaptive icon
-- [ ] 스플래시(LaunchScreen / launch_background) 교체
+- [x] 앱 아이콘 교체 (1024×1024, 투명 배경 X) — iOS AppIcon / Android mipmap·adaptive icon
+- [x] 스플래시(LaunchScreen / launch_background) 교체
 - [ ] 개인정보처리방침 URL 준비 (양 스토어 필수, 웹페이지 호스팅)
 - [ ] 고객 지원 URL·이메일
 - [ ] 릴리즈 빌드에서 env.json 주입 확인 (`--dart-define-from-file=env.json`)

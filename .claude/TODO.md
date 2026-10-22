@@ -8,4 +8,4 @@
 - [x] iOS `PrivacyInfo.xcprivacy` 추가
 - [ ] Info.plist에 `ITSAppUsesNonExemptEncryption = NO` 추가
 - [ ] `pubspec.yaml` description 수정
-- [ ] 앱 아이콘·스플래시 교체
+- [x] 앱 아이콘 교체
