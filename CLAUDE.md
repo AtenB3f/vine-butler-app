@@ -125,6 +125,12 @@ flutter run -d [device-id]
 # API 키 주입 실행 (env.json에 NAVER_MAPS_CLIENT_ID / NAVER_MAPS_CLIENT_SECRET / JUSO_CONFM_KEY 작성, env.json은 gitignore)
 flutter run --dart-define-from-file=env.json
 
+# 개발 실행은 VS Code 실행(F5) 사용 — .vscode/launch.json에 --dart-define-from-file=env.json 포함
+
+# 스토어 업로드용 빌드 스크립트 (env.json 필수 키 검사 후 --dart-define-from-file 자동 추가, Windows 포함)
+dart run tool/build.dart ipa   # iOS .ipa
+dart run tool/build.dart aab   # Android .aab (key.properties 없으면 중단)
+
 # 릴리즈 빌드 확인
 flutter build apk --release
 flutter build ios --release
