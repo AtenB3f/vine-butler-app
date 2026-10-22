@@ -12,6 +12,13 @@ import 'package:vine_butler/features/property_detail/property_detail_vm.dart';
 import 'package:vine_butler/shared/extensions/extensions.dart';
 import 'package:vine_butler/shared/utils/utils.dart';
 
+enum _DetailMenu {
+  edit,
+  delete,
+  // export,
+  // sync,
+}
+
 class PropertyDetailScreen extends ConsumerWidget {
   final String id;
 
@@ -20,8 +27,8 @@ class PropertyDetailScreen extends ConsumerWidget {
   static final List<({_DetailMenu menu, String text, Widget Function(Color color) image})> _menuItems = [
     (menu: _DetailMenu.edit, text: '수정', image: AppIcons.editMD),
     (menu: _DetailMenu.delete, text: '삭제', image: AppIcons.trashMD),
-    (menu: _DetailMenu.export, text: '내보내기', image: AppIcons.linkMD),
-    (menu: _DetailMenu.sync, text: '동기화', image: AppIcons.reloadMD),
+    // (menu: _DetailMenu.export, text: '내보내기', image: AppIcons.linkMD),
+    // (menu: _DetailMenu.sync, text: '동기화', image: AppIcons.reloadMD),
   ];
 
   @override
@@ -443,11 +450,4 @@ class PropertyDetailScreen extends ConsumerWidget {
       _ => const ColoredBox(color: BaseColor.light),
     };
   }
-}
-
-enum _DetailMenu {
-  edit,
-  delete,
-  export,
-  sync,
 }
