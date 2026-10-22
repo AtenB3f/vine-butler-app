@@ -61,20 +61,20 @@ class HomeScreen extends ConsumerWidget {
         children: [
           AppFontStyle.header1.text('어떻게 찾아 오셨나요?', TextColor.dark),
           ImageButton(
-            image: 'Tab_Home_Enable',
+            image: 'Property_Find',
             size: const Size(240, 120),
             alignment: ContentAlignment.top,
-            spacing: 10,
+            spacing: 0,
             font: AppFontStyle.sub3,
             fontColor: TextColor.dark,
             text: '찾아요',
             onTap: () => ref.read(homeVMProvider.notifier).action(HomeViewAction.find),
           ),
           ImageButton(
-            image: 'Tab_Home_Enable',
+            image: 'Property_Apply',
             size: const Size(240, 120),
             alignment: ContentAlignment.top,
-            spacing: 10,
+            spacing: 0,
             font: AppFontStyle.sub3,
             fontColor: TextColor.dark,
             text: '맡겨요',
@@ -93,8 +93,8 @@ class HomeScreen extends ConsumerWidget {
       children: [
         AppFontStyle.header1.text('어떻게 찾아 오셨나요?', TextColor.dark),
         ImageButton(
-          image: 'Tab_Home_Enable',
-          size: const Size(120, 75),
+          image: 'Property_Find',
+          size: const Size(160, 80),
           alignment: ContentAlignment.top,
           spacing: 10,
           font: AppFontStyle.sub3,
@@ -103,8 +103,8 @@ class HomeScreen extends ConsumerWidget {
           onTap: () => ref.read(homeVMProvider.notifier).action(HomeViewAction.find),
         ),
         ImageButton(
-          image: 'Tab_Home_Enable',
-          size: const Size(120, 75),
+          image: 'Property_Apply',
+          size: const Size(160, 80),
           alignment: ContentAlignment.top,
           spacing: 10,
           font: AppFontStyle.sub3,
