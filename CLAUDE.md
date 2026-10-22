@@ -9,7 +9,7 @@
 추후 백엔드를 연동할 경우 네이버 부동산에서 검색한 내용을 크롤링한 데이터도 표기 가능하도록 할 예정.
 
 - **타겟 플랫폼**: iOS / macOS / Windows / Android
-- **최소 지원 버전**: iOS 15.0 / macOS 12.0 / Windows 10 / Android 6.0 (API 23)
+- **최소 지원 버전**: iOS 15.0 / macOS 12.0 / Windows 10 / Android 7.0 (API 24, Flutter 기본값)
 - **현재 버전**: 1.0.0
 
 ## 기술 스택
