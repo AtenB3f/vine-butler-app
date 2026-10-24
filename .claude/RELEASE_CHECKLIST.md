@@ -22,16 +22,16 @@
 - [x] `PrivacyInfo.xcprivacy` 추가 (사용 API 사유: UserDefaults, 파일 타임스탬프 등 — 플러그인 포함)
 - [x] Info.plist 권한 문구 점검 (사진 ✅, 위치 ✅ — 네이버 지도 SDK 참조로 필수, 카메라 사용 시 추가)
 - [x] 수출 규정: `ITSAppUsesNonExemptEncryption = NO`
-- [ ] 스크린샷: 6.9"(또는 6.7") iPhone 필수, iPad 지원 시 13" iPad 필수 (지원 안 하면 iPhone 전용 설정)
+- [x] 스크린샷: 6.9"(또는 6.7") iPhone 필수 (iPhone 전용 설정으로 iPad 스크린샷 불필요)
 - [x] 앱 설명·키워드·부제·카테고리(비즈니스/생산성)·연령등급 설문
 - [x] 앱 개인정보 라벨(App Privacy) 작성 — 수집 데이터 없음 (도로명주소·Geocode는 실시간 처리, NMapsMap 3.23.0 manifest 수집 항목 없음 확인)
 - [x] 심사용 메모 (로그인 없음 명시, 기능 설명)
 - [x] `flutter build ipa --release --dart-define-from-file=env.json` → Transporter/Xcode 업로드
-- [x] TestFlight 내부 테스트 → 심사 제출
+- [x] TestFlight 내부 테스트 → 심사 제출 (심사 중)
 
 ## 2. Android / Play Store
 - [x] Google Play Console 개발자 계정
-- [ ] **신규 개인 계정이면 비공개 테스트 12명 이상 × 14일 연속** 후 프로덕션 신청 가능
+- [ ] **신규 개인 계정이면 비공개 테스트 12명 이상 × 14일 연속** 후 프로덕션 신청 가능 (진행 중)
 - [x] 업로드 키스토어 생성 (`keytool`) + `android/key.properties` (gitignore) + `build.gradle.kts` release signingConfig 연결
 - [ ] 키스토어·비밀번호 백업 (분실 시 업데이트 불가)
 - [x] Play App Signing 사용
@@ -42,7 +42,7 @@
 - [x] `flutter build appbundle --release --dart-define-from-file=env.json` (.aab)
 - [x] 스토어 등록정보: 앱 이름(30자), 간단 설명(80자), 자세한 설명, 아이콘 512×512, 그래픽 이미지 1024×500, 휴대전화 스크린샷 2장 이상
 - [x] 앱 콘텐츠: 개인정보처리방침, 데이터 보안 양식, 콘텐츠 등급, 타겟 연령, 광고 포함 여부
-- [ ] 내부 테스트 → 비공개 테스트 → 프로덕션
+- [ ] 내부 테스트 → 비공개 테스트 → 프로덕션 (비공개 테스트 진행 중)
 
 ## 3. 출시 후
 - [ ] 크래시 수집 도구 도입 여부 결정 (Crashlytics/Sentry — 패키지 추가는 별도 승인)

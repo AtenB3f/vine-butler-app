@@ -8,9 +8,11 @@
 지도 SDK를 연동하여 매물 주소와 연동되어 지도로 표시 가능하도록 함.
 추후 백엔드를 연동할 경우 네이버 부동산에서 검색한 내용을 크롤링한 데이터도 표기 가능하도록 할 예정.
 
-- **타겟 플랫폼**: iOS / macOS / Windows / Android
+- **앱 이름**: 넝쿨집사 (번들 ID / 패키지명 `com.atenb.vinebutler`)
+- **타겟 플랫폼**: iOS(iPhone 전용) / macOS / Windows / Android
 - **최소 지원 버전**: iOS 15.0 / macOS 12.0 / Windows 10 / Android 7.0 (API 24, Flutter 기본값)
-- **현재 버전**: 1.0.0
+- **현재 버전**: 1.0.0+3 (스토어 업로드마다 빌드번호 증가)
+- **현재 상태**: 1.0.0 1차 릴리즈 — iOS 심사 중 / Android 비공개 테스트 중, 다음 버전 1.1.0
 
 ## 기술 스택
 
@@ -20,6 +22,12 @@
 | 라우터 | go_router + go_router_builder (typed route) | ^18.0.1 |
 | 로컬 DB | drift + drift_flutter (SQLite), drift_dev (dev) | ^2.35.2 / ^0.3.1 / ^2.35.1 |
 | UUID 생성 | uuid | ^4.6.0 |
+| 도메인 모델 | freezed_annotation, freezed (dev) | ^3.1.0 / ^4.0.2 |
+| 네트워크 | dio | ^5.11.1 |
+| 지도 | flutter_naver_map (iOS/Android), webview_flutter (macOS), webview_windows (Windows) | ^1.4.4 / ^4.14.1 / ^0.4.0 |
+| 사진 첨부·저장 | image_picker, path_provider | ^1.2.4 / ^2.1.6 |
+| 아이콘 | flutter_svg | ^2.3.0 |
+| 외부 API | 도로명주소 API(주소 검색), 네이버 Geocode API(좌표 변환) | — |
 | 백엔드 | [추후 연동] | — |
 
 Dart SDK: `^3.9.2`
@@ -32,46 +40,17 @@ Dart SDK: `^3.9.2`
 - **2단계**: 중앙 제어 로직 추가
 - **3단계**: 모듈화 및 의존성 관리 고도화
 
-## 개발 순서 (순차적 진행)
+## 로드맵
 
-**1단계: UI 컴포넌트 개발 (완료)**
-- 재사용 가능한 기본 위젯 구축 (버튼, 입력창, 카드, 바텀시트 등) — `lib/components/widgets/` 하위에 버튼, 태그, 텍스트필드, 체크박스, 라디오, 토글, 슬라이더, 툴팁, 토스트, 얼럿 다이얼로그, 바텀시트, 인디케이터, 스피너, 탭바, BND 등 구현
-- 디자인 시스템 기초 작성 — `lib/components/color.dart`(컬러), `font.dart`(타이포), `image.dart`(아이콘)에 Figma 변수/이펙트와 동기화된 토큰 정의
-
-**2단계: 뼈대 레이아웃 작성 (완료)**
-- 네비게이션 구조 구현 (go_router 설정) — `lib/core/router/app_router.dart`에 `StatefulShellRoute`(매물/홈/지도 3탭) + `TypedGoRoute` 기반 하위 라우트(찾기/등록/상세) 구성
-- 화면 전환 / 팝업 표시 로직 — ViewModel의 `navigateTo` 이벤트 필드 + View의 `ref.listen` 패턴(`home_vm.dart`/`home_screen.dart` 예시) 적용, `showAppAlertDialog`/`showAppBottomSheet`/`showAppToast` 팝업 표시 함수 구현
-- 주요 탭/페이지 뼈대 — `MainShell` + `Tabbar`로 매물/홈/지도 탭 전환 구현, 찾기·등록·상세 페이지는 뼈대만 존재 (세부 레이아웃은 3단계에서 진행)
-
-**3단계: 세부 페이지 UI 레이아웃** (API 없이 선 작업 가능)
-- 매물 리스트 페이지 (검색/필터 UI)
-- 매물 상세 페이지
-- 매물 수정 페이지
-- 매물 삭제 기능 UI
-
-**4단계: 로컬 저장 기능 추가**
-- Drift DB 연동 — `lib/data/local/` (구현 완료: `PropertyTable`, `AppDatabase`)
-- Property 모델 정의 — 도메인 모델은 Freezed, 저장용 테이블은 Drift로 분리하고 Repository 구현체에서 매핑
-- 동기화 대비 식별자·필드 포함: 기본키는 앱에서 생성한 UUID(`id`), `updatedAt`, `deletedAt`(소프트 삭제, 삭제 시 행을 지우지 않고 표시), `syncedAt`(nullable, 마지막으로 동기화된 시점의 `updatedAt` 값. `syncedAt == null || updatedAt > syncedAt`이면 동기화 필요)
-- 서버 DB 기본키는 숫자 `id`를 유지하고 앱 UUID는 `uuid` 컬럼(UNIQUE)으로 매핑됨 (백엔드 설계 기준)
-- Repository / UseCase 구현
-- Riverpod Notifier로 상태 관리
-
-**5단계: 지도 SDK 연결**
-- 지도 라이브러리 통합
-- 지도 탭 추가
-- 매물 위치 표시
-
-**6단계: 플레이스토어 배포 (1차 릴리즈)**
-- 1~5단계 완료 후 배포 진행
-
-**7단계: 백엔드 연동 (2차 릴리즈 준비)**
-- vine-butler-backend API/클라우드 세팅 완료 후 매물 정보 서버 업로드 연동
-- 기존 로컬 데이터 동기화: 동기화 필요(`syncedAt == null || updatedAt > syncedAt`)한 매물을 UUID 기준 upsert로 일괄 업로드(재시도 안전) → 성공 시 업로드한 시점의 `updatedAt` 값을 `syncedAt`에 기록, 이후 `updatedSince` 기준으로 서버 변경분(크롤링 데이터 포함)을 받아 로컬에 반영
-- 충돌 처리는 1차에서 마지막 수정(`updatedAt`) 우선
-- 로그인 기능 추가
-- 백엔드에서 크롤링한 부동산 정보(네이버 부동산 등) 반영을 위한 UI 수정
-- 완료 후 앱 업데이트 배포
+- 1.0.0: 1~5단계(UI 컴포넌트, 뼈대 레이아웃, 세부 페이지, 로컬 저장, 지도 SDK) 완료, 6단계(스토어 배포) 진행 중 — 세부는 `.claude/RELEASE_CHECKLIST.md`
+- 1.1.0: 금액 입력 컴포넌트·키보드, 사진 크게 보기, 지도 현재 위치 기준 표시·거리순 페이지네이션
+- 1.2.0: 데스크톱 UI, Windows 자동 업데이트, Windows·macOS 배포
+- 1.3.0 (데스크톱만): OCR·녹음 파일 분석으로 매물 등록, 블로그 글 AI 작성 (서버리스 프록시 + 초대 코드)
+- 2.0.0: 백엔드 연동, 회원가입·로그인, 서버 저장, 인앱결제
+- 2.1.0: 로컬 데이터 동기화
+- 2.2.0: 1.3.0 AI 기능 모바일 적용
+- 2.3.0: 마스터 권한용 크롤링 데이터 표기
+- 버전별 상세와 동기화 설계(`syncedAt`, UUID upsert, 충돌 처리)는 `.claude/docs/roadmap.md` 참고
 
 ## 프로젝트 구조
 
@@ -83,9 +62,7 @@ lib/
   core/
     router/              # go_router 설정
     di/                  # Riverpod provider (DB, Repository 구현체를 인터페이스 타입으로 노출)
-    theme/               # 앱 테마, 색상, 텍스트 스타일
-    constants/           # 전역 상수
-    network/             # dio 인스턴스, 인터셉터
+    network/             # dio 인스턴스, 인터셉터, API 키(api_env), ApiException
   domain/                # 순수 Dart (Drift/Flutter 의존 금지)
     model/               # 도메인 모델(Freezed)
     repository/          # Repository 인터페이스
@@ -94,15 +71,21 @@ lib/
     local/
       app_database.dart  # Drift DB
       tables/            # Drift 테이블 정의
-    mapper/              # Drift Row <-> 도메인 모델
+    remote/              # 외부 API (juso: 도로명주소, naver: Geocode) + dto
+    storage/             # 이미지 파일 저장 구현체
+    mapper/              # Drift Row / DTO <-> 도메인 모델
     repository/          # Repository 구현체
   features/
-    apply_property/ property_list/ property_detail/ map/ ...
-      presentation/      # 화면, ViewState, VM (domain 인터페이스만 참조)
-  components/
+    apply_property/ edit_property/ find_property/ home/ map/ property_detail/ property_list/
+      <기능>_vm.dart     # Notifier + Action
+      presentation/      # ViewState, screens/ (domain 인터페이스만 참조)
+  components/            # 디자인 토큰(color/font/image), MainShell, 반응형 유틸
     widgets/             # 공통 재사용 위젯
   shared/
-    utils/               # 유틸 함수
+    extensions/          # 가격·전화번호·매물 유형 등 확장
+    utils/               # 유틸 함수 (주소·면적·날짜 포맷터 등)
+tool/
+  build.dart             # 스토어 업로드용 빌드 스크립트
 ```
 
 ### 레이어 의존성 규칙
@@ -153,121 +136,10 @@ dart run build_runner build --delete-conflicting-outputs
 
 ## 코딩 규칙
 
-### 파일 / 네이밍
-- 파일명: `snake_case.dart`
-- 클래스명: `PascalCase`
-- 변수·함수명: `camelCase`
-- 상수: `camelCase` (Dart 관례 따름, `SCREAMING_SNAKE` 사용 안 함)
-
-### 상수·변수 위치
-- 클래스 안 **두 곳 이상의 메서드에서 함께 쓰는 값만** 클래스 필드(`static const`/`static final` 등)로 꺼냄
-- 한 메서드에서만 쓰는 값(정규식, 코드 집합, 메시지 등)은 그 메서드의 지역변수로 작성
-  - 예: `_filterKeyword`에서만 쓰는 `RegExp` → 함수 안 `final blockedCharacters`, `search()`·`_handleError()`가 함께 쓰는 `_emptyPage` → 클래스 필드
-
-### if문
-- 본문이 문장 하나면 한 줄로 쓰고 중괄호는 유지 (`if (x) return;`처럼 중괄호 생략 금지)
-  - 줄이 길어져도 한 줄 유지
-- 본문이 두 문장 이상이면 여러 줄로 작성
-- 한 줄 if 앞뒤에는 빈 줄을 둬서 다른 로직과 구분
-  - 연속된 guard는 빈 줄 없이 묶음, 블록 마지막 줄이면 뒤 빈 줄 생략
-- `dart format`은 한 줄 블록을 여러 줄로 펼치므로 파일 전체에 실행하지 않음
-
-```dart
-final keyword = _filterKeyword(query);
-
-if (keyword.isEmpty) { return _emptyPage; }
-
-final response = await _jusoApi.search(keyword: keyword, page: page);
-
-if (!response.isOk) { throw ApiException.badRequest(response.errorMessage); }
-if (response.addresses.isEmpty) { return null; }
-
-return ...;
-```
-
-### 개행
-- switch문(`case X:` 형태)은 case 블록 사이마다 빈 줄을 둠
-  - `case A:` 바로 아래 `case B:`가 붙는 fall-through 묶음, `switch (...) {` 바로 다음 첫 case는 예외
-  - switch 식(`=>` 화살표 형태)은 해당 없음
-- 지역 변수 선언 뒤 다른 코드가 오기 전에 빈 줄을 둠
-  - 연속된 선언은 빈 줄 없이 한 묶음 (`final address` / `final latitude` / `final longitude`)
-  - 블록 마지막(`}` 바로 앞)이면 생략
-
-```dart
-switch (action) {
-  case _ToggleFurniture(:final option):
-    final options = {...state.furnitureOptions};
-
-    if (!options.remove(option)) { options.add(option); }
-
-    state = state.copyWith(furnitureOptions: options);
-
-  case _Save():
-    final mockPropertyId = ref.read(propertyListVMProvider).items.length;
-
-    ref.read(propertyListEventVMProvider.notifier).action(PropertyListEventAction.register(mockPropertyId));
-    state = state.copyWith(navigateTo: () => const PropertyListRoute().location);
-
-  case _PopNavigation():
-    state = state.copyWith(navigateTo: () => null);
-}
-```
-
-### 위젯
-- 기본은 `StatelessWidget`, 상태가 필요하면 `ConsumerWidget` 사용
-- `StatefulWidget` + `setState`는 순수 UI 로컬 상태(애니메이션, 포커스)에만 허용
-- 위젯 파일 하나에 public 위젯 하나를 원칙으로 함
-
-### 상태관리 (Riverpod)
-- 비즈니스 로직은 반드시 Provider 안에 둠 (위젯에 직접 쓰지 않음)
-- `ref.watch`는 빌드에, `ref.read`는 이벤트 핸들러에 사용
-- 전역 상태는 `NotifierProvider` / `AsyncNotifierProvider` 우선
-
-### 네비게이션
-- 네비게이션 실행(`context.push`/`pop`/`go`)은 항상 View(위젯)에서 함 — ViewModel이 라우터를
-  직접 호출하지 않음
-- API 응답 등 비즈니스 로직 결과에 따라 이동해야 할 때: ViewState에 일회성 이벤트 필드(예:
-  `navigateTo`)를 두고, View의 `build()`에서 `ref.listen`으로 감지해 이동 실행
-  ("UI State vs UI Event" 패턴)
-- `ref.watch`는 렌더링용, `ref.listen`은 네비게이션/스낵바/다이얼로그 같은 1회성
-  부수효과(side effect)용으로 구분해서 사용
-- 이벤트 필드는 소비 후 반드시 리셋할 것 (특히 Freezed 등 값 동등성을 쓰는 상태에서 동일
-  이벤트가 연달아 발생해도 다시 감지되게 하기 위함)
-- 탭 전환/탭 루트 복귀처럼 화면 구조 자체에 종속된 네비게이션은 View 레이어에 남기고, 이
-  패턴은 비즈니스 로직이 결정하는 네비게이션에만 적용
-
-### 라우팅 전략 (go_router)
-- id 같은 리소스 식별자는 path parameter로 전달 (`extra`는 이미 메모리에 있는 객체를 재직렬화
-  없이 그대로 넘길 때만 사용)
-- `build_runner` + `go_router_builder`(`GoRouteData`/`@TypedGoRoute`) 기반 typed route로
-  전체 라우트를 통일해서 사용 중 (`lib/core/router/app_router.dart` + 생성된
-  `app_router.g.dart`) — 문자열 기반 `GoRoute`/`context.push('/path')`는 사용하지 않음
-- 새 라우트 추가 시에도 `GoRouteData` 서브클래스 + `@TypedGoRoute`로 정의하고
-  `dart run build_runner build --delete-conflicting-outputs`로 코드 생성할 것
-- ViewModel에서 네비게이션 이벤트로 경로를 넘길 때도(`navigateTo` 필드) 리터럴 문자열 대신
-  해당 라우트의 `.location`을 사용 (예: `FindPropertyRoute().location`)
-
-### 주석
-- 함수 안에서 코드 한 줄 한 줄이 무엇을 하는지 설명하는 주석은 쓰지 않음 (이름으로 충분함)
-- 코드만 봐서는 의미를 알 수 없는 값(외부 API 오류 코드, 매직 넘버, 외부 규격·제약 등)은 함수/클래스 위에 `///` 문서 주석으로 설명
-- 작성 형식
-  - 첫 줄: 대상을 명사형 한 줄로 (마침표 없음). 예: `/// 도로명주소 API의 errorCode 처리 함수`
-  - 다음 줄은 빈 `///`
-  - 값 목록은 `` /// - `값`: 짧은 의미 `` 형태, 값 순서대로 정렬, 마침표 없음
-  - 출처·조건 같은 보충은 같은 줄 괄호 안에 씀. 예: `(좌표제공 API 문서 기준)`
-  - 코드로 읽을 수 있는 처리 방식(어떤 예외를 던지는지 등)은 주석에 반복하지 않음
-
-```dart
-/// 도로명주소 API의 errorCode 처리 함수
-///
-/// - `E0001`: 승인되지 않은 키
-/// - `E0005`: 검색어가 입력되지 않음
-/// - `E0007`: 짧은 시간에 요청이 몰림 (좌표제공 API 문서 기준)
-/// - `-999`: 시스템 에러
-```
-
-### 기타
-- UI 작업 패턴(레이아웃, 컴포넌트, VM Action, 네비게이션 등)은 `.claude/ui_patterns.md` 참고
+Dart 코드를 작성·수정하기 전에 아래 문서를 확인할 것 (해당 경로 파일을 다룰 때 자동 로드되지만, 새 파일만 만들 때는 직접 읽기)
+- `.claude/rules/dart-style.md`: 파일/네이밍, 상수·변수 위치, if문, 개행, 주석
+- `.claude/rules/presentation.md`: 위젯, 상태관리(Riverpod), 네비게이션, 라우팅(go_router)
+- `.claude/ui_patterns.md`: UI 작업 패턴 (레이아웃, 컴포넌트, VM Action, 네비게이션)
 
 ## Claude에게 주는 지침
 
@@ -278,7 +150,7 @@ switch (action) {
 
 ### 하지 말아야 할 것
 - 요청하지 않은 기능 추가 / 리팩터링 금지
-- 함수 안 코드 한 줄씩 설명하는 주석 금지 (작성 기준은 "코딩 규칙 > 주석" 참고)
+- 함수 안 코드 한 줄씩 설명하는 주석 금지 (작성 기준은 `.claude/rules/dart-style.md`의 "주석" 참고)
 - `// TODO`, `// FIXME` 남기고 작업 마무리 금지
 
 ### 응답 스타일
