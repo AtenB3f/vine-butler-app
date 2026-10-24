@@ -35,6 +35,8 @@ export 'widgets/image_page/app_image_page.dart';
 export 'widgets/image_page/app_image_page_view_state.dart';
 export 'widgets/indicator/app_indicator.dart';
 export 'widgets/indicator/app_indicator_view_state.dart';
+export 'widgets/keypad/price_keypad.dart';
+export 'widgets/keypad/price_keypad_view_state.dart';
 export 'widgets/radio/app_radio.dart';
 export 'widgets/radio/app_radio_view_state.dart';
 export 'widgets/slider/app_slider.dart';
