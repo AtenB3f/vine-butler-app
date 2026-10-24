@@ -23,6 +23,7 @@ enum _PriceKey {
 /// 금액 입력 키패드
 ///
 /// - `만`·`억` 입력 시 앞서 입력된 값에 단위를 곱하고 이후 입력되는 값을 더함
+/// - `만`·`억` 직후(입력 중 숫자가 없을 때) `0`·`00`·`,000`은 전체 금액에 곱함
 /// - remove 시 입력된 가장 마지막 숫자를 지움
 class PriceKeypad extends StatefulWidget {
   /// 입력할 수 있는 최대 금액 (10,000억)
@@ -191,6 +192,7 @@ class _PriceKeypadState extends State<PriceKeypad> {
   }
 
   (int, int)? _append(int multiplier, int digit) {
+    if (_pending == 0 && digit == 0) { return _multiplyCommitted(multiplier); }
     if (_pending > (PriceKeypad.maxValue - _committed) ~/ multiplier) { return null; }
 
     final pending = _pending * multiplier + digit;
@@ -198,6 +200,12 @@ class _PriceKeypadState extends State<PriceKeypad> {
     if (_committed + pending > PriceKeypad.maxValue) { return null; }
 
     return (_committed, pending);
+  }
+
+  (int, int)? _multiplyCommitted(int multiplier) {
+    if (_committed > PriceKeypad.maxValue ~/ multiplier) { return null; }
+
+    return (_committed * multiplier, 0);
   }
 
   (int, int)? _addUnit(int unit) {

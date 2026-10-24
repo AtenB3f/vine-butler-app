@@ -60,6 +60,17 @@ void main() {
     expect(await tapKeys(tester, 0, ['1', '2', '억', '만']), [1, 12, 1200000000]);
   });
 
+  testWidgets('단위 직후 0·00·,000은 전체 금액에 곱한다', (tester) async {
+    expect((await tapKeys(tester, 0, ['1', '억', '0'])).last, 1000000000);
+    expect((await tapKeys(tester, 0, ['1', '억', ',000'])).last, 100000000000);
+    expect((await tapKeys(tester, 0, ['5', '만', '00'])).last, 5000000);
+    expect((await tapKeys(tester, 0, ['1', '2', '억', '3', ',000', '만', '0'])).last, 12300000000);
+  });
+
+  testWidgets('칸을 막 열었을 때 0은 기존 금액에 곱한다', (tester) async {
+    expect(await tapKeys(tester, 80000, ['0']), [800000]);
+  });
+
   testWidgets('같은 단위를 다시 쓰면 더한다', (tester) async {
     expect((await tapKeys(tester, 0, ['3', '억', '2', '억'])).last, 500000000);
   });
