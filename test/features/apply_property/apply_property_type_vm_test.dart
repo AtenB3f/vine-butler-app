@@ -12,6 +12,7 @@ void main() {
 
   setUp(() {
     container = ProviderContainer();
+    container.listen(applyPropertyTypeVMProvider, (_, _) {});
     action(const ApplyPropertyTypeAction.selectTransactionType(PropertyTransactionType.rent));
   });
 
@@ -78,5 +79,22 @@ void main() {
 
       expect(state().editingField, isNull);
     });
+  });
+
+  test('구독하는 화면이 없어지면 처음 상태로 돌아간다', () async {
+    final fresh = ProviderContainer();
+    final subscription = fresh.listen(applyPropertyTypeVMProvider, (_, _) {});
+
+    fresh.read(applyPropertyTypeVMProvider.notifier)
+      ..action(const ApplyPropertyTypeAction.selectTransactionType(PropertyTransactionType.buy))
+      ..action(const ApplyPropertyTypeAction.changePrice(300000000));
+    subscription.close();
+    await Future<void>.delayed(Duration.zero);
+
+    final reopened = fresh.read(applyPropertyTypeVMProvider);
+
+    expect(reopened.transactionType, isNull);
+    expect(reopened.price, 0);
+    fresh.dispose();
   });
 }

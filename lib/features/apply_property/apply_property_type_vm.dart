@@ -4,7 +4,7 @@ import 'package:vine_butler/domain/property_type.dart';
 import 'package:vine_butler/features/apply_property/presentation/apply_property_type_view_state.dart';
 import 'package:vine_butler/features/property_list/presentation/property_filter_view_state.dart';
 
-final applyPropertyTypeVMProvider = NotifierProvider<ApplyPropertyTypeVM, ApplyPropertyTypeViewState>(ApplyPropertyTypeVM.new);
+final applyPropertyTypeVMProvider = NotifierProvider.autoDispose<ApplyPropertyTypeVM, ApplyPropertyTypeViewState>(ApplyPropertyTypeVM.new);
 
 sealed class ApplyPropertyTypeAction {
   const ApplyPropertyTypeAction();

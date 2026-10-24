@@ -3,7 +3,7 @@ import 'package:vine_butler/core/router/app_router.dart';
 import 'package:vine_butler/features/apply_property/presentation/apply_property_owner_view_state.dart';
 
 final applyPropertyOwnerVMProvider =
-    NotifierProvider<ApplyPropertyOwnerVM, ApplyPropertyOwnerViewState>(ApplyPropertyOwnerVM.new);
+    NotifierProvider.autoDispose<ApplyPropertyOwnerVM, ApplyPropertyOwnerViewState>(ApplyPropertyOwnerVM.new);
 
 sealed class ApplyPropertyOwnerAction {
   const ApplyPropertyOwnerAction();

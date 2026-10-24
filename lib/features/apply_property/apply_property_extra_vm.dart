@@ -10,7 +10,7 @@ import 'package:vine_butler/features/apply_property/presentation/apply_property_
 import 'package:vine_butler/features/property_list/property_list_event_vm.dart';
 
 final applyPropertyExtraVMProvider =
-    NotifierProvider<ApplyPropertyExtraVM, ApplyPropertyExtraViewState>(ApplyPropertyExtraVM.new);
+    NotifierProvider.autoDispose<ApplyPropertyExtraVM, ApplyPropertyExtraViewState>(ApplyPropertyExtraVM.new);
 
 sealed class ApplyPropertyExtraAction {
   const ApplyPropertyExtraAction();

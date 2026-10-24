@@ -27,14 +27,6 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
     for (final MapEntry(key: field, value: node) in _focusNodes.entries) {
       node.addListener(() => _onFocus(field, node.hasFocus));
     }
-    WidgetsBinding.instance.addPostFrameCallback((_) => _restoreFocus());
-  }
-
-  /// provider가 화면보다 오래 유지되므로 다시 들어왔을 때 입력 중이던 칸에 포커스를 되돌림
-  void _restoreFocus() {
-    final field = ref.read(applyPropertyTypeVMProvider).editingField;
-
-    if (field != null) { _focusNodes[field]?.requestFocus(); }
   }
 
   @override
