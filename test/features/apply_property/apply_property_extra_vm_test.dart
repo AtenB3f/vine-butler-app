@@ -78,6 +78,7 @@ void main() {
     type.action(const ApplyPropertyTypeAction.selectPropertyType(PropertyTypeFilterOption.singleMulti));
     type.action(const ApplyPropertyTypeAction.changePrice(10000000));
     type.action(const ApplyPropertyTypeAction.changeMonthlyRent(500000));
+    type.action(const ApplyPropertyTypeAction.changeMaintenanceCost(100000));
     address.action(ApplyPropertyAddressAction.select(AddressResultViewState.fromDomain(_candidate)));
     await Future<void>.delayed(Duration.zero);
     address.action(const ApplyPropertyAddressAction.inputDetail(' 202호 '));

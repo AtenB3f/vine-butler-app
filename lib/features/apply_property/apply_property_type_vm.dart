@@ -93,13 +93,9 @@ class ApplyPropertyTypeVM extends Notifier<ApplyPropertyTypeViewState> {
           transactionType: () => state.transactionType == type ? null : type,
         );
 
-        final isInRange = selected.price >= selected.minPrice && selected.price <= selected.maxPrice;
         final isEditingHiddenField = selected.editingField == ApplyPropertyPriceField.monthlyRent && !selected.isMonthlyRentVisible;
 
-        state = selected.copyWith(
-          price: isInRange ? null : selected.midPrice,
-          editingField: isEditingHiddenField ? () => null : null,
-        );
+        state = isEditingHiddenField ? selected.copyWith(editingField: () => null) : selected;
 
       case _SelectPropertyType(:final option):
         state = state.copyWith(

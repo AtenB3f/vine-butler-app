@@ -17,86 +17,32 @@ void main() {
 
   tearDown(() => container.dispose());
 
-  group('금액', () {
-    test('최대보다 큰 값도 입력한 그대로 둔다', () {
-      action(ApplyPropertyTypeAction.changePrice(state().maxPrice + 1));
-
-      expect(state().price, state().maxPrice + 1);
-    });
-
-    test('최소보다 작은 값도 입력한 그대로 둔다', () {
-      action(ApplyPropertyTypeAction.changePrice(state().minPrice - 1));
-
-      expect(state().price, state().minPrice - 1);
-    });
-
-    test('범위 안이면 입력한 값 그대로 둔다', () {
-      action(const ApplyPropertyTypeAction.changePrice(123456789));
-
-      expect(state().price, 123456789);
-    });
+  test('금액·월세·관리비는 0원에서 시작한다', () {
+    expect(state().price, 0);
+    expect(state().monthlyRent, 0);
+    expect(state().maintenanceCost, 0);
   });
 
-  group('월세', () {
-    test('최대보다 큰 값도 입력한 그대로 둔다', () {
-      action(const ApplyPropertyTypeAction.changeMonthlyRent(ApplyPropertyTypeViewState.maxMonthlyRent + 1));
+  test('입력한 금액·월세·관리비를 그대로 둔다', () {
+    action(const ApplyPropertyTypeAction.changePrice(123456789));
+    action(const ApplyPropertyTypeAction.changeMonthlyRent(555555));
+    action(const ApplyPropertyTypeAction.changeMaintenanceCost(70000));
 
-      expect(state().monthlyRent, ApplyPropertyTypeViewState.maxMonthlyRent + 1);
-    });
-
-    test('최소보다 작은 값도 입력한 그대로 둔다', () {
-      action(const ApplyPropertyTypeAction.changeMonthlyRent(0));
-
-      expect(state().monthlyRent, 0);
-    });
-
-    test('범위 안이면 입력한 값 그대로 둔다', () {
-      action(const ApplyPropertyTypeAction.changeMonthlyRent(555555));
-
-      expect(state().monthlyRent, 555555);
-    });
+    expect(state().price, 123456789);
+    expect(state().monthlyRent, 555555);
+    expect(state().maintenanceCost, 70000);
   });
 
-  group('거래 유형 전환', () {
-    test('입력한 금액이 새 범위 안이면 그대로 둔다', () {
-      action(const ApplyPropertyTypeAction.changePrice(300000000));
+  test('거래 유형을 바꿔도 입력한 금액·월세·관리비를 유지한다', () {
+    action(const ApplyPropertyTypeAction.changePrice(50000000));
+    action(const ApplyPropertyTypeAction.changeMonthlyRent(500000));
+    action(const ApplyPropertyTypeAction.changeMaintenanceCost(150000));
 
-      action(const ApplyPropertyTypeAction.selectTransactionType(PropertyTransactionType.depositOnly));
+    action(const ApplyPropertyTypeAction.selectTransactionType(PropertyTransactionType.buy));
 
-      expect(state().price, 300000000);
-    });
-
-    test('입력한 금액이 새 범위 밖이면 새 범위의 중간값으로 바꾼다', () {
-      action(const ApplyPropertyTypeAction.changePrice(50000000));
-
-      action(const ApplyPropertyTypeAction.selectTransactionType(PropertyTransactionType.buy));
-
-      expect(state().price, state().midPrice);
-    });
-  });
-
-  group('관리비', () {
-    test('기본값은 10만원이다', () {
-      expect(state().maintenanceCost, 100000);
-    });
-
-    test('0원과 범위 밖 값도 입력한 그대로 둔다', () {
-      action(const ApplyPropertyTypeAction.changeMaintenanceCost(0));
-
-      expect(state().maintenanceCost, 0);
-
-      action(const ApplyPropertyTypeAction.changeMaintenanceCost(ApplyPropertyTypeViewState.maxMaintenanceCost + 1));
-
-      expect(state().maintenanceCost, ApplyPropertyTypeViewState.maxMaintenanceCost + 1);
-    });
-
-    test('거래 유형을 바꿔도 유지한다', () {
-      action(const ApplyPropertyTypeAction.changeMaintenanceCost(150000));
-
-      action(const ApplyPropertyTypeAction.selectTransactionType(PropertyTransactionType.buy));
-
-      expect(state().maintenanceCost, 150000);
-    });
+    expect(state().price, 50000000);
+    expect(state().monthlyRent, 500000);
+    expect(state().maintenanceCost, 150000);
   });
 
   group('금액 입력 칸', () {

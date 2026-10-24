@@ -1,6 +1,5 @@
 import 'package:vine_butler/domain/property_type.dart';
 import 'package:vine_butler/features/property_list/presentation/property_filter_view_state.dart';
-import 'package:vine_butler/shared/extensions/extensions.dart';
 
 enum ApplyPropertyPriceField {
   price,
@@ -9,15 +8,6 @@ enum ApplyPropertyPriceField {
 }
 
 class ApplyPropertyTypeViewState {
-  static const double priceDistance = 1000000;
-  static const double minMonthlyRent = 10000;
-  static const double maxMonthlyRent = 1500000;
-  static const double monthlyRentDistance = 10000;
-  static const double minMaintenanceCost = 0;
-  static const double maxMaintenanceCost = 500000;
-  static const double maintenanceCostDistance = 10000;
-  static const double defaultMaintenanceCost = 100000;
-
   final PropertyTransactionType? transactionType;
   final PropertyTypeFilterOption? propertyType;
   final double price;
@@ -29,24 +19,14 @@ class ApplyPropertyTypeViewState {
   const ApplyPropertyTypeViewState({
     this.transactionType,
     this.propertyType,
-    required this.price,
-    required this.monthlyRent,
-    this.maintenanceCost = defaultMaintenanceCost,
+    this.price = 0,
+    this.monthlyRent = 0,
+    this.maintenanceCost = 0,
     this.editingField,
     this.navigateTo,
   });
 
-  factory ApplyPropertyTypeViewState.initial() {
-    const empty = ApplyPropertyTypeViewState(price: 0, monthlyRent: 0);
-
-    return empty.copyWith(
-      price: empty.midPrice,
-      monthlyRent: minMonthlyRent +
-          ((maxMonthlyRent - minMonthlyRent) / 2 / monthlyRentDistance).floor() * monthlyRentDistance,
-    );
-  }
-
-  double get midPrice => minPrice + ((maxPrice - minPrice) / 2 / priceDistance).floor() * priceDistance;
+  factory ApplyPropertyTypeViewState.initial() => const ApplyPropertyTypeViewState();
 
   bool get isMonthlyRentVisible => transactionType == PropertyTransactionType.rent;
 
@@ -77,10 +57,6 @@ class ApplyPropertyTypeViewState {
         return '금액';
     }
   }
-
-  double get minPrice => transactionType?.minPrice ?? 0;
-
-  double get maxPrice => transactionType?.maxPrice ?? PropertyTransactionType.buy.maxPrice;
 
   ApplyPropertyTypeViewState copyWith({
     PropertyTransactionType? Function()? transactionType,

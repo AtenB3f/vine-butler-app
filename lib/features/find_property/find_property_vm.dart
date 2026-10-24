@@ -76,11 +76,9 @@ class FindPropertyVM extends Notifier<FindPropertyViewState> {
   void action(FindPropertyAction action) {
     switch (action) {
       case _SelectTransactionType(:final type):
-        final selected = state.copyWith(
+        state = state.copyWith(
           transactionType: () => state.transactionType == type ? null : type,
         );
-
-        state = selected.copyWith(price: selected.midPrice);
 
       case _TogglePropertyType(:final option):
         final isSelected = state.propertyTypes.containsAll(option.types);
