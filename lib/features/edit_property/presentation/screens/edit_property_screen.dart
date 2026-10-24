@@ -79,27 +79,55 @@ class _EditPropertyFormState extends ConsumerState<_EditPropertyForm> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(editPropertyVMProvider(widget.id));
+    final editingField = state.editingField;
 
-    return AppKeyboardScrollView(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
-      focusedKey: _focusedKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 40,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 16,
-            children: [
-              _address(state),
-              EditPropertyImages(id: widget.id),
-            ],
+    return Column(
+      children: [
+        Expanded(
+          child: AppKeyboardScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
+            focusedKey: _focusedKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 40,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 16,
+                  children: [
+                    _address(state),
+                    EditPropertyImages(id: widget.id),
+                  ],
+                ),
+                EditPropertyDeal(id: widget.id, onFocus: _focus),
+                EditPropertyOwner(id: widget.id, onFocus: _focus),
+                EditPropertyOptions(id: widget.id, onFocus: _focus),
+              ],
+            ),
           ),
-          EditPropertyDeal(id: widget.id),
-          EditPropertyOwner(id: widget.id, onFocus: _focus),
-          EditPropertyOptions(id: widget.id, onFocus: _focus),
-        ],
-      ),
+        ),
+        PriceKeypad.animated(keypad: editingField == null ? null : _keypad(state, editingField)),
+      ],
+    );
+  }
+
+  PriceKeypad _keypad(EditPropertyViewState state, EditPropertyPriceField field) {
+    final viewModel = ref.read(editPropertyVMProvider(widget.id).notifier);
+    final amount = switch (field) {
+      EditPropertyPriceField.price => state.price,
+      EditPropertyPriceField.monthlyRent => state.monthlyRent,
+      EditPropertyPriceField.maintenanceCost => state.maintenanceCost,
+    };
+
+    return PriceKeypad(
+      key: ValueKey(field),
+      viewState: PriceKeypadViewState(value: amount.toInt()),
+      onChanged: (value) => viewModel.action(switch (field) {
+        EditPropertyPriceField.price => EditPropertyAction.changePrice(value.toDouble()),
+        EditPropertyPriceField.monthlyRent => EditPropertyAction.changeMonthlyRent(value.toDouble()),
+        EditPropertyPriceField.maintenanceCost => EditPropertyAction.changeMaintenanceCost(value.toDouble()),
+      }),
+      onConfirm: () => viewModel.action(const EditPropertyAction.nextField()),
     );
   }
 

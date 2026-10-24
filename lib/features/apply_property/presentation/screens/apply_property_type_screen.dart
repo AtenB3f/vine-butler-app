@@ -14,51 +14,49 @@ class ApplyPropertyTypeScreen extends ConsumerStatefulWidget {
 }
 
 class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScreen> {
-  late final ValueNotifier<double> _priceController;
-  late final ValueNotifier<double> _monthlyRentController;
-  late final TextEditingController _priceTextController;
-  late final TextEditingController _monthlyRentTextController;
-  late final ValueNotifier<double> _maintenanceCostController;
-  late final TextEditingController _maintenanceCostTextController;
-  bool _isPriceEditing = false;
-  bool _isMonthlyRentEditing = false;
-  bool _isMaintenanceCostEditing = false;
+  final Map<ApplyPropertyPriceField, FocusNode> _focusNodes = {
+    for (final field in ApplyPropertyPriceField.values) field: FocusNode(),
+  };
 
   ApplyPropertyTypeVM get _viewModel => ref.read(applyPropertyTypeVMProvider.notifier);
 
   @override
   void initState() {
     super.initState();
-    final state = ref.read(applyPropertyTypeVMProvider);
 
-    _priceController = ValueNotifier(state.price)
-      ..addListener(() => _viewModel.action(ApplyPropertyTypeAction.changePrice(_priceController.value)));
-    _monthlyRentController = ValueNotifier(state.monthlyRent)
-      ..addListener(() => _viewModel.action(ApplyPropertyTypeAction.changeMonthlyRent(_monthlyRentController.value)));
-    _priceTextController = TextEditingController(text: state.price.formattedKRW);
-    _monthlyRentTextController = TextEditingController(text: state.monthlyRent.formattedKRW);
-    _maintenanceCostController = ValueNotifier(state.maintenanceCost)
-      ..addListener(() => _viewModel.action(ApplyPropertyTypeAction.changeMaintenanceCost(_maintenanceCostController.value)));
-    _maintenanceCostTextController = TextEditingController(text: _maintenanceCostText(state.maintenanceCost));
+    for (final MapEntry(key: field, value: node) in _focusNodes.entries) {
+      node.addListener(() => _onFocus(field, node.hasFocus));
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) => _restoreFocus());
+  }
+
+  /// provider가 화면보다 오래 유지되므로 다시 들어왔을 때 입력 중이던 칸에 포커스를 되돌림
+  void _restoreFocus() {
+    final field = ref.read(applyPropertyTypeVMProvider).editingField;
+
+    if (field != null) { _focusNodes[field]?.requestFocus(); }
   }
 
   @override
   void dispose() {
-    _priceController.dispose();
-    _monthlyRentController.dispose();
-    _priceTextController.dispose();
-    _monthlyRentTextController.dispose();
-    _maintenanceCostController.dispose();
-    _maintenanceCostTextController.dispose();
+    for (final node in _focusNodes.values) {
+      node.dispose();
+    }
     super.dispose();
   }
 
-  String _maintenanceCostText(double value) => value == 0 ? '관리비 없음' : value.formattedKRW;
+  void _onFocus(ApplyPropertyPriceField field, bool hasFocus) {
+    if (hasFocus) { return _viewModel.action(ApplyPropertyTypeAction.edit(field)); }
+    if (_focusNodes.values.any((node) => node.hasFocus)) { return; }
+
+    _viewModel.action(const ApplyPropertyTypeAction.edit(null));
+  }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(applyPropertyTypeVMProvider);
     final viewModel = ref.read(applyPropertyTypeVMProvider.notifier);
+    final editingField = state.editingField;
 
     ref.handleEvent(
       applyPropertyTypeVMProvider.select((state) => state.navigateTo),
@@ -66,19 +64,11 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
       onEvent: (location) => context.push(location),
     );
 
-    ref.listen(applyPropertyTypeVMProvider.select((state) => state.price), (_, price) {
-      if (_priceController.value != price) { _priceController.value = price; }
-      if (!_isPriceEditing) { _priceTextController.text = price.formattedKRW; }
-    });
-
-    ref.listen(applyPropertyTypeVMProvider.select((state) => state.monthlyRent), (_, monthlyRent) {
-      if (_monthlyRentController.value != monthlyRent) { _monthlyRentController.value = monthlyRent; }
-      if (!_isMonthlyRentEditing) { _monthlyRentTextController.text = monthlyRent.formattedKRW; }
-    });
-
-    ref.listen(applyPropertyTypeVMProvider.select((state) => state.maintenanceCost), (_, maintenanceCost) {
-      if (_maintenanceCostController.value != maintenanceCost) { _maintenanceCostController.value = maintenanceCost; }
-      if (!_isMaintenanceCostEditing) { _maintenanceCostTextController.text = _maintenanceCostText(maintenanceCost); }
+    ref.listen(applyPropertyTypeVMProvider.select((state) => state.editingField), (_, field) {
+      for (final MapEntry(key: nodeField, value: node) in _focusNodes.entries) {
+        if (nodeField == field && !node.hasFocus) { node.requestFocus(); }
+        if (field == null && node.hasFocus) { node.unfocus(); }
+      }
     });
 
     return AppScaffold(
@@ -102,7 +92,10 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
               ),
             ),
           ),
-          _nextButton(state, viewModel),
+          PriceKeypad.animated(
+            keypad: editingField == null ? null : _keypad(state, viewModel, editingField),
+            placeholder: _nextButton(state, viewModel),
+          ),
         ],
       ),
     );
@@ -171,133 +164,83 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
 
   Widget _price(ApplyPropertyTypeViewState state, ApplyPropertyTypeVM viewModel) {
     return Column(
-      spacing: 16,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 20,
       children: [
-        _slider(
-          label: state.priceLabel,
-          viewState: AppSliderViewState(
-            size: AppSliderSize.medium,
-            min: state.minPrice,
-            max: state.maxPrice,
-            distance: ApplyPropertyTypeViewState.priceDistance,
-          ),
-          controller: _priceController,
-          textController: _priceTextController,
-          onFocus: (hasFocus) {
-            _isPriceEditing = hasFocus;
-            _onAmountFocus(
-              hasFocus: hasFocus,
-              textController: _priceTextController,
-              value: () => ref.read(applyPropertyTypeVMProvider).price,
-              apply: (amount) => viewModel.action(ApplyPropertyTypeAction.changePrice(amount)),
-              format: (value) => value.formattedKRW,
-            );
-          },
+        _amountField(
+          state: state,
+          field: ApplyPropertyPriceField.price,
+          title: state.priceLabel,
+          amount: state.price,
+          onClear: () => viewModel.action(const ApplyPropertyTypeAction.changePrice(0)),
         ),
         if (state.isMonthlyRentVisible)
-          _slider(
-            label: '월세',
-            viewState: const AppSliderViewState(
-              size: AppSliderSize.medium,
-              min: ApplyPropertyTypeViewState.minMonthlyRent,
-              max: ApplyPropertyTypeViewState.maxMonthlyRent,
-              distance: ApplyPropertyTypeViewState.monthlyRentDistance,
-            ),
-            controller: _monthlyRentController,
-            textController: _monthlyRentTextController,
-            onFocus: (hasFocus) {
-              _isMonthlyRentEditing = hasFocus;
-              _onAmountFocus(
-                hasFocus: hasFocus,
-                textController: _monthlyRentTextController,
-                value: () => ref.read(applyPropertyTypeVMProvider).monthlyRent,
-                apply: (amount) => viewModel.action(ApplyPropertyTypeAction.changeMonthlyRent(amount)),
-                format: (value) => value.formattedKRW,
-              );
-            },
+          _amountField(
+            state: state,
+            field: ApplyPropertyPriceField.monthlyRent,
+            title: '월세',
+            amount: state.monthlyRent,
+            onClear: () => viewModel.action(const ApplyPropertyTypeAction.changeMonthlyRent(0)),
           ),
-        _slider(
-          label: '관리비',
-          viewState: const AppSliderViewState(
-            size: AppSliderSize.medium,
-            min: ApplyPropertyTypeViewState.minMaintenanceCost,
-            max: ApplyPropertyTypeViewState.maxMaintenanceCost,
-            distance: ApplyPropertyTypeViewState.maintenanceCostDistance,
-          ),
-          controller: _maintenanceCostController,
-          textController: _maintenanceCostTextController,
-          onFocus: (hasFocus) {
-            _isMaintenanceCostEditing = hasFocus;
-            _onAmountFocus(
-              hasFocus: hasFocus,
-              textController: _maintenanceCostTextController,
-              value: () => ref.read(applyPropertyTypeVMProvider).maintenanceCost,
-              apply: (amount) => viewModel.action(ApplyPropertyTypeAction.changeMaintenanceCost(amount)),
-              format: _maintenanceCostText,
-            );
-          },
+        _amountField(
+          state: state,
+          field: ApplyPropertyPriceField.maintenanceCost,
+          title: '관리비',
+          amount: state.maintenanceCost,
+          zeroText: '관리비 없음',
+          onClear: () => viewModel.action(const ApplyPropertyTypeAction.changeMaintenanceCost(0)),
         ),
       ],
     );
   }
 
-  /// 금액 입력란 포커스 처리
-  ///
-  /// - 포커스를 얻으면 원 단위 숫자로 바꾸고 전체 선택
-  /// - 포커스가 풀리면 숫자를 반영하고 `format` 형식으로 표시 (숫자가 아니면 원래 금액으로 되돌림)
-  void _onAmountFocus({
-    required bool hasFocus,
-    required TextEditingController textController,
-    required double Function() value,
-    required void Function(double amount) apply,
-    required String Function(double value) format,
+  Widget _amountField({
+    required ApplyPropertyTypeViewState state,
+    required ApplyPropertyPriceField field,
+    required String title,
+    required double amount,
+    required VoidCallback onClear,
+    String? zeroText,
   }) {
-    if (hasFocus) {
-      final digits = '${value().toInt()}';
+    final focusNode = _focusNodes[field]!;
 
-      textController.value = TextEditingValue(
-        text: digits,
-        selection: TextSelection(baseOffset: 0, extentOffset: digits.length),
-      );
-      return;
-    }
-
-    final amount = double.tryParse(textController.text);
-
-    if (amount != null) { apply(amount); }
-
-    textController.text = format(value());
-  }
-
-  Widget _slider({
-    required String label,
-    required AppSliderViewState viewState,
-    required ValueNotifier<double> controller,
-    required TextEditingController textController,
-    required ValueChanged<bool> onFocus,
-  }) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 10,
       children: [
-        Row(
-          spacing: 6,
-          children: [
-            AppFontStyle.bold1.text(label, TextColor.medium),
-            Expanded(
-              child: BasicTextField(
-                viewState: BasicTextFieldViewState(
-                  style: AppFontStyle.sub3.style(TextColor.dark),
-                  textAlign: TextAlign.right,
-                  keyboardType: AppTextFieldKeyboardType.number,
-                ),
-                controller: textController,
-                onFocus: onFocus,
-              ),
+        AppFontStyle.bold1.text(title, TextColor.medium),
+        Focus(
+          focusNode: focusNode,
+          child: PriceField(
+            viewState: PriceFieldViewState(
+              text: amount == 0 ? zeroText ?? amount.formattedKRW : amount.formattedKRW,
+              subText: amount == 0 ? null : '${amount.formattedNumber}원',
+              isFocused: state.editingField == field,
             ),
-          ],
+            onTap: focusNode.requestFocus,
+            onClear: onClear,
+          ),
         ),
-        AppSlider(viewState: viewState, controller: controller),
       ],
+    );
+  }
+
+  PriceKeypad _keypad(ApplyPropertyTypeViewState state, ApplyPropertyTypeVM viewModel, ApplyPropertyPriceField field) {
+    final amount = switch (field) {
+      ApplyPropertyPriceField.price => state.price,
+      ApplyPropertyPriceField.monthlyRent => state.monthlyRent,
+      ApplyPropertyPriceField.maintenanceCost => state.maintenanceCost,
+    };
+
+    return PriceKeypad(
+      key: ValueKey(field),
+      viewState: PriceKeypadViewState(value: amount.toInt()),
+      onChanged: (value) => viewModel.action(switch (field) {
+        ApplyPropertyPriceField.price => ApplyPropertyTypeAction.changePrice(value.toDouble()),
+        ApplyPropertyPriceField.monthlyRent => ApplyPropertyTypeAction.changeMonthlyRent(value.toDouble()),
+        ApplyPropertyPriceField.maintenanceCost => ApplyPropertyTypeAction.changeMaintenanceCost(value.toDouble()),
+      }),
+      onConfirm: () => viewModel.action(const ApplyPropertyTypeAction.nextField()),
     );
   }
 

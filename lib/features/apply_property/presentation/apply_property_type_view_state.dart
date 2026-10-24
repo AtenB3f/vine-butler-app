@@ -2,6 +2,12 @@ import 'package:vine_butler/domain/property_type.dart';
 import 'package:vine_butler/features/property_list/presentation/property_filter_view_state.dart';
 import 'package:vine_butler/shared/extensions/extensions.dart';
 
+enum ApplyPropertyPriceField {
+  price,
+  monthlyRent,
+  maintenanceCost
+}
+
 class ApplyPropertyTypeViewState {
   static const double priceDistance = 1000000;
   static const double minMonthlyRent = 10000;
@@ -17,6 +23,7 @@ class ApplyPropertyTypeViewState {
   final double price;
   final double monthlyRent;
   final double maintenanceCost;
+  final ApplyPropertyPriceField? editingField;
   final String? navigateTo;
 
   const ApplyPropertyTypeViewState({
@@ -25,6 +32,7 @@ class ApplyPropertyTypeViewState {
     required this.price,
     required this.monthlyRent,
     this.maintenanceCost = defaultMaintenanceCost,
+    this.editingField,
     this.navigateTo,
   });
 
@@ -41,6 +49,20 @@ class ApplyPropertyTypeViewState {
   double get midPrice => minPrice + ((maxPrice - minPrice) / 2 / priceDistance).floor() * priceDistance;
 
   bool get isMonthlyRentVisible => transactionType == PropertyTransactionType.rent;
+
+  ApplyPropertyPriceField? get nextField {
+    switch (editingField) {
+      case ApplyPropertyPriceField.price:
+        return isMonthlyRentVisible ? ApplyPropertyPriceField.monthlyRent : ApplyPropertyPriceField.maintenanceCost;
+
+      case ApplyPropertyPriceField.monthlyRent:
+        return ApplyPropertyPriceField.maintenanceCost;
+
+      case ApplyPropertyPriceField.maintenanceCost:
+      case null:
+        return null;
+    }
+  }
 
   bool get isCompleted => transactionType != null && propertyType != null;
 
@@ -66,6 +88,7 @@ class ApplyPropertyTypeViewState {
     double? price,
     double? monthlyRent,
     double? maintenanceCost,
+    ApplyPropertyPriceField? Function()? editingField,
     String? Function()? navigateTo,
   }) {
     return ApplyPropertyTypeViewState(
@@ -74,6 +97,7 @@ class ApplyPropertyTypeViewState {
       price: price ?? this.price,
       monthlyRent: monthlyRent ?? this.monthlyRent,
       maintenanceCost: maintenanceCost ?? this.maintenanceCost,
+      editingField: editingField != null ? editingField() : this.editingField,
       navigateTo: navigateTo != null ? navigateTo() : this.navigateTo,
     );
   }

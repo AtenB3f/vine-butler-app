@@ -95,4 +95,14 @@ void main() {
 
     expect(state().navigateTo, isNull);
   });
+
+  test('금액 입력 칸은 하나라서 다음을 누르면 입력을 닫는다', () {
+    action(const FindPropertyAction.edit(FindPropertyPriceField.price));
+
+    expect(state().editingField, FindPropertyPriceField.price);
+
+    action(const FindPropertyAction.nextField());
+
+    expect(state().editingField, isNull);
+  });
 }

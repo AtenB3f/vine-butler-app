@@ -14,25 +14,41 @@ class FindPropertyScreen extends ConsumerStatefulWidget {
 }
 
 class _FindPropertyScreenState extends ConsumerState<FindPropertyScreen> {
-  late final ValueNotifier<double> _priceController;
+  final FocusNode _priceFocusNode = FocusNode();
+
+  FindPropertyVM get _viewModel => ref.read(findPropertyVMProvider.notifier);
 
   @override
   void initState() {
     super.initState();
-    _priceController = ValueNotifier(ref.read(findPropertyVMProvider).price)
-      ..addListener(() => ref.read(findPropertyVMProvider.notifier).action(FindPropertyAction.changePrice(_priceController.value)));
+    _priceFocusNode.addListener(_onPriceFocus);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _restoreFocus());
+  }
+
+  /// provider가 화면보다 오래 유지되므로 다시 들어왔을 때 입력 중이던 칸에 포커스를 되돌림
+  void _restoreFocus() {
+    if (ref.read(findPropertyVMProvider).editingField != null) { _priceFocusNode.requestFocus(); }
   }
 
   @override
   void dispose() {
-    _priceController.dispose();
+    _priceFocusNode.removeListener(_onPriceFocus);
+    _priceFocusNode.dispose();
     super.dispose();
+  }
+
+  void _onPriceFocus() {
+    if (_priceFocusNode.hasFocus) {
+      _viewModel.action(const FindPropertyAction.edit(FindPropertyPriceField.price));
+    } else if (ref.read(findPropertyVMProvider).editingField != null) {
+      _viewModel.action(const FindPropertyAction.edit(null));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(findPropertyVMProvider);
-    final viewModel = ref.read(findPropertyVMProvider.notifier);
+    final viewModel = _viewModel;
 
     ref.handleEvent(
       findPropertyVMProvider.select((state) => state.navigateTo),
@@ -40,8 +56,9 @@ class _FindPropertyScreenState extends ConsumerState<FindPropertyScreen> {
       onEvent: (location) => context.go(location),
     );
 
-    ref.listen(findPropertyVMProvider.select((state) => state.price), (_, price) {
-      if (_priceController.value != price) { _priceController.value = price; }
+    ref.listen(findPropertyVMProvider.select((state) => state.editingField), (_, field) {
+      if (field == null && _priceFocusNode.hasFocus) { _priceFocusNode.unfocus(); }
+      if (field != null && !_priceFocusNode.hasFocus) { _priceFocusNode.requestFocus(); }
     });
 
     return AppScaffold(
@@ -60,12 +77,15 @@ class _FindPropertyScreenState extends ConsumerState<FindPropertyScreen> {
                   _title(),
                   _transaction(state, viewModel),
                   _propertyType(state, viewModel),
-                  _price(state),
+                  _price(state, viewModel),
                 ],
               ),
             ),
           ),
-          _nextButton(viewModel),
+          PriceKeypad.animated(
+            keypad: state.editingField == null ? null : _keypad(state, viewModel),
+            placeholder: _nextButton(viewModel),
+          ),
         ],
       ),
     );
@@ -140,33 +160,34 @@ class _FindPropertyScreenState extends ConsumerState<FindPropertyScreen> {
     );
   }
 
-  Widget _price(FindPropertyViewState state) {
+  Widget _price(FindPropertyViewState state, FindPropertyVM viewModel) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 10,
       children: [
-        Row(
-          spacing: 6,
-          children: [
-            AppFontStyle.body1.text('금액', TextColor.medium),
-            Expanded(
-              child: Text(
-                state.price.formattedKRW,
-                style: AppFontStyle.sub3.style(TextColor.dark),
-                textAlign: TextAlign.right,
-              ),
+        AppFontStyle.bold1.text('금액', TextColor.medium),
+        Focus(
+          focusNode: _priceFocusNode,
+          child: PriceField(
+            viewState: PriceFieldViewState(
+              text: state.price.formattedKRW,
+              subText: state.price == 0 ? null : '${state.price.formattedNumber}원',
+              isFocused: state.editingField == FindPropertyPriceField.price,
             ),
-          ],
-        ),
-        AppSlider(
-          viewState: AppSliderViewState(
-            size: AppSliderSize.medium,
-            min: state.minPrice,
-            max: state.maxPrice,
-            distance: FindPropertyViewState.priceDistance,
+            onTap: _priceFocusNode.requestFocus,
+            onClear: () => viewModel.action(const FindPropertyAction.changePrice(0)),
           ),
-          controller: _priceController,
         ),
       ],
+    );
+  }
+
+  PriceKeypad _keypad(FindPropertyViewState state, FindPropertyVM viewModel) {
+    return PriceKeypad(
+      key: const ValueKey(FindPropertyPriceField.price),
+      viewState: PriceKeypadViewState(value: state.price.toInt()),
+      onChanged: (value) => viewModel.action(FindPropertyAction.changePrice(value.toDouble())),
+      onConfirm: () => viewModel.action(const FindPropertyAction.nextField()),
     );
   }
 

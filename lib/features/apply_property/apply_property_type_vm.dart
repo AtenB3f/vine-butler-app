@@ -14,6 +14,8 @@ sealed class ApplyPropertyTypeAction {
   const factory ApplyPropertyTypeAction.changePrice(double price) = _ChangePrice;
   const factory ApplyPropertyTypeAction.changeMonthlyRent(double monthlyRent) = _ChangeMonthlyRent;
   const factory ApplyPropertyTypeAction.changeMaintenanceCost(double maintenanceCost) = _ChangeMaintenanceCost;
+  const factory ApplyPropertyTypeAction.edit(ApplyPropertyPriceField? field) = _Edit;
+  const factory ApplyPropertyTypeAction.nextField() = _NextField;
   const factory ApplyPropertyTypeAction.next() = _Next;
 }
 
@@ -45,6 +47,16 @@ class _ChangeMaintenanceCost extends ApplyPropertyTypeAction {
   final double maintenanceCost;
 
   const _ChangeMaintenanceCost(this.maintenanceCost);
+}
+
+class _Edit extends ApplyPropertyTypeAction {
+  final ApplyPropertyPriceField? field;
+
+  const _Edit(this.field);
+}
+
+class _NextField extends ApplyPropertyTypeAction {
+  const _NextField();
 }
 
 class _Next extends ApplyPropertyTypeAction {
@@ -82,8 +94,12 @@ class ApplyPropertyTypeVM extends Notifier<ApplyPropertyTypeViewState> {
         );
 
         final isInRange = selected.price >= selected.minPrice && selected.price <= selected.maxPrice;
+        final isEditingHiddenField = selected.editingField == ApplyPropertyPriceField.monthlyRent && !selected.isMonthlyRentVisible;
 
-        state = isInRange ? selected : selected.copyWith(price: selected.midPrice);
+        state = selected.copyWith(
+          price: isInRange ? null : selected.midPrice,
+          editingField: isEditingHiddenField ? () => null : null,
+        );
 
       case _SelectPropertyType(:final option):
         state = state.copyWith(
@@ -98,6 +114,12 @@ class ApplyPropertyTypeVM extends Notifier<ApplyPropertyTypeViewState> {
 
       case _ChangeMaintenanceCost(:final maintenanceCost):
         state = state.copyWith(maintenanceCost: maintenanceCost);
+
+      case _Edit(:final field):
+        state = state.copyWith(editingField: () => field);
+
+      case _NextField():
+        state = state.copyWith(editingField: () => state.nextField);
 
       case _Next():
         if (!state.isCompleted) { return; }

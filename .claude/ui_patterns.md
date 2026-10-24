@@ -63,7 +63,8 @@ AppScaffold(
 | 보조 작은 버튼 | `OutlineButton(type: gray, size: small)` | 높이 30. 가로로 늘어나지 않게 `IntrinsicWidth`로 감쌈 |
 | 거래 유형 표시 | `LineTag` | 타입은 `type.tagType` |
 | 텍스트 입력 | `AppTextField` | viewState에 `title`, `placeholder`, `keyboardType` |
-| 금액 슬라이더 | `AppSlider` | 7장의 동기화 주의 참고 |
+| 금액 입력 | `PriceField` + `PriceKeypad` | 7장 참고. 시스템 키보드·슬라이더 대신 사용 |
+| 금액 슬라이더 | `AppSlider` | 필터 패널에서만 사용. 7장의 동기화 주의 참고 |
 | 탭 가능한 영역 | `Pressable` | 눌림 효과 포함 |
 
 ## 4. 화면 내부 위젯 작성법
@@ -173,12 +174,17 @@ ref.handleEvent(
 );
 ```
 
-## 7. 입력 필드 · 슬라이더
+## 7. 입력 필드 · 금액 입력 · 슬라이더
 
 - `TextEditingController`는 화면 State가 만들고 `dispose()`한다. **초기 텍스트는 VM 상태에서 읽는다** (`TextEditingController(text: ref.read(...).name)`). provider는 화면을 나가도 유지되므로, 안 그러면 재진입 시 입력창과 상태가 어긋난다.
 - 전화번호는 `PhoneNumberEditingController`(`lib/shared/utils/`)를 `AppTextField`의 `controller`로 넘긴다. 입력이 반영되는 순간 `010-1234-5678` 형식으로 포맷된다. 숫자 키보드는 viewState의 `keyboardType: AppTextFieldKeyboardType.number`.
 - 컨트롤러 값을 VM이 바꿔야 하면(예: `selected`가 null이 되면 입력창 비움) `ref.listen`에서 `controller.clear()`/`controller.value = ...`로 동기화한다.
-- **`AppSlider`는 `ValueNotifier` 컨트롤러를 받는다.** 그래서 슬라이더 → VM(`addListener`)과 VM → 슬라이더(`ref.listen`) 두 길을 직접 이어야 한다. 한쪽을 빼먹으면 슬라이더 위치와 금액 표시가 어긋난다. 개선 후보는 12장 참고.
+- 금액은 `PriceField`(금액 칸) + `PriceKeypad`(키패드)로 입력한다. 모든 플랫폼 공통이고 제목(`금액`·`관리비` 등)은 화면이 `bold1`로 따로 그린다
+  - 입력 중인 칸은 각 view_state의 칸 enum(`ApplyPropertyPriceField` 등) + `editingField`로 둔다. VM Action은 `edit(field?)`, `nextField()`(`>` 키, 다음 칸 → 마지막이면 닫기)
+  - 칸마다 `FocusNode`를 `Focus`로 감싸고, 포커스를 얻으면 `edit(field)`, 모든 금액 칸이 포커스를 잃으면 `edit(null)`. VM → 포커스는 `ref.listen`으로 맞춘다. 바깥 탭(`AppScaffold`)이나 다른 입력란으로 포커스가 빠지면 키패드가 닫힌다
+  - 키패드는 하단 버튼 자리에 `editingField == null ? 하단 버튼 : PriceKeypad`로 그린다
+  - 표시: 금액 있으면 `text` 함축형 `formattedKRW` + `subText` 숫자형 `'${formattedNumber}원'`, 0이면 `0원`(관리비는 `관리비 없음`)이고 `subText` 없음
+- **`AppSlider`(필터 패널)는 `ValueNotifier` 컨트롤러를 받는다.** 그래서 슬라이더 → VM(`addListener`)과 VM → 슬라이더(`ref.listen`) 두 길을 직접 이어야 한다. 한쪽을 빼먹으면 슬라이더 위치와 금액 표시가 어긋난다. 개선 후보는 12장 참고.
 - 슬라이더 초기값은 `min ~ max`의 중간값(단위에 안 맞으면 내림)이고, 거래 유형이 바뀌면 새 범위의 중간값으로 재설정한다.
 
 ## 8. 공용 확장·유틸
@@ -230,4 +236,4 @@ ref.handleEvent(
 
 ## 12. 개선 후보
 
-- `AppSlider`를 `ValueNotifier` 컨트롤러 대신 `value` + `onChanged(double)` 방식으로 바꾸면 3개 화면(find_property, apply_property_type, 필터 패널)의 이중 동기화(`ValueNotifier` 2개, 리스너, `ref.listen`)가 사라진다. 컴포넌트는 viewState + 콜백 방식이라는 규칙과도 맞는다.
+- `AppSlider`를 `ValueNotifier` 컨트롤러 대신 `value` + `onChanged(double)` 방식으로 바꾸면 필터 패널의 이중 동기화(`ValueNotifier`, 리스너, `ref.listen`)가 사라진다. 컴포넌트는 viewState + 콜백 방식이라는 규칙과도 맞는다.

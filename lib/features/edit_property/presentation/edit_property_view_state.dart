@@ -17,6 +17,12 @@ enum EditPropertyEvent {
   invalidOwner,
 }
 
+enum EditPropertyPriceField {
+  price,
+  monthlyRent,
+  maintenanceCost
+}
+
 class EditPropertyViewState {
   static const double priceDistance = 1000000;
   static const double minMonthlyRent = 10000;
@@ -45,6 +51,7 @@ class EditPropertyViewState {
   final Set<String> furnitureOptions;
   final String memo;
   final List<PropertyImage> images;
+  final EditPropertyPriceField? editingField;
   final EditPropertyEvent? event;
 
   const EditPropertyViewState({
@@ -66,6 +73,7 @@ class EditPropertyViewState {
     this.furnitureOptions = const {},
     this.memo = '',
     this.images = const [],
+    this.editingField,
     this.event,
   });
 
@@ -116,6 +124,20 @@ class EditPropertyViewState {
 
   bool get isMonthlyRentVisible => transactionType == PropertyTransactionType.rent;
 
+  EditPropertyPriceField? get nextField {
+    switch (editingField) {
+      case EditPropertyPriceField.price:
+        return isMonthlyRentVisible ? EditPropertyPriceField.monthlyRent : EditPropertyPriceField.maintenanceCost;
+
+      case EditPropertyPriceField.monthlyRent:
+        return EditPropertyPriceField.maintenanceCost;
+
+      case EditPropertyPriceField.maintenanceCost:
+      case null:
+        return null;
+    }
+  }
+
   bool get isOwnerValid => ownerName.trim().isNotEmpty && _phonePattern.hasMatch(ownerPhone);
 
   bool get hasPhoneError => ownerPhone.isNotEmpty && ownerPhone != '010' && !_phonePattern.hasMatch(ownerPhone);
@@ -139,6 +161,7 @@ class EditPropertyViewState {
     Set<String>? furnitureOptions,
     String? memo,
     List<PropertyImage>? images,
+    EditPropertyPriceField? Function()? editingField,
     EditPropertyEvent? Function()? event,
   }) {
     return EditPropertyViewState(
@@ -161,6 +184,7 @@ class EditPropertyViewState {
       furnitureOptions: furnitureOptions ?? this.furnitureOptions,
       memo: memo ?? this.memo,
       images: images ?? this.images,
+      editingField: editingField != null ? editingField() : this.editingField,
       event: event != null ? event() : this.event,
     );
   }

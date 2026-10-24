@@ -20,6 +20,8 @@ sealed class EditPropertyAction {
   const factory EditPropertyAction.changePrice(double price) = _ChangePrice;
   const factory EditPropertyAction.changeMonthlyRent(double monthlyRent) = _ChangeMonthlyRent;
   const factory EditPropertyAction.changeMaintenanceCost(double maintenanceCost) = _ChangeMaintenanceCost;
+  const factory EditPropertyAction.edit(EditPropertyPriceField? field) = _Edit;
+  const factory EditPropertyAction.nextField() = _NextField;
   const factory EditPropertyAction.changeOwnerName(String name) = _ChangeOwnerName;
   const factory EditPropertyAction.changeOwnerPhone(String phone) = _ChangeOwnerPhone;
   const factory EditPropertyAction.changeMoveInDate(DateTime date) = _ChangeMoveInDate;
@@ -57,6 +59,16 @@ class _ChangeMaintenanceCost extends EditPropertyAction {
   final double maintenanceCost;
 
   const _ChangeMaintenanceCost(this.maintenanceCost);
+}
+
+class _Edit extends EditPropertyAction {
+  final EditPropertyPriceField? field;
+
+  const _Edit(this.field);
+}
+
+class _NextField extends EditPropertyAction {
+  const _NextField();
 }
 
 class _ChangeOwnerName extends EditPropertyAction {
@@ -153,8 +165,12 @@ class EditPropertyVM extends Notifier<EditPropertyViewState> {
       case _SelectTransactionType(:final type):
         final selected = state.copyWith(transactionType: type);
         final isInRange = selected.price >= selected.minPrice && selected.price <= selected.maxPrice;
+        final isEditingHiddenField = selected.editingField == EditPropertyPriceField.monthlyRent && !selected.isMonthlyRentVisible;
 
-        state = isInRange ? selected : selected.copyWith(price: selected.midPrice);
+        state = selected.copyWith(
+          price: isInRange ? null : selected.midPrice,
+          editingField: isEditingHiddenField ? () => null : null,
+        );
 
       case _ChangePrice(:final price):
         state = state.copyWith(price: price);
@@ -164,6 +180,12 @@ class EditPropertyVM extends Notifier<EditPropertyViewState> {
 
       case _ChangeMaintenanceCost(:final maintenanceCost):
         state = state.copyWith(maintenanceCost: maintenanceCost);
+
+      case _Edit(:final field):
+        state = state.copyWith(editingField: () => field);
+
+      case _NextField():
+        state = state.copyWith(editingField: () => state.nextField);
 
       case _ChangeOwnerName(:final name):
         state = state.copyWith(ownerName: name);

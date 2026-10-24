@@ -13,6 +13,8 @@ sealed class FindPropertyAction {
   const factory FindPropertyAction.selectTransactionType(PropertyTransactionType type) = _SelectTransactionType;
   const factory FindPropertyAction.togglePropertyType(PropertyTypeFilterOption option) = _TogglePropertyType;
   const factory FindPropertyAction.changePrice(double price) = _ChangePrice;
+  const factory FindPropertyAction.edit(FindPropertyPriceField? field) = _Edit;
+  const factory FindPropertyAction.nextField() = _NextField;
   const factory FindPropertyAction.next() = _Next;
 }
 
@@ -32,6 +34,16 @@ class _ChangePrice extends FindPropertyAction {
   final double price;
 
   const _ChangePrice(this.price);
+}
+
+class _Edit extends FindPropertyAction {
+  final FindPropertyPriceField? field;
+
+  const _Edit(this.field);
+}
+
+class _NextField extends FindPropertyAction {
+  const _NextField();
 }
 
 class _Next extends FindPropertyAction {
@@ -81,6 +93,12 @@ class FindPropertyVM extends Notifier<FindPropertyViewState> {
 
       case _ChangePrice(:final price):
         state = state.copyWith(price: price);
+
+      case _Edit(:final field):
+        state = state.copyWith(editingField: () => field);
+
+      case _NextField():
+        state = state.copyWith(editingField: () => null);
 
       case _Next():
         final filter = PropertyFilterData(

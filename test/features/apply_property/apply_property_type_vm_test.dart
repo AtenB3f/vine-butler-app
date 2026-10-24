@@ -98,4 +98,39 @@ void main() {
       expect(state().maintenanceCost, 150000);
     });
   });
+
+  group('금액 입력 칸', () {
+    test('월세 거래면 금액 → 월세 → 관리비 순서로 넘어가고 마지막에 닫는다', () {
+      action(const ApplyPropertyTypeAction.edit(ApplyPropertyPriceField.price));
+
+      action(const ApplyPropertyTypeAction.nextField());
+
+      expect(state().editingField, ApplyPropertyPriceField.monthlyRent);
+
+      action(const ApplyPropertyTypeAction.nextField());
+
+      expect(state().editingField, ApplyPropertyPriceField.maintenanceCost);
+
+      action(const ApplyPropertyTypeAction.nextField());
+
+      expect(state().editingField, isNull);
+    });
+
+    test('월세 거래가 아니면 금액 다음에 관리비로 넘어간다', () {
+      action(const ApplyPropertyTypeAction.selectTransactionType(PropertyTransactionType.buy));
+      action(const ApplyPropertyTypeAction.edit(ApplyPropertyPriceField.price));
+
+      action(const ApplyPropertyTypeAction.nextField());
+
+      expect(state().editingField, ApplyPropertyPriceField.maintenanceCost);
+    });
+
+    test('월세 입력 중에 월세가 없는 거래로 바꾸면 입력을 닫는다', () {
+      action(const ApplyPropertyTypeAction.edit(ApplyPropertyPriceField.monthlyRent));
+
+      action(const ApplyPropertyTypeAction.selectTransactionType(PropertyTransactionType.buy));
+
+      expect(state().editingField, isNull);
+    });
+  });
 }

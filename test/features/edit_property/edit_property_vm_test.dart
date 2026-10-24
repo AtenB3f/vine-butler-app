@@ -302,4 +302,26 @@ void main() {
 
     expect(imageStorage.deleted, isEmpty);
   });
+
+  test('금액 입력 칸은 월세 거래일 때만 월세 칸을 거쳐 넘어간다', () async {
+    await load();
+    action(const EditPropertyAction.edit(EditPropertyPriceField.price));
+
+    action(const EditPropertyAction.nextField());
+
+    expect(state().editingField, EditPropertyPriceField.monthlyRent);
+
+    action(const EditPropertyAction.selectTransactionType(PropertyTransactionType.buy));
+
+    expect(state().editingField, isNull);
+
+    action(const EditPropertyAction.edit(EditPropertyPriceField.price));
+    action(const EditPropertyAction.nextField());
+
+    expect(state().editingField, EditPropertyPriceField.maintenanceCost);
+
+    action(const EditPropertyAction.nextField());
+
+    expect(state().editingField, isNull);
+  });
 }
