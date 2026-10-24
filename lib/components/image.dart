@@ -456,6 +456,15 @@ class AppIcons {
   static Widget reloadLG([Color color = GrayColor.dark]) {
     return iconLG('Reload_LG', color);
   }
+  static Widget removeSM([Color color = GrayColor.dark]) {
+    return iconSM('Remove_SM', color);
+  }
+  static Widget removeMD([Color color = GrayColor.dark]) {
+    return iconMD('Remove_MD', color);
+  }
+  static Widget removeLG([Color color = GrayColor.dark]) {
+    return iconLG('Remove_LG', color);
+  }
   static Widget fileUploadSM([Color color = GrayColor.dark]) {
     return iconSM('File_Upload_SM', color);
   }
