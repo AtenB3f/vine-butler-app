@@ -54,6 +54,8 @@ export 'widgets/textfield/app_text_field.dart';
 export 'widgets/textfield/app_text_field_view_state.dart';
 export 'widgets/textfield/basic_text_field.dart';
 export 'widgets/textfield/basic_text_field_view_state.dart';
+export 'widgets/textfield/price_field.dart';
+export 'widgets/textfield/price_field_view_state.dart';
 
 export 'widgets/map/mac_map.dart';
 export 'widgets/map/native_map.dart';
