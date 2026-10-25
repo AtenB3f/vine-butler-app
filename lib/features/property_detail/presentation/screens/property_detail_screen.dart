@@ -198,7 +198,10 @@ class PropertyDetailScreen extends ConsumerWidget {
       return SizedBox(
         height: height,
         width: double.infinity,
-        child: AppImagePage(viewState: _imagePageViewState(data)),
+        child: AppImagePage(
+          viewState: _imagePageViewState(data),
+          onTap: (index) => _showImages(context, data, index),
+        ),
       );
     }
 
@@ -207,7 +210,7 @@ class PropertyDetailScreen extends ConsumerWidget {
       spacing: 4,
       children: [
         _mediaButtons(ref, isMapVisible),
-        SizedBox(height: height, width: double.infinity, child: _imageMap(data, isMapVisible)),
+        SizedBox(height: height, width: double.infinity, child: _imageMap(context, data, isMapVisible)),
       ],
     );
   }
@@ -427,12 +430,52 @@ class PropertyDetailScreen extends ConsumerWidget {
     );
   }
 
-  AppImagePageViewState _imagePageViewState(PropertyDetailData data) {
-    return AppImagePageViewState(images: [for (final path in data.imagePaths) FileImage(File(path))]);
+  AppImagePageViewState _imagePageViewState(PropertyDetailData data, {BoxFit fit = BoxFit.cover, int index = 0}) {
+    return AppImagePageViewState(
+      images: [for (final path in data.imagePaths) FileImage(File(path))],
+      fit: fit,
+      index: index,
+    );
   }
 
-  Widget _imageMap(PropertyDetailData data, bool isMapVisible) {
-    return isMapVisible ? _map(data) : AppImagePage(viewState: _imagePageViewState(data));
+  Widget _imageMap(BuildContext context, PropertyDetailData data, bool isMapVisible) {
+    if (isMapVisible) { return _map(data); }
+
+    return AppImagePage(
+      viewState: _imagePageViewState(data),
+      onTap: (index) => _showImages(context, data, index),
+    );
+  }
+
+  void _showImages(BuildContext context, PropertyDetailData data, int index) {
+    showGeneralDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: '사진 닫기',
+      barrierColor: StateColor.dimmed,
+      pageBuilder: (dialogContext, animation, secondaryAnimation) => _imageViewer(dialogContext, data, index),
+    );
+  }
+
+  Widget _imageViewer(BuildContext dialogContext, PropertyDetailData data, int index) {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          spacing: 10,
+          children: [
+            Pressable(
+              onTap: () => Navigator.of(dialogContext).pop(),
+              child: AppIcons.closeLG(StateColor.white),
+            ),
+            Expanded(
+              child: AppImagePage(viewState: _imagePageViewState(data, fit: BoxFit.contain, index: index)),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _map(PropertyDetailData data) {
