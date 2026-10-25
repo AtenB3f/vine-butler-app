@@ -40,6 +40,7 @@ class _FakePropertyRepository implements PropertyRepository {
 
 Property _property({
   bool? hasLoan,
+  int? roomCount,
   String memo = '',
   String lotAddress = '서울특별시 강남구 역삼동 1-1 역삼빌딩',
   String sido = '서울특별시',
@@ -66,6 +67,7 @@ Property _property({
     isParkingAvailable: true,
     isSuretyInsuranceAvailable: false,
     hasLoan: hasLoan,
+    roomCount: roomCount,
     moveInDate: DateTime(2026, 11, 1),
     isFlexibleMoveInDate: true,
     furnitureOptions: const ['냉장고'],
@@ -105,7 +107,7 @@ void main() {
   });
 
   test('매물이 있으면 상세 데이터로 바꿔 보여준다', () async {
-    repository.property = _property(hasLoan: true, memo: '메모');
+    repository.property = _property(hasLoan: true, roomCount: 2, memo: '메모');
 
     await load();
 
@@ -130,14 +132,16 @@ void main() {
     expect(data.latitude, 37.5006);
     expect(data.longitude, 127.0364);
     expect(data.areaExclusive, isNull);
+    expect(data.roomCount, 2);
   });
 
-  test('융자를 선택하지 않았으면 융자 값이 없고 빈 메모는 null이다', () async {
+  test('융자·방 개수를 선택하지 않았으면 값이 없고 빈 메모는 null이다', () async {
     repository.property = _property();
 
     await load();
 
     expect(state().data!.isAvailableLoan, isNull);
+    expect(state().data!.roomCount, isNull);
     expect(state().data!.memo, isNull);
   });
 
