@@ -5,10 +5,12 @@ import 'package:vine_butler/components/components.dart';
 
 class AppImagePage extends StatefulWidget {
   final AppImagePageViewState viewState;
+  final ValueChanged<int>? onTap;
 
   const AppImagePage({
     super.key,
     required this.viewState,
+    this.onTap,
   });
 
   @override
@@ -23,8 +25,8 @@ class _AppImagePageState extends State<AppImagePage> {
   static const Color _edgeShadow = Color(0x80000000);
   static const Color _edgeClear = Color(0x00000000);
 
-  final PageController _pageController = PageController();
-  final ValueNotifier<int> _index = ValueNotifier(0);
+  late final PageController _pageController = PageController(initialPage: widget.viewState.index);
+  late final ValueNotifier<int> _index = ValueNotifier(widget.viewState.index);
 
   AppIndicatorViewState? _indicatorViewState;
   bool _isLeftHovered = false;
@@ -81,7 +83,10 @@ class _AppImagePageState extends State<AppImagePage> {
       controller: _pageController,
       itemCount: images.length,
       onPageChanged: (index) => _index.value = index,
-      itemBuilder: (context, index) => _page(images[index]),
+      itemBuilder: (context, index) => GestureDetector(
+        onTap: widget.onTap == null ? null : () => widget.onTap!(index),
+        child: _page(images[index]),
+      ),
     );
 
     if (!context.isDesktop) {
@@ -102,18 +107,18 @@ class _AppImagePageState extends State<AppImagePage> {
   }
 
   Widget _page(ImageProvider image) {
-    return Image(
-      image: image,
-      fit: BoxFit.cover,
-      loadingBuilder: (context, child, progress) {
-        if (progress == null) {
-          return child;
-        }
-        return const ColoredBox(color: BaseColor.light);
-      },
-      errorBuilder: (context, error, stackTrace) => ColoredBox(
-        color: BaseColor.light,
-        child: Center(child: AppIcons.imageLG(GrayColor.light)),
+    return ColoredBox(
+      color: BaseColor.light,
+      child: Image(
+        image: image,
+        fit: widget.viewState.fit,
+        loadingBuilder: (context, child, progress) {
+          if (progress == null) {
+            return child;
+          }
+          return const ColoredBox(color: BaseColor.light);
+        },
+        errorBuilder: (context, error, stackTrace) => Center(child: AppIcons.imageLG(GrayColor.light)),
       ),
     );
   }
