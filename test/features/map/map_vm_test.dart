@@ -84,6 +84,15 @@ void main() {
 
   tearDown(() => container.dispose());
 
+  test('매물 목록을 처음 받기 전에는 불러오지 않은 상태이고, 빈 목록이라도 받으면 불러온 상태가 된다', () async {
+    expect(state().isLoaded, isFalse);
+
+    await emit([]);
+
+    expect(state().isLoaded, isTrue);
+    expect(state().markers, isEmpty);
+  });
+
   test('매물마다 좌표와 가격 라벨, 거래 유형별 라벨 색의 마커를 만든다', () async {
     await emit([_property('rent', _rent), _property('deposit', _depositOnly), _property('buy', _buy)]);
 

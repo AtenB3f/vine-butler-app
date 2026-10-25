@@ -15,6 +15,7 @@ class MapViewState {
   final PropertySearchStatus status;
   final PropertyFilterData filter;
   final List<PropertyListItemViewState> searchResults;
+  final bool isLoaded;
 
   const MapViewState({
     this.markers = const [],
@@ -23,6 +24,7 @@ class MapViewState {
     this.status = PropertySearchStatus.close,
     this.filter = const PropertyFilterData(),
     this.searchResults = const [],
+    this.isLoaded = false,
   });
 
   AppBndSearchStatus get bndStatus => status.bndStatus(query: query, isFilterApplied: filter.isApplied);
@@ -34,6 +36,7 @@ class MapViewState {
     PropertySearchStatus? status,
     PropertyFilterData? filter,
     List<PropertyListItemViewState>? searchResults,
+    bool? isLoaded,
   }) {
     return MapViewState(
       markers: markers ?? this.markers,
@@ -42,6 +45,7 @@ class MapViewState {
       status: status ?? this.status,
       filter: filter ?? this.filter,
       searchResults: searchResults ?? this.searchResults,
+      isLoaded: isLoaded ?? this.isLoaded,
     );
   }
 }

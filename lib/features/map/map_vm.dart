@@ -108,6 +108,7 @@ class MapVM extends Notifier<MapViewState> {
       searchResults: state.query.isEmpty
           ? const []
           : properties.take(MapViewState.maxPanelResultCount).map(PropertyListItemViewState.fromDomain).toList(),
+      isLoaded: true,
     );
   }
 

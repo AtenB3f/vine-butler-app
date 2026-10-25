@@ -87,6 +87,7 @@ class MapScreen extends ConsumerWidget {
       webServiceUrl: ApiEnv.naverMapsWebServiceUrl,
       markers: state.markers,
       selectedMarkerId: state.selected?.id,
+      isLoaded: state.isLoaded,
     );
 
     void onMarkerTap(String id) => viewModel.action(MapAction.select(id));
