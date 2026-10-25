@@ -8,6 +8,7 @@ class NaverMapViewState {
   final String webServiceUrl;
   final List<NaverMarkerViewState> markers;
   final String? selectedMarkerId;
+  final bool isLoaded;
 
   const NaverMapViewState({
     required this.clientId,
@@ -17,6 +18,7 @@ class NaverMapViewState {
     this.zoom = 16,
     this.markers = const [],
     this.selectedMarkerId,
+    this.isLoaded = true,
   });
 }
 

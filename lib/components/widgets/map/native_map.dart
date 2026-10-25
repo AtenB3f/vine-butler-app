@@ -29,6 +29,7 @@ class _NativeMapState extends State<NativeMap> {
   final Map<String, ({NOverlayImage enable, NOverlayImage disable})> _images = {};
   NaverMapController? _controller;
   bool _isLoaded = false;
+  int _markerRequestId = 0;
   ({PictureInfo enable, PictureInfo disable})? _pins;
 
   NLatLng get _position => NLatLng(widget.viewState.latitude, widget.viewState.longitude);
@@ -39,16 +40,20 @@ class _NativeMapState extends State<NativeMap> {
     final old = oldWidget.viewState;
     final current = widget.viewState;
 
-    if (listEquals(old.markers, current.markers) &&
-        old.latitude == current.latitude &&
-        old.longitude == current.longitude &&
-        old.zoom == current.zoom) {
-      if (old.selectedMarkerId != current.selectedMarkerId) { _select(old.selectedMarkerId, current.selectedMarkerId); }
+    final isMarkerChanged = !listEquals(old.markers, current.markers);
+    final isCameraChanged = !listEquals(_points(old.markers), _points(current.markers)) ||
+        old.latitude != current.latitude ||
+        old.longitude != current.longitude ||
+        old.zoom != current.zoom ||
+        old.isLoaded != current.isLoaded;
 
-      return;
-    }
+    if (isMarkerChanged) { _updateMarkers(); }
+    if (isCameraChanged) { _moveCamera(); }
+    if (!isMarkerChanged && old.selectedMarkerId != current.selectedMarkerId) { _select(old.selectedMarkerId, current.selectedMarkerId); }
+  }
 
-    _showOverlays();
+  List<(double, double)> _points(List<NaverMarkerViewState> markers) {
+    return [for (final marker in markers) (marker.latitude, marker.longitude)];
   }
 
   @override
@@ -74,20 +79,22 @@ class _NativeMapState extends State<NativeMap> {
     }
   }
 
-  Future<void> _showOverlays() async {
+  /// 마커 갱신
+  ///
+  /// - 이미지를 그리는 동안 더 새로운 갱신이 시작되면(`_markerRequestId` 변경) 중간에 멈추고 마지막 목록만 올림
+  Future<void> _updateMarkers() async {
     final controller = _controller;
     final markers = widget.viewState.markers;
     final pixelRatio = MediaQuery.devicePixelRatioOf(context);
     final textScaler = MediaQuery.textScalerOf(context);
+    final requestId = ++_markerRequestId;
 
     if (controller == null) { return; }
 
-    await controller.clearOverlays(type: NOverlayType.marker);
-    _markers.clear();
-    _images.clear();
-
     if (markers.isEmpty) {
-      await controller.updateCamera(NCameraUpdate.scrollAndZoomTo(target: _position, zoom: widget.viewState.zoom));
+      await controller.clearOverlays(type: NOverlayType.marker);
+      _markers.clear();
+      _images.clear();
       await controller.addOverlay(NMarker(id: 'position', position: _position));
       return;
     }
@@ -96,13 +103,14 @@ class _NativeMapState extends State<NativeMap> {
       enable: await vg.loadPicture(const SvgAssetLoader(PinSpec.enableAsset), null),
       disable: await vg.loadPicture(const SvgAssetLoader(PinSpec.disableAsset), null),
     );
-    final overlays = <NMarker>{};
+    final markerOverlays = <String, NMarker>{};
+    final images = <String, ({NOverlayImage enable, NOverlayImage disable})>{};
 
     for (final marker in markers) {
       final enable = await _markerImage(marker, pins.enable.picture, 'enable', pixelRatio, textScaler);
       final disable = await _markerImage(marker, pins.disable.picture, 'disable', pixelRatio, textScaler);
 
-      if (!mounted) { return; }
+      if (!mounted || requestId != _markerRequestId) { return; }
 
       final isSelected = marker.id == widget.viewState.selectedMarkerId;
       final overlay = NMarker(
@@ -116,11 +124,33 @@ class _NativeMapState extends State<NativeMap> {
       overlay
         ..setZIndex(isSelected ? _selectedZIndex : _defaultZIndex)
         ..setOnTapListener((_) => widget.onMarkerTap?.call(marker.id));
-      _markers[marker.id] = overlay;
-      _images[marker.id] = (enable: enable.image, disable: disable.image);
-      overlays.add(overlay);
+      markerOverlays[marker.id] = overlay;
+      images[marker.id] = (enable: enable.image, disable: disable.image);
     }
-    await controller.addOverlayAll(overlays);
+    await controller.clearOverlays(type: NOverlayType.marker);
+
+    if (!mounted || requestId != _markerRequestId) { return; }
+
+    _markers
+      ..clear()
+      ..addAll(markerOverlays);
+    _images
+      ..clear()
+      ..addAll(images);
+    await controller.addOverlayAll(markerOverlays.values.toSet());
+  }
+
+  Future<void> _moveCamera() async {
+    final controller = _controller;
+    final markers = widget.viewState.markers;
+
+    if (controller == null || !widget.viewState.isLoaded) { return; }
+
+    if (markers.isEmpty) {
+      await controller.updateCamera(NCameraUpdate.scrollAndZoomTo(target: _position, zoom: widget.viewState.zoom));
+      return;
+    }
+
     await controller.updateCamera(_fitCamera(markers));
   }
 
@@ -143,7 +173,8 @@ class _NativeMapState extends State<NativeMap> {
           ),
           onMapReady: (controller) {
             _controller = controller;
-            _showOverlays();
+            _updateMarkers();
+            _moveCamera();
           },
           onMapLoaded: () {
             if (mounted) { setState(() => _isLoaded = true); }
