@@ -51,6 +51,7 @@ class StateColor {
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF111111);
   static const Color overlay = Color(0x1A000000);
+  static const Color dimmed = Color(0x4D000000);
 }
 
 class AppShadow {
