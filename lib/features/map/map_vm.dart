@@ -11,6 +11,7 @@ import 'package:vine_butler/features/map/presentation/map_view_state.dart';
 import 'package:vine_butler/features/property_list/presentation/property_filter_view_state.dart';
 import 'package:vine_butler/features/property_list/presentation/property_list_item_view_state.dart';
 import 'package:vine_butler/shared/extensions/extensions.dart';
+import 'package:vine_butler/shared/utils/utils.dart';
 
 final mapVMProvider = NotifierProvider<MapVM, MapViewState>(MapVM.new);
 
@@ -142,6 +143,7 @@ class MapVM extends Notifier<MapViewState> {
 
     state = state.copyWith(
       userLocation: () => location,
+      nearbyLocation: () => null,
       cameraRequestId: state.cameraRequestId + 1,
     );
   }
@@ -152,10 +154,33 @@ class MapVM extends Notifier<MapViewState> {
     if (!ref.mounted) { return; }
 
     _isLocationLoaded = true;
+    state = state.copyWith(userLocation: () => location);
+    _completeLoad();
+  }
+
+  /// 첫 로드 완료 (매물 목록과 내 위치를 모두 받은 순간 한 번)
+  ///
+  /// - 가장 가까운 매물이 `nearbyDistance`보다 멀면 그 위치를 `nearbyLocation`에 담아 첫 카메라에 함께 보여줌
+  void _completeLoad() {
+    if (state.isLoaded || !_isPropertyLoaded || !_isLocationLoaded) { return; }
+
     state = state.copyWith(
-      userLocation: () => location,
-      isLoaded: _isPropertyLoaded,
+      nearbyLocation: () => _nearbyLocation(),
+      isLoaded: true,
     );
+  }
+
+  ({double latitude, double longitude})? _nearbyLocation() {
+    final userLocation = state.userLocation;
+
+    if (userLocation == null || _properties.isEmpty) { return null; }
+
+    final locations = [
+      for (final property in _properties) (latitude: property.address.latitude, longitude: property.address.longitude),
+    ];
+    final nearest = locations.reduce((a, b) => distanceMeters(userLocation, a) <= distanceMeters(userLocation, b) ? a : b);
+
+    return distanceMeters(userLocation, nearest) > MapViewState.nearbyDistance ? nearest : null;
   }
 
   void _filtering(MapViewState target) {
@@ -176,8 +201,8 @@ class MapVM extends Notifier<MapViewState> {
       searchResults: state.query.isEmpty
           ? const []
           : properties.take(MapViewState.maxPanelResultCount).map(PropertyListItemViewState.fromDomain).toList(),
-      isLoaded: _isLocationLoaded,
     );
+    _completeLoad();
   }
 
   MapPropertyCardViewState? _card(String id) {

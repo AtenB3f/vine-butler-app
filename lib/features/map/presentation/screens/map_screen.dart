@@ -116,6 +116,7 @@ class MapScreen extends ConsumerWidget {
     final viewState = NaverMapViewState(
       cameraLocation: (latitude: MapViewState.defaultLatitude, longitude: MapViewState.defaultLongitude),
       userLocation: state.userLocation,
+      nearbyLocation: state.nearbyLocation,
       zoom: state.userLocation == null ? MapViewState.defaultZoom : MapViewState.userLocationZoom,
       clientId: ApiEnv.naverMapsClientId,
       webServiceUrl: ApiEnv.naverMapsWebServiceUrl,

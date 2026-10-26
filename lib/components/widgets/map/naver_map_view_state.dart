@@ -3,6 +3,7 @@ import 'package:flutter/painting.dart';
 class NaverMapViewState {
   final ({double latitude, double longitude}) cameraLocation;
   final ({double latitude, double longitude})? userLocation;
+  final ({double latitude, double longitude})? nearbyLocation;
   final double zoom;
   final String clientId;
   final String webServiceUrl;
@@ -16,6 +17,7 @@ class NaverMapViewState {
     required this.webServiceUrl,
     required this.cameraLocation,
     this.userLocation,
+    this.nearbyLocation,
     this.zoom = 16,
     this.markers = const [],
     this.selectedMarkerId,

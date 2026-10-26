@@ -12,6 +12,7 @@ class MapViewState {
   static const double defaultLongitude = 126.9784;
   static const double defaultZoom = 11;
   static const double userLocationZoom = 14;
+  static const double nearbyDistance = 1000;
   static const int maxPanelResultCount = 5;
 
   final List<NaverMarkerViewState> markers;
@@ -21,6 +22,7 @@ class MapViewState {
   final PropertyFilterData filter;
   final List<PropertyListItemViewState> searchResults;
   final ({double latitude, double longitude})? userLocation;
+  final ({double latitude, double longitude})? nearbyLocation;
   final int cameraRequestId;
   final bool isLoaded;
   final MapEvent? event;
@@ -33,6 +35,7 @@ class MapViewState {
     this.filter = const PropertyFilterData(),
     this.searchResults = const [],
     this.userLocation,
+    this.nearbyLocation,
     this.cameraRequestId = 0,
     this.isLoaded = false,
     this.event,
@@ -48,6 +51,7 @@ class MapViewState {
     PropertyFilterData? filter,
     List<PropertyListItemViewState>? searchResults,
     ({double latitude, double longitude})? Function()? userLocation,
+    ({double latitude, double longitude})? Function()? nearbyLocation,
     int? cameraRequestId,
     bool? isLoaded,
     MapEvent? Function()? event,
@@ -60,6 +64,7 @@ class MapViewState {
       filter: filter ?? this.filter,
       searchResults: searchResults ?? this.searchResults,
       userLocation: userLocation != null ? userLocation() : this.userLocation,
+      nearbyLocation: nearbyLocation != null ? nearbyLocation() : this.nearbyLocation,
       cameraRequestId: cameraRequestId ?? this.cameraRequestId,
       isLoaded: isLoaded ?? this.isLoaded,
       event: event != null ? event() : this.event,

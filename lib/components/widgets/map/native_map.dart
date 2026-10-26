@@ -156,9 +156,7 @@ class _NativeMapState extends State<NativeMap> {
     if (controller == null || !widget.viewState.isLoaded) { return; }
 
     if (userLocation != null) {
-      final target = NLatLng(userLocation.latitude, userLocation.longitude);
-
-      await controller.updateCamera(NCameraUpdate.scrollAndZoomTo(target: target, zoom: widget.viewState.zoom));
+      await controller.updateCamera(_userCamera(userLocation, widget.viewState.nearbyLocation));
       return;
     }
     if (markers.isEmpty) {
@@ -195,6 +193,27 @@ class _NativeMapState extends State<NativeMap> {
       ..setCircleRadius(0)
       ..setPosition(NLatLng(userLocation.latitude, userLocation.longitude))
       ..setIsVisible(true);
+  }
+
+  /// 내 위치 중심으로 카메라를 조정하는 함수
+  ///
+  /// - `nearbyLocation`이 있으면 내 위치를 가운데에 두고 그 위치까지 보이게 대칭 범위로 맞춤
+  NCameraUpdate _userCamera(
+    ({double latitude, double longitude}) userLocation,
+    ({double latitude, double longitude})? nearbyLocation,
+  ) {
+    final target = NLatLng(userLocation.latitude, userLocation.longitude);
+
+    if (nearbyLocation == null) { return NCameraUpdate.scrollAndZoomTo(target: target, zoom: widget.viewState.zoom); }
+
+    final latitudeDelta = (nearbyLocation.latitude - userLocation.latitude).abs();
+    final longitudeDelta = (nearbyLocation.longitude - userLocation.longitude).abs();
+    final bounds = NLatLngBounds(
+      southWest: NLatLng(userLocation.latitude - latitudeDelta, userLocation.longitude - longitudeDelta),
+      northEast: NLatLng(userLocation.latitude + latitudeDelta, userLocation.longitude + longitudeDelta),
+    );
+
+    return NCameraUpdate.fitBounds(bounds, padding: _boundsPadding);
   }
 
   NCameraUpdate _fitCamera(List<NaverMarkerViewState> markers) {

@@ -56,7 +56,7 @@ class _FakePropertyRepository implements PropertyRepository {
   Future<void> delete(String id) async {}
 }
 
-Property _property(String id, PropertyDeal deal, {String detailAddress = ''}) {
+Property _property(String id, PropertyDeal deal, {String detailAddress = '', double latitude = 37.5006, double longitude = 127.0364}) {
   return Property(
     id: id,
     owner: const Owner(name: '홍길동', phone: '010-1234-5678'),
@@ -70,8 +70,8 @@ Property _property(String id, PropertyDeal deal, {String detailAddress = ''}) {
       sigungu: '강남구',
       dongMyeon: '역삼동',
       detailAddress: detailAddress,
-      latitude: 37.5006,
-      longitude: 127.0364,
+      latitude: latitude,
+      longitude: longitude,
     ),
     updatedAt: DateTime(2020),
   );
@@ -130,6 +130,37 @@ void main() {
         ],
       );
       container.listen(mapVMProvider, (_, _) {});
+    });
+
+    test('가장 가까운 매물이 1km보다 멀면 그 위치를 첫 카메라에 함께 보여줄 위치로 둔다', () async {
+      pending.completer.complete((latitude: 37.5666, longitude: 126.9784));
+      await emit([
+        _property('far', _rent, latitude: 37.4, longitude: 127.2),
+        _property('near', _rent),
+      ]);
+
+      expect(state().isLoaded, isTrue);
+      expect(state().nearbyLocation, (latitude: 37.5006, longitude: 127.0364));
+    });
+
+    test('1km 안에 매물이 있으면 함께 보여줄 위치가 없다', () async {
+      pending.completer.complete((latitude: 37.5010, longitude: 127.0364));
+      await emit([_property('near', _rent)]);
+
+      expect(state().isLoaded, isTrue);
+      expect(state().nearbyLocation, isNull);
+    });
+
+    test('내 위치 버튼을 누르면 함께 보여줄 위치를 비운다', () async {
+      pending.completer.complete((latitude: 37.5666, longitude: 126.9784));
+      await emit([_property('near', _rent)]);
+
+      expect(state().nearbyLocation, isNotNull);
+
+      action(const MapAction.locate());
+      await Future<void>.delayed(Duration.zero);
+
+      expect(state().nearbyLocation, isNull);
     });
 
     test('매물 목록과 현재 위치를 모두 받아야 불러온 상태가 된다', () async {
