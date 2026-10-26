@@ -15,6 +15,8 @@ class FindPropertyScreen extends ConsumerStatefulWidget {
 
 class _FindPropertyScreenState extends ConsumerState<FindPropertyScreen> {
   final FocusNode _priceFocusNode = FocusNode();
+  final GlobalKey _priceKey = GlobalKey();
+  GlobalKey? _focusedKey;
 
   FindPropertyVM get _viewModel => ref.read(findPropertyVMProvider.notifier);
 
@@ -38,6 +40,8 @@ class _FindPropertyScreenState extends ConsumerState<FindPropertyScreen> {
   }
 
   void _onPriceFocus() {
+    setState(() => _focusedKey = _priceFocusNode.hasFocus ? _priceKey : null);
+
     if (_priceFocusNode.hasFocus) {
       _viewModel.action(const FindPropertyAction.edit(FindPropertyPriceField.price));
     } else if (ref.read(findPropertyVMProvider).editingField != null) {
@@ -68,8 +72,9 @@ class _FindPropertyScreenState extends ConsumerState<FindPropertyScreen> {
       body: Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
+            child: AppKeyboardScrollView(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
+              focusedKey: _focusedKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 spacing: 40,
@@ -162,6 +167,7 @@ class _FindPropertyScreenState extends ConsumerState<FindPropertyScreen> {
 
   Widget _price(FindPropertyViewState state, FindPropertyVM viewModel) {
     return Column(
+      key: _priceKey,
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 10,
       children: [

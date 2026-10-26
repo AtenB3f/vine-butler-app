@@ -17,6 +17,10 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
   final Map<ApplyPropertyPriceField, FocusNode> _focusNodes = {
     for (final field in ApplyPropertyPriceField.values) field: FocusNode(),
   };
+  final Map<ApplyPropertyPriceField, GlobalKey> _fieldKeys = {
+    for (final field in ApplyPropertyPriceField.values) field: GlobalKey(),
+  };
+  GlobalKey? _focusedKey;
 
   ApplyPropertyTypeVM get _viewModel => ref.read(applyPropertyTypeVMProvider.notifier);
 
@@ -38,9 +42,14 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
   }
 
   void _onFocus(ApplyPropertyPriceField field, bool hasFocus) {
-    if (hasFocus) { return _viewModel.action(ApplyPropertyTypeAction.edit(field)); }
+    if (hasFocus) {
+      setState(() => _focusedKey = _fieldKeys[field]);
+      _viewModel.action(ApplyPropertyTypeAction.edit(field));
+      return;
+    }
     if (_focusNodes.values.any((node) => node.hasFocus)) { return; }
 
+    setState(() => _focusedKey = null);
     _viewModel.action(const ApplyPropertyTypeAction.edit(null));
   }
 
@@ -70,8 +79,9 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
       body: Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
+            child: AppKeyboardScrollView(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
+              focusedKey: _focusedKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 spacing: 40,
@@ -197,6 +207,7 @@ class _ApplyPropertyTypeScreenState extends ConsumerState<ApplyPropertyTypeScree
     final focusNode = _focusNodes[field]!;
 
     return Column(
+      key: _fieldKeys[field],
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 10,
       children: [
