@@ -1,4 +1,5 @@
 import 'package:flutter/painting.dart';
+import 'package:vine_butler/components/color.dart';
 
 class NaverMapViewState {
   final ({double latitude, double longitude}) cameraLocation;
@@ -30,7 +31,7 @@ class NaverMarkerViewState {
   final String id;
   final double latitude;
   final double longitude;
-  final String label;
+  final String? label;
   final Color backgroundColor;
   final Color borderColor;
 
@@ -38,9 +39,9 @@ class NaverMarkerViewState {
     required this.id,
     required this.latitude,
     required this.longitude,
-    required this.label,
-    required this.backgroundColor,
-    required this.borderColor,
+    this.label,
+    this.backgroundColor = StateColor.white,
+    this.borderColor = StateColor.white,
   });
 
   @override

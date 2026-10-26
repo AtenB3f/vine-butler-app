@@ -99,7 +99,6 @@ class _NativeMapState extends State<NativeMap> {
       await controller.clearOverlays(type: NOverlayType.marker);
       _markers.clear();
       _images.clear();
-      await controller.addOverlay(NMarker(id: 'position', position: _position));
       return;
     }
 
@@ -281,7 +280,7 @@ Future<({NOverlayImage image, Size size})> _userLocationImage(double pixelRatio)
   );
 }
 
-/// 모바일용 매물 마커 이미지 (라벨 + 핀)
+/// 모바일용 매물 마커 이미지 (라벨 + 핀, 라벨이 없으면 핀만)
 Future<({NOverlayImage image, Size size, double tipY})> _markerImage(
   NaverMarkerViewState marker,
   ui.Picture pin,
@@ -289,34 +288,40 @@ Future<({NOverlayImage image, Size size, double tipY})> _markerImage(
   double pixelRatio,
   TextScaler textScaler,
 ) async {
-  final text = TextPainter(
-    text: TextSpan(text: marker.label, style: AppFontStyle.sub1.style(TextColor.dark)),
-    textDirection: TextDirection.ltr,
-    textScaler: textScaler,
-  )..layout();
-  final labelSize = Size(text.width + 22, text.height + 10);
+  final label = marker.label;
+  final text = label == null
+      ? null
+      : (TextPainter(
+          text: TextSpan(text: label, style: AppFontStyle.sub1.style(TextColor.dark)),
+          textDirection: TextDirection.ltr,
+          textScaler: textScaler,
+        )..layout());
+  final labelSize = text == null ? Size.zero : Size(text.width + 22, text.height + 10);
+  final labelGap = text == null ? 0.0 : PinSpec.labelGap;
   final size = Size(
     math.max(labelSize.width, PinSpec.shape.width).ceilToDouble(),
-    (labelSize.height + PinSpec.labelGap + PinSpec.shape.height).ceilToDouble(),
+    (labelSize.height + labelGap + PinSpec.shape.height).ceilToDouble(),
   );
   final labelRect = RRect.fromRectAndRadius(
     Rect.fromLTWH((size.width - labelSize.width) / 2 + 0.5, 0.5, labelSize.width - 1, labelSize.height - 1),
     const Radius.circular(4),
   );
   final pinLeft = (size.width - PinSpec.shape.width) / 2;
-  final pinTop = labelSize.height + PinSpec.labelGap;
+  final pinTop = labelSize.height + labelGap;
   final recorder = ui.PictureRecorder();
   final canvas = Canvas(recorder)..scale(pixelRatio);
 
-  canvas
-    ..drawRRect(labelRect, Paint()..color = marker.backgroundColor)
-    ..drawRRect(
-      labelRect,
-      Paint()
-        ..color = marker.borderColor
-        ..style = PaintingStyle.stroke,
-    );
-  text.paint(canvas, Offset((size.width - text.width) / 2, (labelSize.height - text.height) / 2));
+  if (text != null) {
+    canvas
+      ..drawRRect(labelRect, Paint()..color = marker.backgroundColor)
+      ..drawRRect(
+        labelRect,
+        Paint()
+          ..color = marker.borderColor
+          ..style = PaintingStyle.stroke,
+      );
+    text.paint(canvas, Offset((size.width - text.width) / 2, (labelSize.height - text.height) / 2));
+  }
   canvas
     ..save()
     ..translate(pinLeft - PinSpec.shape.left, pinTop - PinSpec.shape.top)
@@ -335,7 +340,7 @@ Future<({NOverlayImage image, Size size, double tipY})> _markerImage(
     textScaler.scale(1),
   ].join('_');
 
-  text.dispose();
+  text?.dispose();
   image.dispose();
   return (
     image: await NOverlayImage.fromByteArray(bytes!.buffer.asUint8List(), cacheKey: cacheKey),

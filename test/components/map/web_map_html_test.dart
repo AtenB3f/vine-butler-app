@@ -82,6 +82,17 @@ void main() {
       expect(result, contains('label.textContent = item.label;'));
     });
 
+    test('라벨이 없는 마커는 라벨 없이 핀만 그린다', () {
+      final result = html(markers: [const NaverMarkerViewState(id: 'position', latitude: 37.5, longitude: 127.0)]);
+
+      expect(result, contains('"label":null'));
+      expect(result, contains('if (item.label !== null) { element.appendChild(label); }'));
+    });
+
+    test('마커가 없으면 기본 마커를 만들지 않는다', () {
+      expect(html(), isNot(contains('new naver.maps.Marker({ position: position')));
+    });
+
     test('선택 스크립트는 id를 문자열로 넘기고 선택이 없으면 빈 문자열을 넘긴다', () {
       expect(selectMarkerScript('a1'), 'select("a1");');
       expect(selectMarkerScript(null), 'select("");');

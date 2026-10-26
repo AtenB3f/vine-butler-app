@@ -48,7 +48,7 @@ String selectMarkerScript(String? id) => 'select(${jsonEncode(id ?? '')});';
 /// - `ncpKeyId`: NCP Maps Application의 Client ID
 /// - `navermap_authFailure`: 인증 실패 시 JS API가 호출하는 전역 함수
 /// - `VineButler.postMessage`: macOS `webview_flutter` 채널, `window.chrome.webview.postMessage`: Windows WebView2 채널
-/// - `markers`가 비어 있으면 지도 중심에 기본 마커 하나, 있으면 라벨+핀 마커들을 그리고 모두 보이게 범위를 맞춤
+/// - 라벨+핀 마커들을 그리고 모두 보이게 범위를 맞춤 (`label`이 없는 마커는 핀만)
 /// - `select(id)`: 선택된 마커 ID
 /// - 마커 클릭은 라벨+핀 DOM 요소에 직접 등록
 /// - `pointer-events`: 라벨 박스와 핀 모양(SVG path·circle)만 클릭을 받고, 마커 안 빈 공간은 지도와 뒤의 마커로 통과
@@ -126,7 +126,7 @@ markers.forEach(function (item) {
   label.textContent = item.label;
   pin.className = 'pin';
   pin.innerHTML = '<div class="enable">' + pinEnable + '</div><div class="disable">' + pinDisable + '</div>';
-  element.appendChild(label);
+  if (item.label !== null) { element.appendChild(label); }
   element.appendChild(pin);
 
   var marker = new naver.maps.Marker({ position: latLng, map: map, icon: { content: element, anchor: new naver.maps.Point(0, 0) } });
@@ -142,7 +142,6 @@ markers.forEach(function (item) {
   bounds = bounds ? bounds.extend(latLng) : new naver.maps.LatLngBounds(latLng, latLng);
 });
 
-if (markers.length === 0) { new naver.maps.Marker({ position: position, map: map }); }
 if (markers.length === 1) { map.setCenter(bounds.getCenter()); }
 if (markers.length > 1) { map.fitBounds(bounds, { top: 60, right: 60, bottom: 60, left: 60 }); }
 
