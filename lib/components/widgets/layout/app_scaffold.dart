@@ -22,6 +22,7 @@ class AppScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      primary: false,
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(

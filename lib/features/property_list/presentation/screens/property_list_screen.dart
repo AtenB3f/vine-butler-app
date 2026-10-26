@@ -93,6 +93,7 @@ class PropertyListScreen extends ConsumerWidget {
         onCollapse: () => viewModel.action(const PropertyListAction.panel(false)),
       ),
       child: Scaffold(
+        primary: false,
         backgroundColor: Colors.white,
         body: Column(
           children: [
