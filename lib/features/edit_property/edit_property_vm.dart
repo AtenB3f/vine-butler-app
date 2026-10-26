@@ -8,6 +8,7 @@ import 'package:vine_butler/domain/model/property_image.dart';
 import 'package:vine_butler/domain/repository/image_storage.dart';
 import 'package:vine_butler/domain/property_type.dart';
 import 'package:vine_butler/features/edit_property/presentation/edit_property_view_state.dart';
+import 'package:vine_butler/features/property_detail/presentation/property_detail_view_state.dart';
 import 'package:vine_butler/features/property_detail/property_detail_vm.dart';
 
 final editPropertyVMProvider =
@@ -323,7 +324,7 @@ class EditPropertyVM extends Notifier<EditPropertyViewState> {
 
       if (!ref.mounted) { return; }
 
-      ref.invalidate(propertyDetailVMProvider(id));
+      ref.read(propertyDetailVMProvider(id).notifier).action(PropertyDetailAction.fetch);
       sendEvent(EditPropertyEvent.save);
     } catch (_) {
       if (!ref.mounted) { return; }

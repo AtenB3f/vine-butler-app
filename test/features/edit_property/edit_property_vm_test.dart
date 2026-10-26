@@ -12,6 +12,8 @@ import 'package:vine_butler/domain/repository/image_storage.dart';
 import 'package:vine_butler/domain/repository/property_repository.dart';
 import 'package:vine_butler/features/edit_property/edit_property_vm.dart';
 import 'package:vine_butler/features/edit_property/presentation/edit_property_view_state.dart';
+import 'package:vine_butler/features/property_detail/presentation/property_detail_view_state.dart';
+import 'package:vine_butler/features/property_detail/property_detail_vm.dart';
 
 class _FakePropertyRepository implements PropertyRepository {
   Property? property;
@@ -26,6 +28,7 @@ class _FakePropertyRepository implements PropertyRepository {
     if (shouldFailSave) { throw Exception('save failed'); }
 
     saved.add(property);
+    this.property = property;
   }
 
   @override
@@ -175,6 +178,27 @@ void main() {
     expect(property.memo, '새 메모');
     expect(property.address, _address);
     expect(state().event, EditPropertyEvent.save);
+  });
+
+  test('저장하면 상세 화면을 로딩으로 되돌리지 않고 지도/이미지 선택을 유지한 채 바뀐 값으로 갱신한다', () async {
+    final statuses = <PropertyDetailStatus>[];
+
+    container.listen(propertyDetailVMProvider('a'), (_, next) => statuses.add(next.status));
+    await Future<void>.delayed(Duration.zero);
+    container.read(propertyDetailVMProvider('a').notifier).action(PropertyDetailAction.toggleMap);
+    statuses.clear();
+    await load();
+    action(const EditPropertyAction.changePrice(20000000));
+
+    await save();
+    await Future<void>.delayed(Duration.zero);
+
+    final detail = container.read(propertyDetailVMProvider('a'));
+
+    expect(statuses, isNot(contains(PropertyDetailStatus.loading)));
+    expect(detail.status, PropertyDetailStatus.loaded);
+    expect(detail.isMapVisible, isTrue);
+    expect(detail.data?.amount, 20000000);
   });
 
   test('주소를 바로 저장하면 주소만 바뀐 매물을 저장하고 이후 저장에도 새 주소를 쓴다', () async {
