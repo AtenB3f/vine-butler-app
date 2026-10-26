@@ -83,6 +83,8 @@ class _ApplyPropertyAddressDetailState extends ConsumerState<ApplyPropertyAddres
   Widget _map(double latitude, double longitude) {
     final viewState = NaverMapViewState(
       cameraLocation: (latitude: latitude, longitude: longitude),
+      markers: [NaverMarkerViewState(id: 'position', latitude: latitude, longitude: longitude)],
+      selectedMarkerId: 'position',
       clientId: ApiEnv.naverMapsClientId,
       webServiceUrl: ApiEnv.naverMapsWebServiceUrl,
     );
