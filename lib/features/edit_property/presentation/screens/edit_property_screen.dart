@@ -55,6 +55,12 @@ class EditPropertyScreen extends ConsumerWidget {
           const AppToastViewState(type: AppToastType.warning, text: '매물 정보를 수정하지 못했습니다. 다시 시도해주세요.', hasLink: false),
         );
 
+      case EditPropertyEvent.invalidPrice:
+        showAppToast(
+          context,
+          const AppToastViewState(type: AppToastType.warning, text: '거래 금액을 입력해주세요.', hasLink: false),
+        );
+
       case EditPropertyEvent.invalidOwner:
         showAppToast(
           context,

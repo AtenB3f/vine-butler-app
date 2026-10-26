@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:vine_butler/domain/property_type.dart';
 import 'package:vine_butler/features/apply_property/apply_property_type_vm.dart';
 import 'package:vine_butler/features/apply_property/presentation/apply_property_type_view_state.dart';
+import 'package:vine_butler/features/property_list/presentation/property_filter_view_state.dart';
 
 void main() {
   late ProviderContainer container;
@@ -44,6 +45,37 @@ void main() {
     expect(state().price, 50000000);
     expect(state().monthlyRent, 500000);
     expect(state().maintenanceCost, 150000);
+  });
+
+  group('다음 버튼', () {
+    test('금액이 0원이면 완료가 아니고 다음으로 가지 않는다', () {
+      action(const ApplyPropertyTypeAction.selectPropertyType(PropertyTypeFilterOption.villa));
+      action(const ApplyPropertyTypeAction.changeMonthlyRent(500000));
+
+      action(const ApplyPropertyTypeAction.next());
+
+      expect(state().isCompleted, isFalse);
+      expect(state().navigateTo, isNull);
+    });
+
+    test('월세 거래는 금액과 월세가 모두 있어야 완료다', () {
+      action(const ApplyPropertyTypeAction.selectPropertyType(PropertyTypeFilterOption.villa));
+      action(const ApplyPropertyTypeAction.changePrice(10000000));
+
+      expect(state().isCompleted, isFalse);
+
+      action(const ApplyPropertyTypeAction.changeMonthlyRent(500000));
+
+      expect(state().isCompleted, isTrue);
+    });
+
+    test('매매·전세는 월세가 0원이어도 금액만 있으면 완료다', () {
+      action(const ApplyPropertyTypeAction.selectTransactionType(PropertyTransactionType.buy));
+      action(const ApplyPropertyTypeAction.selectPropertyType(PropertyTypeFilterOption.villa));
+      action(const ApplyPropertyTypeAction.changePrice(300000000));
+
+      expect(state().isCompleted, isTrue);
+    });
   });
 
   group('금액 입력 칸', () {

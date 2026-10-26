@@ -281,6 +281,10 @@ class EditPropertyVM extends Notifier<EditPropertyViewState> {
 
     if (property == null || address == null) { return; }
 
+    if (state.price <= 0 || (state.isMonthlyRentVisible && state.monthlyRent <= 0)) {
+      sendEvent(EditPropertyEvent.invalidPrice);
+      return;
+    }
     if (!state.isOwnerValid) {
       sendEvent(EditPropertyEvent.invalidOwner);
       return;

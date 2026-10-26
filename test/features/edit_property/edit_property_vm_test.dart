@@ -245,6 +245,25 @@ void main() {
     expect(state().event, EditPropertyEvent.invalidOwner);
   });
 
+  test('금액이 0원이거나 월세 거래인데 월세가 0원이면 저장하지 않는다', () async {
+    await load();
+    action(const EditPropertyAction.changePrice(0));
+
+    await save();
+
+    expect(repository.saved, isEmpty);
+    expect(state().event, EditPropertyEvent.invalidPrice);
+
+    container.read(editPropertyVMProvider('a').notifier).sendEvent();
+    action(const EditPropertyAction.changePrice(10000000));
+    action(const EditPropertyAction.changeMonthlyRent(0));
+
+    await save();
+
+    expect(repository.saved, isEmpty);
+    expect(state().event, EditPropertyEvent.invalidPrice);
+  });
+
   test('저장에 실패하면 저장 실패 이벤트를 보낸다', () async {
     repository.shouldFailSave = true;
     await load();

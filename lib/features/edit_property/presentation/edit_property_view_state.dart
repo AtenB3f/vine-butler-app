@@ -14,6 +14,7 @@ enum EditPropertyStatus {
 enum EditPropertyEvent {
   save,
   failSave,
+  invalidPrice,
   invalidOwner,
 }
 

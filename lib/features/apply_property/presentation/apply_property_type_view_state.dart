@@ -44,7 +44,8 @@ class ApplyPropertyTypeViewState {
     }
   }
 
-  bool get isCompleted => transactionType != null && propertyType != null;
+  bool get isCompleted =>
+      transactionType != null && propertyType != null && price > 0 && (!isMonthlyRentVisible || monthlyRent > 0);
 
   String get priceLabel {
     switch (transactionType) {
