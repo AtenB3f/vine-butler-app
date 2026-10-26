@@ -237,8 +237,7 @@ class _EditPropertyAddressScreenState extends ConsumerState<EditPropertyAddressS
 
   Widget _map(double latitude, double longitude) {
     final viewState = NaverMapViewState(
-      latitude: latitude,
-      longitude: longitude,
+      cameraLocation: (latitude: latitude, longitude: longitude),
       clientId: ApiEnv.naverMapsClientId,
       webServiceUrl: ApiEnv.naverMapsWebServiceUrl,
     );

@@ -54,7 +54,7 @@ void main() {
     );
 
     String html({List<NaverMarkerViewState> markers = const []}) => webMapHtml(
-          NaverMapViewState(clientId: 'client', webServiceUrl: 'https://example.com', latitude: 37.5, longitude: 127.0, markers: markers),
+          NaverMapViewState(clientId: 'client', webServiceUrl: 'https://example.com', cameraLocation: (latitude: 37.5, longitude: 127.0), markers: markers),
           _pins,
         );
 

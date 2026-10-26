@@ -1,24 +1,26 @@
 import 'package:flutter/painting.dart';
 
 class NaverMapViewState {
-  final double latitude;
-  final double longitude;
+  final ({double latitude, double longitude}) cameraLocation;
+  final ({double latitude, double longitude})? userLocation;
   final double zoom;
   final String clientId;
   final String webServiceUrl;
   final List<NaverMarkerViewState> markers;
   final String? selectedMarkerId;
   final bool isLoaded;
+  final int cameraRequestId;
 
   const NaverMapViewState({
     required this.clientId,
     required this.webServiceUrl,
-    required this.latitude,
-    required this.longitude,
+    required this.cameraLocation,
+    this.userLocation,
     this.zoom = 16,
     this.markers = const [],
     this.selectedMarkerId,
     this.isLoaded = true,
+    this.cameraRequestId = 0,
   });
 }
 

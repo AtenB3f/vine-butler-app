@@ -10,10 +10,27 @@ import 'package:vine_butler/domain/model/property.dart';
 import 'package:vine_butler/domain/model/property_deal.dart';
 import 'package:vine_butler/domain/model/property_search_condition.dart';
 import 'package:vine_butler/domain/property_type.dart';
+import 'package:vine_butler/domain/repository/location_repository.dart';
 import 'package:vine_butler/domain/repository/property_repository.dart';
 import 'package:vine_butler/features/map/map_vm.dart';
 import 'package:vine_butler/features/map/presentation/map_view_state.dart';
 import 'package:vine_butler/features/property_list/presentation/property_filter_view_state.dart';
+
+class _FakeLocationRepository implements LocationRepository {
+  final Completer<({double latitude, double longitude})?> completer = Completer();
+
+  bool isDenied = false;
+  int openSettingsCount = 0;
+
+  @override
+  Future<({double latitude, double longitude})?> current() => completer.future;
+
+  @override
+  Future<bool> isPermanentlyDenied() async => isDenied;
+
+  @override
+  Future<void> openSettings() async => openSettingsCount++;
+}
 
 class _FakePropertyRepository implements PropertyRepository {
   final List<PropertySearchCondition> requests = [];
@@ -66,6 +83,7 @@ const _buy = PropertyDeal(transactionType: PropertyTransactionType.buy, price: 1
 
 void main() {
   late _FakePropertyRepository repository;
+  late _FakeLocationRepository location;
   late ProviderContainer container;
 
   MapViewState state() => container.read(mapVMProvider);
@@ -78,7 +96,13 @@ void main() {
 
   setUp(() {
     repository = _FakePropertyRepository();
-    container = ProviderContainer(overrides: [propertyRepositoryProvider.overrideWithValue(repository)]);
+    location = _FakeLocationRepository()..completer.complete(null);
+    container = ProviderContainer(
+      overrides: [
+        propertyRepositoryProvider.overrideWithValue(repository),
+        locationRepositoryProvider.overrideWithValue(location),
+      ],
+    );
     container.listen(mapVMProvider, (_, _) {});
   });
 
@@ -91,6 +115,91 @@ void main() {
 
     expect(state().isLoaded, isTrue);
     expect(state().markers, isEmpty);
+  });
+
+  group('현재 위치', () {
+    late _FakeLocationRepository pending;
+
+    setUp(() {
+      container.dispose();
+      pending = _FakeLocationRepository();
+      container = ProviderContainer(
+        overrides: [
+          propertyRepositoryProvider.overrideWithValue(repository),
+          locationRepositoryProvider.overrideWithValue(pending),
+        ],
+      );
+      container.listen(mapVMProvider, (_, _) {});
+    });
+
+    test('매물 목록과 현재 위치를 모두 받아야 불러온 상태가 된다', () async {
+      await emit([]);
+
+      expect(state().isLoaded, isFalse);
+
+      pending.completer.complete((latitude: 37.5, longitude: 127.0));
+      await Future<void>.delayed(Duration.zero);
+
+      expect(state().isLoaded, isTrue);
+      expect(state().userLocation, (latitude: 37.5, longitude: 127.0));
+    });
+
+    test('내 위치 버튼을 누르면 위치를 갱신하고 카메라 이동을 요청한다', () async {
+      pending.completer.complete((latitude: 37.5, longitude: 127.0));
+      await Future<void>.delayed(Duration.zero);
+
+      action(const MapAction.locate());
+      await Future<void>.delayed(Duration.zero);
+
+      expect(state().userLocation, (latitude: 37.5, longitude: 127.0));
+      expect(state().cameraRequestId, 1);
+    });
+
+    test('내 위치 버튼을 눌러도 위치를 못 얻으면 카메라 이동을 요청하지 않는다', () async {
+      pending.completer.complete(null);
+      await Future<void>.delayed(Duration.zero);
+
+      action(const MapAction.locate());
+      await Future<void>.delayed(Duration.zero);
+
+      expect(state().cameraRequestId, 0);
+      expect(state().event, isNull);
+    });
+
+    test('다시 묻지 않음으로 거부된 상태면 설정 팝업 이벤트를 보내고, 소비하면 비운다', () async {
+      pending
+        ..isDenied = true
+        ..completer.complete(null);
+      await Future<void>.delayed(Duration.zero);
+
+      action(const MapAction.locate());
+      await Future<void>.delayed(Duration.zero);
+
+      expect(state().event, MapEvent.locationPermission);
+      expect(state().cameraRequestId, 0);
+
+      action(const MapAction.consumeEvent());
+
+      expect(state().event, isNull);
+    });
+
+    test('설정 열기를 누르면 앱 설정 화면을 연다', () {
+      action(const MapAction.openSettings());
+
+      expect(pending.openSettingsCount, 1);
+    });
+
+    test('현재 위치를 못 얻으면 위치 없이 불러온 상태가 된다', () async {
+      pending.completer.complete(null);
+      await Future<void>.delayed(Duration.zero);
+
+      expect(state().isLoaded, isFalse);
+
+      await emit([]);
+
+      expect(state().isLoaded, isTrue);
+      expect(state().userLocation, isNull);
+    });
   });
 
   test('매물마다 좌표와 가격 라벨, 거래 유형별 라벨 색의 마커를 만든다', () async {

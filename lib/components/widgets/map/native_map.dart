@@ -31,8 +31,9 @@ class _NativeMapState extends State<NativeMap> {
   bool _isLoaded = false;
   int _markerRequestId = 0;
   ({PictureInfo enable, PictureInfo disable})? _pins;
+  ({NOverlayImage image, Size size})? _userLocationIcon;
 
-  NLatLng get _position => NLatLng(widget.viewState.latitude, widget.viewState.longitude);
+  NLatLng get _position => NLatLng(widget.viewState.cameraLocation.latitude, widget.viewState.cameraLocation.longitude);
 
   @override
   void didUpdateWidget(covariant NativeMap oldWidget) {
@@ -41,13 +42,16 @@ class _NativeMapState extends State<NativeMap> {
     final current = widget.viewState;
 
     final isMarkerChanged = !listEquals(old.markers, current.markers);
-    final isCameraChanged = !listEquals(_points(old.markers), _points(current.markers)) ||
-        old.latitude != current.latitude ||
-        old.longitude != current.longitude ||
+    final isPointChanged = current.userLocation == null && !listEquals(_points(old.markers), _points(current.markers));
+    final isCameraChanged = isPointChanged ||
+        old.userLocation != current.userLocation ||
+        old.cameraLocation != current.cameraLocation ||
         old.zoom != current.zoom ||
-        old.isLoaded != current.isLoaded;
+        old.isLoaded != current.isLoaded ||
+        old.cameraRequestId != current.cameraRequestId;
 
     if (isMarkerChanged) { _updateMarkers(); }
+    if (old.userLocation != current.userLocation) { _showUserLocation(); }
     if (isCameraChanged) { _moveCamera(); }
     if (!isMarkerChanged && old.selectedMarkerId != current.selectedMarkerId) { _select(old.selectedMarkerId, current.selectedMarkerId); }
   }
@@ -140,18 +144,57 @@ class _NativeMapState extends State<NativeMap> {
     await controller.addOverlayAll(markerOverlays.values.toSet());
   }
 
+  /// 카메라 이동
+  ///
+  /// - 현재 위치가 있으면 현재 위치 중심
+  /// - 없으면 매물 전체가 보이게, 매물이 없으면 기본 위치로
   Future<void> _moveCamera() async {
     final controller = _controller;
     final markers = widget.viewState.markers;
+    final userLocation = widget.viewState.userLocation;
 
     if (controller == null || !widget.viewState.isLoaded) { return; }
 
+    if (userLocation != null) {
+      final target = NLatLng(userLocation.latitude, userLocation.longitude);
+
+      await controller.updateCamera(NCameraUpdate.scrollAndZoomTo(target: target, zoom: widget.viewState.zoom));
+      return;
+    }
     if (markers.isEmpty) {
       await controller.updateCamera(NCameraUpdate.scrollAndZoomTo(target: _position, zoom: widget.viewState.zoom));
       return;
     }
 
     await controller.updateCamera(_fitCamera(markers));
+  }
+
+  /// 내 위치 표시
+  ///
+  /// - 아이콘은 원이 이미지 정가운데라 anchor는 (0.5, 0.5)
+  /// - 네이버 기본 방향 아이콘(subIcon)과 정확도 원(circle)은 숨김
+  Future<void> _showUserLocation() async {
+    final controller = _controller;
+    final userLocation = widget.viewState.userLocation;
+
+    if (controller == null) { return; }
+
+    final overlay = controller.getLocationOverlay();
+
+    if (userLocation == null) { return overlay.setIsVisible(false); }
+
+    final icon = _userLocationIcon ??= await _userLocationImage(MediaQuery.devicePixelRatioOf(context));
+
+    if (!mounted) { return; }
+
+    overlay
+      ..setIcon(icon.image)
+      ..setIconSize(icon.size)
+      ..setAnchor(const NPoint(0.5, 0.5))
+      ..setSubIcon(null)
+      ..setCircleRadius(0)
+      ..setPosition(NLatLng(userLocation.latitude, userLocation.longitude))
+      ..setIsVisible(true);
   }
 
   NCameraUpdate _fitCamera(List<NaverMarkerViewState> markers) {
@@ -174,6 +217,7 @@ class _NativeMapState extends State<NativeMap> {
           onMapReady: (controller) {
             _controller = controller;
             _updateMarkers();
+            _showUserLocation();
             _moveCamera();
           },
           onMapLoaded: () {
@@ -185,6 +229,37 @@ class _NativeMapState extends State<NativeMap> {
       ],
     );
   }
+}
+
+Future<({NOverlayImage image, Size size})> _userLocationImage(double pixelRatio) async {
+  const size = Size(58, 58);
+  final center = size.center(Offset.zero);
+  final recorder = ui.PictureRecorder();
+
+  Paint strokePaint(Color color) {
+    return Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+  }
+
+  Canvas(recorder)
+    ..scale(pixelRatio)
+    ..drawCircle(center, 11, Paint()..color = MainColor.medium..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6))
+    ..drawCircle(center, 11, Paint()..color = StateColor.dimmed..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2))
+    ..drawCircle(center, 11, Paint()..color = MainColor.medium)
+    ..drawCircle(center, 10.5, strokePaint(MainColor.dark))
+    ..drawCircle(center, 4.8, Paint()..color = StateColor.white)
+    ..drawCircle(center, 4.3, strokePaint(MainColor.dark));
+
+  final image = await recorder.endRecording().toImage((size.width * pixelRatio).ceil(), (size.height * pixelRatio).ceil());
+  final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+
+  image.dispose();
+  return (
+    image: await NOverlayImage.fromByteArray(bytes!.buffer.asUint8List(), cacheKey: 'user_location_$pixelRatio'),
+    size: size,
+  );
 }
 
 /// 모바일용 매물 마커 이미지 (라벨 + 핀)

@@ -8,11 +8,13 @@ import 'package:vine_butler/features/map/map_vm.dart';
 import 'package:vine_butler/features/map/presentation/map_property_card_view_state.dart';
 import 'package:vine_butler/features/map/presentation/map_view_state.dart';
 import 'package:vine_butler/features/map/presentation/screens/map_property_card.dart';
+import 'package:vine_butler/features/map/presentation/screens/map_top_section.dart';
 import 'package:vine_butler/features/property_list/presentation/property_filter_view_state.dart';
 import 'package:vine_butler/features/property_list/presentation/screens/property_filter_panel.dart';
 import 'package:vine_butler/features/property_list/presentation/screens/property_filter_tags.dart';
 import 'package:vine_butler/features/property_list/presentation/screens/property_search_overlay.dart';
 import 'package:vine_butler/features/property_list/presentation/screens/property_search_result_item.dart';
+import 'package:vine_butler/shared/extensions/extensions.dart';
 
 class MapScreen extends ConsumerWidget {
   const MapScreen({super.key});
@@ -22,6 +24,12 @@ class MapScreen extends ConsumerWidget {
     final state = ref.watch(mapVMProvider);
     final viewModel = ref.read(mapVMProvider.notifier);
     final selected = state.selected;
+
+    ref.handleEvent(
+      mapVMProvider.select((state) => state.event),
+      consume: () => viewModel.action(const MapAction.consumeEvent()),
+      onEvent: (event) => _onEvent(context, viewModel, event),
+    );
 
     return Scaffold(
       backgroundColor: StateColor.white,
@@ -47,12 +55,21 @@ class MapScreen extends ConsumerWidget {
               ),
               child: Column(
                 children: [
-                  PropertyFilterTags(
-                    query: state.query,
-                    filter: state.filter,
-                    onFilter: (data) => viewModel.action(MapAction.filtering(data)),
-                    onClearQuery: () => viewModel.action(const MapAction.search('')),
-                  ),
+                  if (context.isMobile)
+                    MapTopSection(
+                      query: state.query,
+                      filter: state.filter,
+                      onFilter: (data) => viewModel.action(MapAction.filtering(data)),
+                      onClearQuery: () => viewModel.action(const MapAction.search('')),
+                      onMyLocationTap: () => viewModel.action(const MapAction.locate()),
+                    )
+                  else
+                    PropertyFilterTags(
+                      query: state.query,
+                      filter: state.filter,
+                      onFilter: (data) => viewModel.action(MapAction.filtering(data)),
+                      onClearQuery: () => viewModel.action(const MapAction.search('')),
+                    ),
                   Expanded(
                     child: Stack(
                       children: [
@@ -78,16 +95,34 @@ class MapScreen extends ConsumerWidget {
     );
   }
 
+  Future<void> _onEvent(BuildContext context, MapVM viewModel, MapEvent event) async {
+    switch (event) {
+      case MapEvent.locationPermission:
+        final isConfirmed = await showAppAlertDialog(
+          context,
+          const AppAlertDialogViewState(
+            title: '위치 접근 권한을 허용해 주세요.',
+            message: '사용자의 위치를 기반으로\n지도를 표시하기 위해\n위치 권한 허용 설정이 필요합니다.',
+            primaryText: '설정',
+            secondaryText: '취소',
+          ),
+        );
+
+        if (isConfirmed == true) { viewModel.action(const MapAction.openSettings()); }
+    }
+  }
+
   Widget _map(MapViewState state, MapVM viewModel) {
     final viewState = NaverMapViewState(
-      latitude: MapViewState.defaultLatitude,
-      longitude: MapViewState.defaultLongitude,
-      zoom: MapViewState.defaultZoom,
+      cameraLocation: (latitude: MapViewState.defaultLatitude, longitude: MapViewState.defaultLongitude),
+      userLocation: state.userLocation,
+      zoom: state.userLocation == null ? MapViewState.defaultZoom : MapViewState.userLocationZoom,
       clientId: ApiEnv.naverMapsClientId,
       webServiceUrl: ApiEnv.naverMapsWebServiceUrl,
       markers: state.markers,
       selectedMarkerId: state.selected?.id,
       isLoaded: state.isLoaded,
+      cameraRequestId: state.cameraRequestId,
     );
 
     void onMarkerTap(String id) => viewModel.action(MapAction.select(id));

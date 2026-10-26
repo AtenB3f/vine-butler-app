@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vine_butler/components/components.dart';
 import 'package:vine_butler/core/di/providers.dart';
@@ -21,6 +22,9 @@ sealed class MapAction {
   const factory MapAction.search(String query) = _Search;
   const factory MapAction.panel(bool isPresented) = _Panel;
   const factory MapAction.filtering(PropertyFilterData data) = _Filtering;
+  const factory MapAction.locate() = _Locate;
+  const factory MapAction.openSettings() = _OpenSettings;
+  const factory MapAction.consumeEvent() = _ConsumeEvent;
 }
 
 class _Select extends MapAction {
@@ -51,16 +55,35 @@ class _Filtering extends MapAction {
   const _Filtering(this.data);
 }
 
+class _Locate extends MapAction {
+  const _Locate();
+}
+
+class _OpenSettings extends MapAction {
+  const _OpenSettings();
+}
+
+class _ConsumeEvent extends MapAction {
+  const _ConsumeEvent();
+}
+
 class MapVM extends Notifier<MapViewState> {
   List<Property> _properties = const [];
   StreamSubscription<List<Property>>? _subscription;
+  bool _isPropertyLoaded = false;
+  bool _isLocationLoaded = false;
 
   @override
   MapViewState build() {
     const initial = MapViewState();
+    final isMobile = defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.android;
 
     ref.onDispose(() => _subscription?.cancel());
     _filtering(initial);
+    _isLocationLoaded = !isMobile;
+
+    if (isMobile) { _loadUserLocation(); }
+
     return initial;
   }
 
@@ -88,7 +111,51 @@ class MapVM extends Notifier<MapViewState> {
       case _Filtering(:final data):
         state = state.copyWith(filter: data);
         _filtering(state);
+
+      case _Locate():
+        _locate();
+
+      case _OpenSettings():
+        ref.read(locationRepositoryProvider).openSettings();
+
+      case _ConsumeEvent():
+        state = state.copyWith(event: () => null);
     }
+  }
+
+  /// 내 위치 버튼
+  ///
+  /// - 다시 묻지 않음으로 거부된 상태면 설정 이동 팝업 이벤트
+  /// - 위치를 받으면 카메라 이동 요청 번호를 올려 지도를 내 위치로 옮김
+  Future<void> _locate() async {
+    final repository = ref.read(locationRepositoryProvider);
+
+    if (await repository.isPermanentlyDenied()) {
+      if (ref.mounted) { state = state.copyWith(event: () => MapEvent.locationPermission); }
+
+      return;
+    }
+
+    final location = await repository.current();
+
+    if (!ref.mounted || location == null) { return; }
+
+    state = state.copyWith(
+      userLocation: () => location,
+      cameraRequestId: state.cameraRequestId + 1,
+    );
+  }
+
+  Future<void> _loadUserLocation() async {
+    final location = await ref.read(locationRepositoryProvider).current();
+
+    if (!ref.mounted) { return; }
+
+    _isLocationLoaded = true;
+    state = state.copyWith(
+      userLocation: () => location,
+      isLoaded: _isPropertyLoaded,
+    );
   }
 
   void _filtering(MapViewState target) {
@@ -102,13 +169,14 @@ class MapVM extends Notifier<MapViewState> {
     final selectedId = state.selected?.id;
 
     _properties = properties;
+    _isPropertyLoaded = true;
     state = state.copyWith(
       markers: properties.map(_marker).toList(),
       selected: () => selectedId == null ? null : _card(selectedId),
       searchResults: state.query.isEmpty
           ? const []
           : properties.take(MapViewState.maxPanelResultCount).map(PropertyListItemViewState.fromDomain).toList(),
-      isLoaded: true,
+      isLoaded: _isLocationLoaded,
     );
   }
 

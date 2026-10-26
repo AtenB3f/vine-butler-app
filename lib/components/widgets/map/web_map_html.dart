@@ -54,7 +54,7 @@ String selectMarkerScript(String? id) => 'select(${jsonEncode(id ?? '')});';
 /// - `pointer-events`: 라벨 박스와 핀 모양(SVG path·circle)만 클릭을 받고, 마커 안 빈 공간은 지도와 뒤의 마커로 통과
 /// - `lastMarkerClick`: 마커 클릭 직후 지도 클릭 이벤트가 같이 오면 무시하기 위한 시각
 String webMapHtml(NaverMapViewState viewState, PinSvgs pins) {
-  final position = '${viewState.latitude}, ${viewState.longitude}';
+  final position = '${viewState.cameraLocation.latitude}, ${viewState.cameraLocation.longitude}';
   final markers = _scriptJson([
     for (final marker in viewState.markers)
       {
