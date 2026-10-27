@@ -14,6 +14,7 @@ class MapViewState {
   static const double userLocationZoom = 14;
   static const double nearbyDistance = 1000;
   static const int maxPanelResultCount = 5;
+  static const double boundsMarginRatio = 0.5;
 
   final List<NaverMarkerViewState> markers;
   final MapPropertyCardViewState? selected;

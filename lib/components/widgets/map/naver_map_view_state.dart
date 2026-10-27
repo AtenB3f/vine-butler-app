@@ -27,6 +27,16 @@ class NaverMapViewState {
   });
 }
 
+/// 카메라가 멈춘 시점의 지도 상태 (중심, zoom, 화면에 보이는 범위)
+class NaverMapCamera {
+  final ({double latitude, double longitude}) center;
+  final double zoom;
+  final ({double latitude, double longitude}) southWest;
+  final ({double latitude, double longitude}) northEast;
+
+  const NaverMapCamera({required this.center, required this.zoom, required this.southWest, required this.northEast});
+}
+
 class NaverMarkerViewState {
   final String id;
   final double latitude;

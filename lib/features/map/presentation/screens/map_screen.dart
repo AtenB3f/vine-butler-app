@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vine_butler/components/components.dart';
 import 'package:vine_butler/core/network/api_env.dart';
 import 'package:vine_butler/core/router/app_router.dart';
+import 'package:vine_butler/core/shared/app_manager.dart';
 import 'package:vine_butler/features/map/map_vm.dart';
 import 'package:vine_butler/features/map/presentation/map_property_card_view_state.dart';
 import 'package:vine_butler/features/map/presentation/map_view_state.dart';
@@ -131,7 +132,13 @@ class MapScreen extends ConsumerWidget {
     void onMapTap() => viewModel.action(const MapAction.clear());
 
     return switch (defaultTargetPlatform) {
-      TargetPlatform.android || TargetPlatform.iOS => NativeMap(viewState: viewState, onMarkerTap: onMarkerTap, onMapTap: onMapTap),
+      TargetPlatform.android || TargetPlatform.iOS => NativeMap(
+          viewState: viewState,
+          onMarkerTap: onMarkerTap,
+          onMapTap: onMapTap,
+          onStopCamera: (camera) => viewModel.action(MapAction.camera(camera)),
+          onInit: () => AppManager.shared.mapImagesReady,
+        ),
       TargetPlatform.macOS => MacMap(viewState: viewState, onMarkerTap: onMarkerTap, onMapTap: onMapTap),
       TargetPlatform.windows => WindowsMap(viewState: viewState, onMarkerTap: onMarkerTap, onMapTap: onMapTap),
       _ => const ColoredBox(color: BaseColor.light),
