@@ -32,6 +32,7 @@ class MapScreen extends ConsumerWidget {
     );
 
     return Scaffold(
+      primary: false,
       backgroundColor: StateColor.white,
       body: Column(
         children: [

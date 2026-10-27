@@ -60,6 +60,7 @@ class PropertyDetailData {
   final int? monthlyAmount; // 월세
   final int? maintenanceCost;  // 관리비
   final double? areaExclusive; // 전용면적
+  final int? roomCount; // 방 개수
   final String ownerPhone;  // 집주인 핸드폰 번호
   final String? agentCompany;  // 공인중개사무소
   final String? agentName;  // 공인중개사 이름
@@ -84,6 +85,7 @@ class PropertyDetailData {
     this.monthlyAmount,
     this.maintenanceCost,
     this.areaExclusive,
+    this.roomCount,
     required this.ownerPhone,
     this.agentCompany,
     this.agentName,
@@ -113,6 +115,7 @@ class PropertyDetailData {
       amount: property.deal.price,
       monthlyAmount: property.deal.monthlyRent,
       maintenanceCost: property.maintenanceCost,
+      roomCount: property.roomCount,
       ownerPhone: property.owner.phone,
       vicinity: const [],
       isAvailableParking: property.isParkingAvailable == true,

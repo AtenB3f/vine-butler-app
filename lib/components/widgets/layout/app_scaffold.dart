@@ -22,12 +22,13 @@ class AppScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      primary: false,
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 9),
               child: Row(
                 children: [
                   _buildSideButton(icon: leftIcon, onTap: onLeftTap),
@@ -61,10 +62,14 @@ class AppScaffold extends StatelessWidget {
     required VoidCallback? onTap,
   }) {
     return SizedBox(
-      width: 24,
-      height: 24,
+      width: 40,
+      height: 40,
       child: (icon != null && onTap != null)
-          ? GestureDetector(onTap: onTap, child: icon(TextColor.dark))
+          ? GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onTap,
+              child: Center(child: icon(TextColor.dark)),
+            )
           : null,
     );
   }

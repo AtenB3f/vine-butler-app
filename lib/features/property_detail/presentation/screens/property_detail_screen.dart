@@ -275,6 +275,13 @@ class PropertyDetailScreen extends ConsumerWidget {
   }
 
   Widget _priceInfo(PropertyDetailData data) {
+    final areaExclusive = data.areaExclusive;
+    final roomCount = data.roomCount;
+    final spaceInfo = [
+      if (areaExclusive != null) ...['${calculatePyeong(areaExclusive)}평', '${areaExclusive}m²'],
+      if (roomCount != null) '방 $roomCount개',
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 6,
@@ -301,13 +308,14 @@ class PropertyDetailScreen extends ConsumerWidget {
               AppFontStyle.header3.text(maintenanceCost == 0 ? '없음' : maintenanceCost.formattedKRW, TextColor.dark),
             ],
           ),
-        if (data.areaExclusive case final areaExclusive?)
+        if (spaceInfo.isNotEmpty)
           Row(
             spacing: 6,
             children: [
-              AppFontStyle.sub1.text('${calculatePyeong(areaExclusive)}평', TextColor.medium),
-              const Circle(size: 2, color: BaseColor.medium),
-              AppFontStyle.sub1.text('${areaExclusive}m²', TextColor.medium),
+              for (final (index, text) in spaceInfo.indexed) ...[
+                if (index > 0) const Circle(size: 3, color: BaseColor.medium),
+                AppFontStyle.sub1.text(text, TextColor.medium),
+              ],
             ],
           ),
       ],
