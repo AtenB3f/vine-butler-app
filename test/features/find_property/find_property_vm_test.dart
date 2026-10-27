@@ -85,7 +85,7 @@ void main() {
     expect(state().navigateTo, const PropertyListRoute().location);
     expect(state().transactionType, isNull);
     expect(state().propertyTypes, isEmpty);
-    expect(state().price, FindPropertyViewState.initial().price);
+    expect(state().price, 0);
   });
 
   test('이동 이벤트를 소비하면 비운다', () {
@@ -94,5 +94,24 @@ void main() {
     container.read(findPropertyVMProvider.notifier).navigate();
 
     expect(state().navigateTo, isNull);
+  });
+
+  test('금액 입력 칸은 하나라서 다음을 누르면 입력을 닫는다', () {
+    action(const FindPropertyAction.edit(FindPropertyPriceField.price));
+
+    expect(state().editingField, FindPropertyPriceField.price);
+
+    action(const FindPropertyAction.nextField());
+
+    expect(state().editingField, isNull);
+  });
+
+  test('금액은 0원에서 시작하고 거래 유형을 바꿔도 입력한 금액을 유지한다', () {
+    expect(state().price, 0);
+
+    action(const FindPropertyAction.changePrice(300000000));
+    action(const FindPropertyAction.selectTransactionType(PropertyTransactionType.buy));
+
+    expect(state().price, 300000000);
   });
 }

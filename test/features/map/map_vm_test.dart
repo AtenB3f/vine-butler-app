@@ -90,7 +90,7 @@ void main() {
     final markers = state().markers;
 
     expect(markers.map((marker) => marker.id), ['rent', 'deposit', 'buy']);
-    expect(markers.map((marker) => marker.label), ['1000만원 | 50만원', '3억원', '12억원']);
+    expect(markers.map((marker) => marker.label), ['1,000만원 | 50만원', '3억원', '12억원']);
     expect(markers.map((marker) => marker.backgroundColor), [PrimaryColor.light, SecondaryColor.light, TertiaryColor.light]);
     expect(markers.map((marker) => marker.borderColor), [PrimaryColor.dark, SecondaryColor.dark, TertiaryColor.dark]);
     expect(markers.first.latitude, 37.5006);
