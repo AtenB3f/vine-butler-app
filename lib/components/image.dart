@@ -198,6 +198,16 @@ class AppIcons {
     return iconLG('Chevron_Up_LG', color);
   }
 
+  static Widget compassSM([Color color = GrayColor.dark]) {
+    return iconSM('Compass_SM', color);
+  }
+  static Widget compassMD([Color color = GrayColor.dark]) {
+    return iconMD('Compass_MD', color);
+  }
+  static Widget compassLG([Color color = GrayColor.dark]) {
+    return iconLG('Compass_LG', color);
+  }
+
   static Widget closeSM([Color color = GrayColor.dark]) {
     return iconSM('Close_SM', color);
   }

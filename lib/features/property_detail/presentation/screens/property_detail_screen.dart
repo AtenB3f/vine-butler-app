@@ -480,8 +480,9 @@ class PropertyDetailScreen extends ConsumerWidget {
 
   Widget _map(PropertyDetailData data) {
     final viewState = NaverMapViewState(
-      latitude: data.latitude,
-      longitude: data.longitude,
+      cameraLocation: (latitude: data.latitude, longitude: data.longitude),
+      markers: [NaverMarkerViewState(id: 'position', latitude: data.latitude, longitude: data.longitude)],
+      selectedMarkerId: 'position',
       clientId: ApiEnv.naverMapsClientId,
       webServiceUrl: ApiEnv.naverMapsWebServiceUrl,
     );
