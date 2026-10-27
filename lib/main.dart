@@ -9,6 +9,7 @@ import 'package:vine_butler/components/components.dart';
 import 'package:vine_butler/core/di/providers.dart';
 import 'package:vine_butler/core/network/api_env.dart';
 import 'package:vine_butler/core/router/app_router.dart';
+import 'package:vine_butler/core/shared/app_manager.dart';
 import 'package:vine_butler/features/property_list/property_list_vm.dart';
 
 Future<void> main() async {
@@ -21,6 +22,7 @@ Future<void> main() async {
         if (kDebugMode) { debugPrint('[MAP] auth failed ${exception.code} ${exception.message}'); }
       },
     );
+    AppManager.shared.mapImagesReady = NativeMap.prepareImages(WidgetsBinding.instance.platformDispatcher.views.first.devicePixelRatio);
   }
 
   final supportDirectory = await getApplicationSupportDirectory();

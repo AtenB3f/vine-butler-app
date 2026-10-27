@@ -346,4 +346,90 @@ void main() {
     expect(state().selected, isNull);
     expect(state().bndStatus, AppBndSearchStatus.filter);
   });
+
+  group('zoom별 마커 개수', () {
+    final properties = [for (var i = 0; i < 25; i++) _property('p$i', _rent, latitude: 37.50 + i * 0.01, longitude: 127.0)];
+
+    NaverMapCamera camera(double zoom) => NaverMapCamera(
+          center: (latitude: 37.50, longitude: 127.0),
+          zoom: zoom,
+          southWest: (latitude: 37.50, longitude: 126.99),
+          northEast: (latitude: 37.525, longitude: 127.01),
+        );
+
+    NaverMapCamera wideCamera(double zoom) => NaverMapCamera(
+          center: (latitude: 37.50, longitude: 127.0),
+          zoom: zoom,
+          southWest: (latitude: 37.0, longitude: 126.5),
+          northEast: (latitude: 38.0, longitude: 127.5),
+        );
+
+    List<String> markerIds() => state().markers.map((marker) => marker.id).toList();
+    List<String> nearest(int count) => [for (var i = 0; i < count; i++) 'p$i'];
+
+    test('카메라 정보를 받기 전에는 전체 마커를 올린다', () async {
+      await emit(properties);
+
+      expect(markerIds(), hasLength(25));
+    });
+
+    test('화면 범위를 상하좌우 50% 넓힌 영역 안의 매물만 올린다', () async {
+      await emit(properties);
+
+      action(MapAction.camera(camera(16)));
+
+      expect(markerIds(), ['p0', 'p1', 'p2', 'p3']);
+    });
+
+    test('범위 안 매물이 zoom별 상한을 넘으면 카메라 중심에서 가까운 순으로 상한만큼 올린다', () async {
+      await emit(properties);
+
+      action(MapAction.camera(wideCamera(9.5)));
+
+      expect(markerIds(), nearest(10));
+
+      action(MapAction.camera(wideCamera(12)));
+
+      expect(markerIds(), nearest(15));
+
+      action(MapAction.camera(wideCamera(14)));
+
+      expect(markerIds(), nearest(20));
+
+      action(MapAction.camera(wideCamera(15)));
+
+      expect(markerIds(), hasLength(25));
+    });
+
+    test('카메라 중심과 거리가 같으면 목록 순서(금액 가까운 순)대로 상한만큼 올린다', () async {
+      await emit([for (var i = 0; i < 12; i++) _property('same$i', _rent, latitude: 37.51, longitude: 127.0)]);
+
+      action(MapAction.camera(wideCamera(9.5)));
+
+      expect(markerIds(), [for (var i = 0; i < 10; i++) 'same$i']);
+    });
+
+    test('선택한 매물은 범위 밖이어도 마커를 유지하고, 선택을 해제하면 뺀다', () async {
+      await emit(properties);
+      action(MapAction.camera(camera(12)));
+
+      action(const MapAction.select('p24'));
+
+      expect(markerIds(), ['p0', 'p1', 'p2', 'p3', 'p24']);
+
+      action(const MapAction.clear());
+
+      expect(markerIds(), ['p0', 'p1', 'p2', 'p3']);
+    });
+
+    test('내 위치 없이 매물 구성이 바뀌면 전체 마커를 올리고 카메라 이동을 요청한다', () async {
+      await emit(properties);
+      action(MapAction.camera(camera(12)));
+
+      await emit([...properties, _property('new', _buy, latitude: 37.60)]);
+
+      expect(markerIds(), hasLength(26));
+      expect(state().cameraRequestId, 1);
+    });
+  });
 }

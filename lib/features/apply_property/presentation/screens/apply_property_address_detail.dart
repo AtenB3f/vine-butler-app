@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vine_butler/components/components.dart';
 import 'package:vine_butler/core/network/api_env.dart';
+import 'package:vine_butler/core/shared/app_manager.dart';
 import 'package:vine_butler/features/apply_property/apply_property_address_vm.dart';
 
 class ApplyPropertyAddressDetail extends ConsumerStatefulWidget {
@@ -90,7 +91,7 @@ class _ApplyPropertyAddressDetailState extends ConsumerState<ApplyPropertyAddres
     );
 
     return switch (defaultTargetPlatform) {
-      TargetPlatform.android || TargetPlatform.iOS => NativeMap(viewState: viewState),
+      TargetPlatform.android || TargetPlatform.iOS => NativeMap(viewState: viewState, onInit: () => AppManager.shared.mapImagesReady),
       TargetPlatform.macOS => MacMap(viewState: viewState),
       TargetPlatform.windows => WindowsMap(viewState: viewState),
       _ => const ColoredBox(color: BaseColor.light),

@@ -43,7 +43,7 @@ Dart SDK: `^3.9.2`
 ## 로드맵
 
 - 1.0.0: 1~5단계(UI 컴포넌트, 뼈대 레이아웃, 세부 페이지, 로컬 저장, 지도 SDK) 완료, 6단계(스토어 배포) 진행 중 — 세부는 `.claude/RELEASE_CHECKLIST.md`
-- 1.1.0: 금액 입력 컴포넌트·키보드, 사진 크게 보기, 지도 현재 위치 기준 표시·거리순 페이지네이션
+- 1.1.0: 금액 입력 컴포넌트·키보드, 사진 크게 보기, 지도 현재 위치 기준 표시·화면 범위 안 매물만 zoom별 최대 개수로 표시
 - 1.2.0: 데스크톱 UI, Windows 자동 업데이트, Windows·macOS 배포
 - 1.3.0 (데스크톱만): OCR·녹음 파일 분석으로 매물 등록, 블로그 글 AI 작성 (서버리스 프록시 + 초대 코드)
 - 2.0.0: 백엔드 연동, 회원가입·로그인, 서버 저장, 인앱결제
@@ -63,6 +63,7 @@ lib/
     router/              # go_router 설정
     di/                  # Riverpod provider (DB, Repository 구현체를 인터페이스 타입으로 노출)
     network/             # dio 인스턴스, 인터셉터, API 키(api_env), ApiException
+    shared/              # 앱 전체 싱글톤 상태 (AppManager)
   domain/                # 순수 Dart (Drift/Flutter 의존 금지)
     model/               # 도메인 모델(Freezed)
     repository/          # Repository 인터페이스
@@ -142,6 +143,7 @@ Dart 코드를 작성·수정하기 전에 아래 문서를 확인할 것 (해�
 - `.claude/rules/dart-style.md`: 파일/네이밍, 상수·변수 위치, if문, 개행, 주석
 - `.claude/rules/presentation.md`: 위젯, 상태관리(Riverpod), 네비게이션, 라우팅(go_router)
 - `.claude/ui_patterns.md`: UI 작업 패턴 (레이아웃, 컴포넌트, VM Action, 네비게이션)
+- `.claude/rules/git.md`: PR 머지 커밋 메시지
 
 ## Claude에게 주는 지침
 

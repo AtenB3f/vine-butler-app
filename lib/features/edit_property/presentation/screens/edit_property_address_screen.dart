@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vine_butler/components/components.dart';
 import 'package:vine_butler/core/network/api_env.dart';
+import 'package:vine_butler/core/shared/app_manager.dart';
 import 'package:vine_butler/features/apply_property/presentation/apply_property_address_view_state.dart';
 import 'package:vine_butler/features/edit_property/edit_property_address_vm.dart';
 import 'package:vine_butler/features/edit_property/presentation/edit_property_address_view_state.dart';
@@ -245,7 +246,7 @@ class _EditPropertyAddressScreenState extends ConsumerState<EditPropertyAddressS
     );
 
     return switch (defaultTargetPlatform) {
-      TargetPlatform.android || TargetPlatform.iOS => NativeMap(viewState: viewState),
+      TargetPlatform.android || TargetPlatform.iOS => NativeMap(viewState: viewState, onInit: () => AppManager.shared.mapImagesReady),
       TargetPlatform.macOS => MacMap(viewState: viewState),
       TargetPlatform.windows => WindowsMap(viewState: viewState),
       _ => const ColoredBox(color: BaseColor.light),
