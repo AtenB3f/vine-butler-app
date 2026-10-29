@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vine_butler/core/di/providers.dart';
-import 'package:vine_butler/core/network/api_exception.dart';
+import 'package:vine_butler/domain/exception/api_exception.dart';
 import 'package:vine_butler/domain/model/address.dart';
 import 'package:vine_butler/features/apply_property/presentation/apply_property_address_view_state.dart';
 import 'package:vine_butler/features/edit_property/edit_property_vm.dart';
