@@ -16,6 +16,7 @@ List<RouteBase> get $appRoutes => [
   $propertyDetailRoute,
   $editPropertyRoute,
   $editPropertyAddressRoute,
+  $propertyWriteRoute,
 ];
 
 RouteBase get $mainShellRouteData => StatefulShellRouteData.$route(
@@ -328,6 +329,36 @@ mixin $EditPropertyAddressRoute on GoRouteData {
   String get location => GoRouteData.$location(
     '/property/${Uri.encodeComponent(_self.id)}/edit/address',
   );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $propertyWriteRoute => GoRouteData.$route(
+  path: '/property/:id/write',
+  hasOverriddenOnExit: false,
+  factory: $PropertyWriteRoute._fromState,
+);
+
+mixin $PropertyWriteRoute on GoRouteData {
+  static PropertyWriteRoute _fromState(GoRouterState state) =>
+      PropertyWriteRoute(id: state.pathParameters['id']!);
+
+  PropertyWriteRoute get _self => this as PropertyWriteRoute;
+
+  @override
+  String get location =>
+      GoRouteData.$location('/property/${Uri.encodeComponent(_self.id)}/write');
 
   @override
   void go(BuildContext context) => context.go(location);
