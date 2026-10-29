@@ -4,13 +4,13 @@ import 'package:vine_butler/components/components.dart';
 import 'package:vine_butler/features/property_write/property_write_vm.dart';
 
 class PropertyWriteContentFail extends ConsumerWidget {
-  final String id;
+  final PropertyWriteArgs args;
 
-  const PropertyWriteContentFail({super.key, required this.id});
+  const PropertyWriteContentFail({super.key, required this.args});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final viewModel = ref.read(propertyWriteVMProvider(id).notifier);
+    final viewModel = ref.read(propertyWriteVMProvider(args).notifier);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

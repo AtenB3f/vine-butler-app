@@ -109,7 +109,7 @@ class PropertyDetailScreen extends ConsumerWidget {
 
   Future<void> _onMenuSelect(BuildContext context, WidgetRef ref, _DetailMenu menu) async {
     if (menu == _DetailMenu.aiWrite) {
-      PropertyWriteRoute(id: id).push(context);
+      await _openPost(context, ref, PropertyWriteRoute(id: id));
       return;
     }
     if (menu == _DetailMenu.edit) {
@@ -176,6 +176,7 @@ class PropertyDetailScreen extends ConsumerWidget {
             _options(data),
             _furnitures(data),
             if (data.memo != null) _memo(data),
+            if (data.postTitle != null) _post(context, ref, data),
           ],
         ),
       ),
@@ -448,6 +449,41 @@ class PropertyDetailScreen extends ConsumerWidget {
         AppFontStyle.body3.text(data.memo!, TextColor.dark),
       ],
     );
+  }
+
+  Widget _post(BuildContext context, WidgetRef ref, PropertyDetailData data) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 10,
+      children: [
+        AppFontStyle.body1.text('포스트', TextColor.light),
+        Pressable(
+          onTap: () => _openPost(context, ref, PropertyPostRoute(id: id)),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  data.postTitle!,
+                  style: AppFontStyle.sub2.style(TextColor.dark),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              SizedBox.square(dimension: 30, child: Center(child: AppIcons.chevronRightSM(TextColor.dark))),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 포스트 화면 이동 함수 (돌아오면 새로 저장된 포스트를 반영하도록 다시 조회)
+  Future<void> _openPost(BuildContext context, WidgetRef ref, GoRouteData route) async {
+    await route.push(context);
+
+    if (!context.mounted) { return; }
+
+    ref.read(propertyDetailVMProvider(id).notifier).action(PropertyDetailAction.fetch);
   }
 
   AppImagePageViewState _imagePageViewState(PropertyDetailData data, {BoxFit fit = BoxFit.cover, int index = 0}) {

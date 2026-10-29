@@ -8,14 +8,14 @@ import 'package:vine_butler/features/property_write/presentation/property_write_
 import 'package:vine_butler/features/property_write/property_write_vm.dart';
 
 class PropertyWriteContentComplete extends ConsumerWidget {
-  final String id;
+  final PropertyWriteArgs args;
 
-  const PropertyWriteContentComplete({super.key, required this.id});
+  const PropertyWriteContentComplete({super.key, required this.args});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final viewModel = ref.read(propertyWriteVMProvider(id).notifier);
-    final state = ref.watch(propertyWriteVMProvider(id));
+    final viewModel = ref.read(propertyWriteVMProvider(args).notifier);
+    final state = ref.watch(propertyWriteVMProvider(args));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -27,18 +27,20 @@ class PropertyWriteContentComplete extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               spacing: 40,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 16,
-                  children: [
-                    AppFontStyle.header1.text('포스트가 생성되었습니다.', TextColor.dark),
-                    AppFontStyle.body2.text(
-                      '생성된 포스트는 기기에 저장되어 페이지를\n나가도 다시 확인하실 수 있습니다.\n앱 삭제 시 저장된 포스트는 지워집니다.',
-                      TextColor.medium,
-                    ),
-                  ],
-                ),
-                const AppDivider(type: AppDividerType.medium),
+                if (args.source == PostSource.generate) ...[
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 16,
+                    children: [
+                      AppFontStyle.header1.text('포스트가 생성되었습니다.', TextColor.dark),
+                      AppFontStyle.body2.text(
+                        '생성된 포스트는 기기에 저장되어 페이지를\n나가도 다시 확인하실 수 있습니다.\n앱 삭제 시 저장된 포스트는 지워집니다.',
+                        TextColor.medium,
+                      ),
+                    ],
+                  ),
+                  const AppDivider(type: AppDividerType.medium),
+                ],
                 _section(
                   label: '제목',
                   copyText: '제목 복사',

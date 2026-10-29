@@ -11,29 +11,32 @@ import 'package:vine_butler/shared/extensions/extensions.dart';
 
 class PropertyWriteScreen extends ConsumerWidget {
   final String id;
+  final PostSource source;
 
-  const PropertyWriteScreen({super.key, required this.id});
+  const PropertyWriteScreen({super.key, required this.id, required this.source});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final viewModel = ref.read(propertyWriteVMProvider(id).notifier);
+    final args = (id: id, source: source);
+
+    final viewModel = ref.read(propertyWriteVMProvider(args).notifier);
 
     ref.handleEvent(
-      propertyWriteVMProvider(id).select((state) => state.copyType),
+      propertyWriteVMProvider(args).select((state) => state.copyType),
       consume: () => viewModel.action(const PropertyWriteAction.clearCopy()),
       onEvent: (event) => showAppToast(context, AppToastViewState(type: AppToastType.check, text: _copyText(event), hasLink: false)),
     );
 
-    final status = ref.watch(propertyWriteVMProvider(id).select((state) => state.status));
+    final status = ref.watch(propertyWriteVMProvider(args).select((state) => state.status));
 
     return AppScaffold(
-      title: 'AI 글쓰기',
+      title: source == PostSource.generate ? 'AI 글쓰기' : '포스트',
       leftIcon: AppIcons.chevronLeftMD,
       onLeftTap: () => context.pop(),
       body: switch (status) {
         PropertyWriteStatus.loading => const PropertyWriteContentLoading(),
-        PropertyWriteStatus.fail => PropertyWriteContentFail(id: id),
-        PropertyWriteStatus.complete => PropertyWriteContentComplete(id: id),
+        PropertyWriteStatus.fail => PropertyWriteContentFail(args: args),
+        PropertyWriteStatus.complete => PropertyWriteContentComplete(args: args),
       },
     );
   }

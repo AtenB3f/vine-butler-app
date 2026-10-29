@@ -12,8 +12,10 @@ import 'package:vine_butler/domain/exception/permission_denied_exception.dart';
 import 'package:vine_butler/features/property_write/presentation/property_write_view_state.dart';
 import 'package:vine_butler/shared/utils/utils.dart';
 
+typedef PropertyWriteArgs = ({String id, PostSource source});
+
 final propertyWriteVMProvider =
-    NotifierProvider.autoDispose.family<PropertyWriteVM, PropertyWriteViewState, String>(PropertyWriteVM.new);
+    NotifierProvider.autoDispose.family<PropertyWriteVM, PropertyWriteViewState, PropertyWriteArgs>(PropertyWriteVM.new);
 
 sealed class PropertyWriteAction {
   const PropertyWriteAction();
@@ -55,13 +57,15 @@ class _ClearCopy extends PropertyWriteAction {
 }
 
 class PropertyWriteVM extends Notifier<PropertyWriteViewState> {
-  PropertyWriteVM(this.id);
+  PropertyWriteVM(this.args);
 
-  final String id;
+  final PropertyWriteArgs args;
+
+  String get id => args.id;
 
   @override
   PropertyWriteViewState build() {
-    _write();
+    _load();
     return const PropertyWriteViewState();
   }
 
@@ -69,7 +73,7 @@ class PropertyWriteVM extends Notifier<PropertyWriteViewState> {
     switch (action) {
       case _Retry():
         state = state.copyWith(status: PropertyWriteStatus.loading, errorDetail: () => null);
-        _write();
+        _load();
 
       case _Copy(:final type):
         _copy(type);
@@ -88,9 +92,42 @@ class PropertyWriteVM extends Notifier<PropertyWriteViewState> {
     }
   }
 
+  void _load() {
+    switch (args.source) {
+      case PostSource.generate:
+        _write();
+
+      case PostSource.db:
+        _loadSaved();
+    }
+  }
+
+  /// 저장된 포스트 표시 (매물이 수정된 뒤 쓴 글이어도 그대로 표시)
+  Future<void> _loadSaved() async {
+    try {
+      final property = await ref.read(propertyUseCaseProvider).get(id);
+      final post = property?.blogPost;
+
+      if (!ref.mounted) { return; }
+      if (post == null) {
+        _fail('저장된 포스트 없음');
+        return;
+      }
+
+      final imagePaths = await _imagePaths();
+
+      if (!ref.mounted) { return; }
+
+      state = state.copyWith(status: PropertyWriteStatus.complete, title: post.title, body: post.body, imagePaths: imagePaths);
+    } catch (e) {
+      _fail(e.toString());
+    }
+  }
+
   Future<void> _write() async {
     try {
-      final post = await ref.read(blogUseCaseProvider).write(id);
+      final blogUseCase = ref.read(blogUseCaseProvider);
+      final post = await blogUseCase.fetch(id) ?? await blogUseCase.write(id);
 
       if (!ref.mounted) { return; }
       if (post == null) {

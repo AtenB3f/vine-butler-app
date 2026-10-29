@@ -40,6 +40,15 @@ enum PropertyWriteStatus {
   complete,
 }
 
+/// 포스트 데이터 출처
+///
+/// - `generate`: AI 글쓰기 API
+/// - `db`: 저장된 포스트
+enum PostSource {
+  generate,
+  db,
+}
+
 enum PropertyWriteEvent {
   copyTitle,
   copyBody,
