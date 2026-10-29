@@ -1,9 +1,19 @@
 class ChatRequestDto {
-  const ChatRequestDto({required this.messages, required this.maxTokens, this.temperature = 0.5});
+  const ChatRequestDto({
+    required this.messages,
+    required this.maxTokens,
+    this.temperature = 0.4,
+    this.topP,
+    this.topK,
+    this.repetitionPenalty,
+  });
 
   final List<ChatMessageDto> messages;
   final int maxTokens;
   final double temperature;
+  final double? topP;
+  final int? topK;
+  final double? repetitionPenalty;
 
   int get imageCount => messages.expand((message) => message.contents).where((content) => content.isImage).length;
 
@@ -12,6 +22,9 @@ class ChatRequestDto {
       'messages': [for (final message in messages) message.toJson()],
       'maxTokens': maxTokens,
       'temperature': temperature,
+      'topP': ?topP,
+      'topK': ?topK,
+      'repetitionPenalty': ?repetitionPenalty,
     };
   }
 }
@@ -40,6 +53,9 @@ class ChatMessageDto {
   }
 }
 
+/// 메시지 내용 (텍스트 또는 이미지)
+///
+/// - `dataUri.data`: `data:image/png;base64,` 접두사를 붙인 data URL (이미지는 리사이저가 항상 PNG로 변환)
 class ChatContentDto {
   const ChatContentDto.text(String this.text) : base64Image = null;
 
@@ -54,7 +70,7 @@ class ChatContentDto {
     if (base64Image case final data?) {
       return {
         'type': 'image_url',
-        'dataUri': {'data': data},
+        'dataUri': {'data': 'data:image/png;base64,$data'},
       };
     }
 
