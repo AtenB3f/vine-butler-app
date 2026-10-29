@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$BlogPost {
 
- String get title; String get body; bool get isTruncated;
+ String get title; String get body; bool get isTruncated; DateTime? get propertyUpdatedAt;
 /// Create a copy of BlogPost
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -27,20 +27,20 @@ $BlogPostCopyWith<BlogPost> get copyWith => _$BlogPostCopyWithImpl<BlogPost>(thi
 @override
 bool operator ==(Object other) {
   final _this = this as BlogPost;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is BlogPost&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.body, _this.body) || other.body == _this.body)&&(identical(other.isTruncated, _this.isTruncated) || other.isTruncated == _this.isTruncated));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is BlogPost&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.body, _this.body) || other.body == _this.body)&&(identical(other.isTruncated, _this.isTruncated) || other.isTruncated == _this.isTruncated)&&(identical(other.propertyUpdatedAt, _this.propertyUpdatedAt) || other.propertyUpdatedAt == _this.propertyUpdatedAt));
 }
 
 
 @override
 int get hashCode {
   final _this = this as BlogPost;
-  return Object.hash(runtimeType,_this.title,_this.body,_this.isTruncated);
+  return Object.hash(runtimeType,_this.title,_this.body,_this.isTruncated,_this.propertyUpdatedAt);
 }
 
 @override
 String toString() {
   final _this = this as BlogPost;
-  return 'BlogPost(title: ${_this.title}, body: ${_this.body}, isTruncated: ${_this.isTruncated})';
+  return 'BlogPost(title: ${_this.title}, body: ${_this.body}, isTruncated: ${_this.isTruncated}, propertyUpdatedAt: ${_this.propertyUpdatedAt})';
 }
 
 
@@ -51,7 +51,7 @@ abstract mixin class $BlogPostCopyWith<$Res>  {
   factory $BlogPostCopyWith(BlogPost value, $Res Function(BlogPost) _then) = _$BlogPostCopyWithImpl;
 @useResult
 $Res call({
- String title, String body, bool isTruncated
+ String title, String body, bool isTruncated, DateTime? propertyUpdatedAt
 });
 
 
@@ -68,12 +68,13 @@ class _$BlogPostCopyWithImpl<$Res>
 
 /// Create a copy of BlogPost
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? body = null,Object? isTruncated = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? body = null,Object? isTruncated = null,Object? propertyUpdatedAt = freezed,}) {
   return _then(BlogPost(
 title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,body: null == body ? _self.body : body // ignore: cast_nullable_to_non_nullable
 as String,isTruncated: null == isTruncated ? _self.isTruncated : isTruncated // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,propertyUpdatedAt: freezed == propertyUpdatedAt ? _self.propertyUpdatedAt : propertyUpdatedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 
@@ -158,10 +159,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String title,  String body,  bool isTruncated)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String title,  String body,  bool isTruncated,  DateTime? propertyUpdatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _BlogPost() when $default != null:
-return $default(_that.title,_that.body,_that.isTruncated);case _:
+return $default(_that.title,_that.body,_that.isTruncated,_that.propertyUpdatedAt);case _:
   return orElse();
 
 }
@@ -179,10 +180,10 @@ return $default(_that.title,_that.body,_that.isTruncated);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String title,  String body,  bool isTruncated)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String title,  String body,  bool isTruncated,  DateTime? propertyUpdatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _BlogPost():
-return $default(_that.title,_that.body,_that.isTruncated);case _:
+return $default(_that.title,_that.body,_that.isTruncated,_that.propertyUpdatedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -199,10 +200,10 @@ return $default(_that.title,_that.body,_that.isTruncated);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String title,  String body,  bool isTruncated)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String title,  String body,  bool isTruncated,  DateTime? propertyUpdatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _BlogPost() when $default != null:
-return $default(_that.title,_that.body,_that.isTruncated);case _:
+return $default(_that.title,_that.body,_that.isTruncated,_that.propertyUpdatedAt);case _:
   return null;
 
 }
@@ -214,12 +215,13 @@ return $default(_that.title,_that.body,_that.isTruncated);case _:
 
 
 class _BlogPost implements BlogPost {
-  const _BlogPost({this.title = '', required this.body, this.isTruncated = false});
+  const _BlogPost({this.title = '', required this.body, this.isTruncated = false, this.propertyUpdatedAt});
   
 
 @override@JsonKey() final  String title;
 @override final  String body;
 @override@JsonKey() final  bool isTruncated;
+@override final  DateTime? propertyUpdatedAt;
 
 /// Create a copy of BlogPost
 /// with the given fields replaced by the non-null parameter values.
@@ -231,18 +233,18 @@ _$BlogPostCopyWith<_BlogPost> get copyWith => __$BlogPostCopyWithImpl<_BlogPost>
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _BlogPost&&(identical(other.title, title) || other.title == title)&&(identical(other.body, body) || other.body == body)&&(identical(other.isTruncated, isTruncated) || other.isTruncated == isTruncated));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _BlogPost&&(identical(other.title, title) || other.title == title)&&(identical(other.body, body) || other.body == body)&&(identical(other.isTruncated, isTruncated) || other.isTruncated == isTruncated)&&(identical(other.propertyUpdatedAt, propertyUpdatedAt) || other.propertyUpdatedAt == propertyUpdatedAt));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,title,body,isTruncated);
+    return Object.hash(runtimeType,title,body,isTruncated,propertyUpdatedAt);
 }
 
 @override
 String toString() {
-    return 'BlogPost(title: $title, body: $body, isTruncated: $isTruncated)';
+    return 'BlogPost(title: $title, body: $body, isTruncated: $isTruncated, propertyUpdatedAt: $propertyUpdatedAt)';
 }
 
 
@@ -253,7 +255,7 @@ abstract mixin class _$BlogPostCopyWith<$Res> implements $BlogPostCopyWith<$Res>
   factory _$BlogPostCopyWith(_BlogPost value, $Res Function(_BlogPost) _then) = __$BlogPostCopyWithImpl;
 @override @useResult
 $Res call({
- String title, String body, bool isTruncated
+ String title, String body, bool isTruncated, DateTime? propertyUpdatedAt
 });
 
 
@@ -270,12 +272,13 @@ class __$BlogPostCopyWithImpl<$Res>
 
 /// Create a copy of BlogPost
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? title = null,Object? body = null,Object? isTruncated = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? title = null,Object? body = null,Object? isTruncated = null,Object? propertyUpdatedAt = freezed,}) {
   return _then(_BlogPost(
 title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,body: null == body ? _self.body : body // ignore: cast_nullable_to_non_nullable
 as String,isTruncated: null == isTruncated ? _self.isTruncated : isTruncated // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,propertyUpdatedAt: freezed == propertyUpdatedAt ? _self.propertyUpdatedAt : propertyUpdatedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 

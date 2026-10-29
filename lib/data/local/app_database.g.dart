@@ -1947,12 +1947,398 @@ class PropertyImageTableCompanion
   }
 }
 
+class $PropertyBlogPostTableTable extends PropertyBlogPostTable
+    with TableInfo<$PropertyBlogPostTableTable, PropertyBlogPostTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PropertyBlogPostTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _propertyIdMeta = const VerificationMeta(
+    'propertyId',
+  );
+  @override
+  late final GeneratedColumn<String> propertyId = GeneratedColumn<String>(
+    'property_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES properties (id)',
+    ),
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _bodyMeta = const VerificationMeta('body');
+  @override
+  late final GeneratedColumn<String> body = GeneratedColumn<String>(
+    'body',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _propertyUpdatedAtMeta = const VerificationMeta(
+    'propertyUpdatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> propertyUpdatedAt =
+      GeneratedColumn<DateTime>(
+        'property_updated_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    propertyId,
+    title,
+    body,
+    propertyUpdatedAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'property_blog_posts';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PropertyBlogPostTableData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('property_id')) {
+      context.handle(
+        _propertyIdMeta,
+        propertyId.isAcceptableOrUnknown(data['property_id']!, _propertyIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_propertyIdMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('body')) {
+      context.handle(
+        _bodyMeta,
+        body.isAcceptableOrUnknown(data['body']!, _bodyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bodyMeta);
+    }
+    if (data.containsKey('property_updated_at')) {
+      context.handle(
+        _propertyUpdatedAtMeta,
+        propertyUpdatedAt.isAcceptableOrUnknown(
+          data['property_updated_at']!,
+          _propertyUpdatedAtMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_propertyUpdatedAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {propertyId};
+  @override
+  PropertyBlogPostTableData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PropertyBlogPostTableData(
+      propertyId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}property_id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      body: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}body'],
+      )!,
+      propertyUpdatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}property_updated_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $PropertyBlogPostTableTable createAlias(String alias) {
+    return $PropertyBlogPostTableTable(attachedDatabase, alias);
+  }
+}
+
+class PropertyBlogPostTableData extends DataClass
+    implements Insertable<PropertyBlogPostTableData> {
+  final String propertyId;
+  final String title;
+  final String body;
+  final DateTime propertyUpdatedAt;
+  final DateTime updatedAt;
+  const PropertyBlogPostTableData({
+    required this.propertyId,
+    required this.title,
+    required this.body,
+    required this.propertyUpdatedAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['property_id'] = Variable<String>(propertyId);
+    map['title'] = Variable<String>(title);
+    map['body'] = Variable<String>(body);
+    map['property_updated_at'] = Variable<DateTime>(propertyUpdatedAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  PropertyBlogPostTableCompanion toCompanion(bool nullToAbsent) {
+    return PropertyBlogPostTableCompanion(
+      propertyId: Value(propertyId),
+      title: Value(title),
+      body: Value(body),
+      propertyUpdatedAt: Value(propertyUpdatedAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory PropertyBlogPostTableData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PropertyBlogPostTableData(
+      propertyId: serializer.fromJson<String>(json['propertyId']),
+      title: serializer.fromJson<String>(json['title']),
+      body: serializer.fromJson<String>(json['body']),
+      propertyUpdatedAt: serializer.fromJson<DateTime>(
+        json['propertyUpdatedAt'],
+      ),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'propertyId': serializer.toJson<String>(propertyId),
+      'title': serializer.toJson<String>(title),
+      'body': serializer.toJson<String>(body),
+      'propertyUpdatedAt': serializer.toJson<DateTime>(propertyUpdatedAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  PropertyBlogPostTableData copyWith({
+    String? propertyId,
+    String? title,
+    String? body,
+    DateTime? propertyUpdatedAt,
+    DateTime? updatedAt,
+  }) => PropertyBlogPostTableData(
+    propertyId: propertyId ?? this.propertyId,
+    title: title ?? this.title,
+    body: body ?? this.body,
+    propertyUpdatedAt: propertyUpdatedAt ?? this.propertyUpdatedAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  PropertyBlogPostTableData copyWithCompanion(
+    PropertyBlogPostTableCompanion data,
+  ) {
+    return PropertyBlogPostTableData(
+      propertyId: data.propertyId.present
+          ? data.propertyId.value
+          : this.propertyId,
+      title: data.title.present ? data.title.value : this.title,
+      body: data.body.present ? data.body.value : this.body,
+      propertyUpdatedAt: data.propertyUpdatedAt.present
+          ? data.propertyUpdatedAt.value
+          : this.propertyUpdatedAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PropertyBlogPostTableData(')
+          ..write('propertyId: $propertyId, ')
+          ..write('title: $title, ')
+          ..write('body: $body, ')
+          ..write('propertyUpdatedAt: $propertyUpdatedAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(propertyId, title, body, propertyUpdatedAt, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PropertyBlogPostTableData &&
+          other.propertyId == this.propertyId &&
+          other.title == this.title &&
+          other.body == this.body &&
+          other.propertyUpdatedAt == this.propertyUpdatedAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class PropertyBlogPostTableCompanion
+    extends UpdateCompanion<PropertyBlogPostTableData> {
+  final Value<String> propertyId;
+  final Value<String> title;
+  final Value<String> body;
+  final Value<DateTime> propertyUpdatedAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const PropertyBlogPostTableCompanion({
+    this.propertyId = const Value.absent(),
+    this.title = const Value.absent(),
+    this.body = const Value.absent(),
+    this.propertyUpdatedAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PropertyBlogPostTableCompanion.insert({
+    required String propertyId,
+    required String title,
+    required String body,
+    required DateTime propertyUpdatedAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : propertyId = Value(propertyId),
+       title = Value(title),
+       body = Value(body),
+       propertyUpdatedAt = Value(propertyUpdatedAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<PropertyBlogPostTableData> custom({
+    Expression<String>? propertyId,
+    Expression<String>? title,
+    Expression<String>? body,
+    Expression<DateTime>? propertyUpdatedAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (propertyId != null) 'property_id': propertyId,
+      if (title != null) 'title': title,
+      if (body != null) 'body': body,
+      if (propertyUpdatedAt != null) 'property_updated_at': propertyUpdatedAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PropertyBlogPostTableCompanion copyWith({
+    Value<String>? propertyId,
+    Value<String>? title,
+    Value<String>? body,
+    Value<DateTime>? propertyUpdatedAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return PropertyBlogPostTableCompanion(
+      propertyId: propertyId ?? this.propertyId,
+      title: title ?? this.title,
+      body: body ?? this.body,
+      propertyUpdatedAt: propertyUpdatedAt ?? this.propertyUpdatedAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (propertyId.present) {
+      map['property_id'] = Variable<String>(propertyId.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (body.present) {
+      map['body'] = Variable<String>(body.value);
+    }
+    if (propertyUpdatedAt.present) {
+      map['property_updated_at'] = Variable<DateTime>(propertyUpdatedAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PropertyBlogPostTableCompanion(')
+          ..write('propertyId: $propertyId, ')
+          ..write('title: $title, ')
+          ..write('body: $body, ')
+          ..write('propertyUpdatedAt: $propertyUpdatedAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $PropertyTableTable propertyTable = $PropertyTableTable(this);
   late final $PropertyImageTableTable propertyImageTable =
       $PropertyImageTableTable(this);
+  late final $PropertyBlogPostTableTable propertyBlogPostTable =
+      $PropertyBlogPostTableTable(this);
   late final Index propertyImagesPropertyId = Index(
     'property_images_property_id',
     'CREATE INDEX property_images_property_id ON property_images (property_id)',
@@ -1964,6 +2350,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     propertyTable,
     propertyImageTable,
+    propertyBlogPostTable,
     propertyImagesPropertyId,
   ];
 }
@@ -2060,6 +2447,31 @@ final class $$PropertyTableTableReferences
 
     final cache = $_typedResult.readTableOrNull(
       _propertyImageTableRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $PropertyBlogPostTableTable,
+    List<PropertyBlogPostTableData>
+  >
+  _propertyBlogPostTableRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.propertyBlogPostTable,
+        aliasName: 'properties__id__property_blog_posts__property_id',
+      );
+
+  $$PropertyBlogPostTableTableProcessedTableManager
+  get propertyBlogPostTableRefs {
+    final manager = $$PropertyBlogPostTableTableTableManager(
+      $_db,
+      $_db.propertyBlogPostTable,
+    ).filter((f) => f.propertyId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _propertyBlogPostTableRefsTable($_db),
     );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
@@ -2245,6 +2657,32 @@ class $$PropertyTableTableFilterComposer
                 $removeJoinBuilderFromRootComposer,
           ),
     );
+    return f(composer);
+  }
+
+  Expression<bool> propertyBlogPostTableRefs(
+    Expression<bool> Function($$PropertyBlogPostTableTableFilterComposer f) f,
+  ) {
+    final $$PropertyBlogPostTableTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.propertyBlogPostTable,
+          getReferencedColumn: (t) => t.propertyId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$PropertyBlogPostTableTableFilterComposer(
+                $db: $db,
+                $table: $db.propertyBlogPostTable,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
     return f(composer);
   }
 }
@@ -2546,6 +2984,32 @@ class $$PropertyTableTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> propertyBlogPostTableRefs<T extends Object>(
+    Expression<T> Function($$PropertyBlogPostTableTableAnnotationComposer a) f,
+  ) {
+    final $$PropertyBlogPostTableTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.propertyBlogPostTable,
+          getReferencedColumn: (t) => t.propertyId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$PropertyBlogPostTableTableAnnotationComposer(
+                $db: $db,
+                $table: $db.propertyBlogPostTable,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$PropertyTableTableTableManager
@@ -2561,7 +3025,10 @@ class $$PropertyTableTableTableManager
           $$PropertyTableTableUpdateCompanionBuilder,
           (PropertyTableData, $$PropertyTableTableReferences),
           PropertyTableData,
-          PrefetchHooks Function({bool propertyImageTableRefs})
+          PrefetchHooks Function({
+            bool propertyImageTableRefs,
+            bool propertyBlogPostTableRefs,
+          })
         > {
   $$PropertyTableTableTableManager(_$AppDatabase db, $PropertyTableTable table)
     : super(
@@ -2707,38 +3174,66 @@ class $$PropertyTableTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({propertyImageTableRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [
-                if (propertyImageTableRefs) db.propertyImageTable,
-              ],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (propertyImageTableRefs)
-                    await $_getPrefetchedData<
-                      PropertyTableData,
-                      $PropertyTableTable,
-                      PropertyImageTableData
-                    >(
-                      currentTable: table,
-                      referencedTable: $$PropertyTableTableReferences
-                          ._propertyImageTableRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$PropertyTableTableReferences(
-                            db,
-                            table,
-                            p0,
-                          ).propertyImageTableRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.propertyId == item.id),
-                      typedResults: items,
-                    ),
-                ];
+          prefetchHooksCallback:
+              ({
+                propertyImageTableRefs = false,
+                propertyBlogPostTableRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (propertyImageTableRefs) db.propertyImageTable,
+                    if (propertyBlogPostTableRefs) db.propertyBlogPostTable,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (propertyImageTableRefs)
+                        await $_getPrefetchedData<
+                          PropertyTableData,
+                          $PropertyTableTable,
+                          PropertyImageTableData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PropertyTableTableReferences
+                              ._propertyImageTableRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PropertyTableTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).propertyImageTableRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.propertyId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (propertyBlogPostTableRefs)
+                        await $_getPrefetchedData<
+                          PropertyTableData,
+                          $PropertyTableTable,
+                          PropertyBlogPostTableData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PropertyTableTableReferences
+                              ._propertyBlogPostTableRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PropertyTableTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).propertyBlogPostTableRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.propertyId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -2755,7 +3250,10 @@ typedef $$PropertyTableTableProcessedTableManager =
       $$PropertyTableTableUpdateCompanionBuilder,
       (PropertyTableData, $$PropertyTableTableReferences),
       PropertyTableData,
-      PrefetchHooks Function({bool propertyImageTableRefs})
+      PrefetchHooks Function({
+        bool propertyImageTableRefs,
+        bool propertyBlogPostTableRefs,
+      })
     >;
 typedef $$PropertyImageTableTableCreateCompanionBuilder =
     PropertyImageTableCompanion Function({
@@ -3093,6 +3591,351 @@ typedef $$PropertyImageTableTableProcessedTableManager =
       PropertyImageTableData,
       PrefetchHooks Function({bool propertyId})
     >;
+typedef $$PropertyBlogPostTableTableCreateCompanionBuilder =
+    PropertyBlogPostTableCompanion Function({
+      required String propertyId,
+      required String title,
+      required String body,
+      required DateTime propertyUpdatedAt,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$PropertyBlogPostTableTableUpdateCompanionBuilder =
+    PropertyBlogPostTableCompanion Function({
+      Value<String> propertyId,
+      Value<String> title,
+      Value<String> body,
+      Value<DateTime> propertyUpdatedAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+final class $$PropertyBlogPostTableTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $PropertyBlogPostTableTable,
+          PropertyBlogPostTableData
+        > {
+  $$PropertyBlogPostTableTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $PropertyTableTable _propertyIdTable(_$AppDatabase db) => db
+      .propertyTable
+      .createAlias('property_blog_posts__property_id__properties__id');
+
+  $$PropertyTableTableProcessedTableManager get propertyId {
+    final $_column = $_itemColumn<String>('property_id')!;
+
+    final manager = $$PropertyTableTableTableManager(
+      $_db,
+      $_db.propertyTable,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_propertyIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$PropertyBlogPostTableTableFilterComposer
+    extends Composer<_$AppDatabase, $PropertyBlogPostTableTable> {
+  $$PropertyBlogPostTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get propertyUpdatedAt => $composableBuilder(
+    column: $table.propertyUpdatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$PropertyTableTableFilterComposer get propertyId {
+    final $$PropertyTableTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.propertyId,
+      referencedTable: $db.propertyTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PropertyTableTableFilterComposer(
+            $db: $db,
+            $table: $db.propertyTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PropertyBlogPostTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $PropertyBlogPostTableTable> {
+  $$PropertyBlogPostTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get propertyUpdatedAt => $composableBuilder(
+    column: $table.propertyUpdatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$PropertyTableTableOrderingComposer get propertyId {
+    final $$PropertyTableTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.propertyId,
+      referencedTable: $db.propertyTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PropertyTableTableOrderingComposer(
+            $db: $db,
+            $table: $db.propertyTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PropertyBlogPostTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PropertyBlogPostTableTable> {
+  $$PropertyBlogPostTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get body =>
+      $composableBuilder(column: $table.body, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get propertyUpdatedAt => $composableBuilder(
+    column: $table.propertyUpdatedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$PropertyTableTableAnnotationComposer get propertyId {
+    final $$PropertyTableTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.propertyId,
+      referencedTable: $db.propertyTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PropertyTableTableAnnotationComposer(
+            $db: $db,
+            $table: $db.propertyTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PropertyBlogPostTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PropertyBlogPostTableTable,
+          PropertyBlogPostTableData,
+          $$PropertyBlogPostTableTableFilterComposer,
+          $$PropertyBlogPostTableTableOrderingComposer,
+          $$PropertyBlogPostTableTableAnnotationComposer,
+          $$PropertyBlogPostTableTableCreateCompanionBuilder,
+          $$PropertyBlogPostTableTableUpdateCompanionBuilder,
+          (PropertyBlogPostTableData, $$PropertyBlogPostTableTableReferences),
+          PropertyBlogPostTableData,
+          PrefetchHooks Function({bool propertyId})
+        > {
+  $$PropertyBlogPostTableTableTableManager(
+    _$AppDatabase db,
+    $PropertyBlogPostTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PropertyBlogPostTableTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$PropertyBlogPostTableTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$PropertyBlogPostTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> propertyId = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String> body = const Value.absent(),
+                Value<DateTime> propertyUpdatedAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PropertyBlogPostTableCompanion(
+                propertyId: propertyId,
+                title: title,
+                body: body,
+                propertyUpdatedAt: propertyUpdatedAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String propertyId,
+                required String title,
+                required String body,
+                required DateTime propertyUpdatedAt,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => PropertyBlogPostTableCompanion.insert(
+                propertyId: propertyId,
+                title: title,
+                body: body,
+                propertyUpdatedAt: propertyUpdatedAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<
+                    $PropertyBlogPostTableTable,
+                    PropertyBlogPostTableData
+                  >(table),
+                  $$PropertyBlogPostTableTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({propertyId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (propertyId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.propertyId,
+                                referencedTable:
+                                    $$PropertyBlogPostTableTableReferences
+                                        ._propertyIdTable(db),
+                                referencedColumn:
+                                    $$PropertyBlogPostTableTableReferences
+                                        ._propertyIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$PropertyBlogPostTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PropertyBlogPostTableTable,
+      PropertyBlogPostTableData,
+      $$PropertyBlogPostTableTableFilterComposer,
+      $$PropertyBlogPostTableTableOrderingComposer,
+      $$PropertyBlogPostTableTableAnnotationComposer,
+      $$PropertyBlogPostTableTableCreateCompanionBuilder,
+      $$PropertyBlogPostTableTableUpdateCompanionBuilder,
+      (PropertyBlogPostTableData, $$PropertyBlogPostTableTableReferences),
+      PropertyBlogPostTableData,
+      PrefetchHooks Function({bool propertyId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3101,4 +3944,6 @@ class $AppDatabaseManager {
       $$PropertyTableTableTableManager(_db, _db.propertyTable);
   $$PropertyImageTableTableTableManager get propertyImageTable =>
       $$PropertyImageTableTableTableManager(_db, _db.propertyImageTable);
+  $$PropertyBlogPostTableTableTableManager get propertyBlogPostTable =>
+      $$PropertyBlogPostTableTableTableManager(_db, _db.propertyBlogPostTable);
 }

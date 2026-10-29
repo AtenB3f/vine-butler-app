@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vine_butler/core/di/providers.dart';
 import 'package:vine_butler/core/router/app_router.dart';
+import 'package:vine_butler/domain/model/blog_post.dart';
 import 'package:vine_butler/domain/model/property.dart';
 import 'package:vine_butler/domain/model/property_search_condition.dart';
 import 'package:vine_butler/domain/property_type.dart';
@@ -31,6 +32,9 @@ class _FakePropertyRepository implements PropertyRepository {
 
   @override
   Future<void> delete(String id) async {}
+
+  @override
+  Future<void> saveBlogPost(String propertyId, BlogPost post) async {}
 }
 
 void main() {
