@@ -8,6 +8,7 @@ class PropertyDetailViewState {
   final PropertyDetailEvent? event;
   final String? navigateTo;
   final bool isMapVisible;
+  final bool canWrite;
 
   const PropertyDetailViewState({
     this.data,
@@ -15,6 +16,7 @@ class PropertyDetailViewState {
     this.event,
     this.navigateTo,
     this.isMapVisible = false,
+    this.canWrite = false,
   });
 
   PropertyDetailViewState copyWith({
@@ -23,6 +25,7 @@ class PropertyDetailViewState {
     PropertyDetailEvent? Function()? event,
     String? Function()? navigateTo,
     bool? isMapVisible,
+    bool? canWrite,
   }) {
     return PropertyDetailViewState(
       data: data ?? this.data,
@@ -30,6 +33,7 @@ class PropertyDetailViewState {
       event: event != null ? event() : this.event,
       navigateTo: navigateTo != null ? navigateTo() : this.navigateTo,
       isMapVisible: isMapVisible ?? this.isMapVisible,
+      canWrite: canWrite ?? this.canWrite,
     );
   }
 }
