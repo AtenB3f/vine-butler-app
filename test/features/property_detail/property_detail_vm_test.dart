@@ -7,36 +7,11 @@ import 'package:vine_butler/domain/model/address.dart';
 import 'package:vine_butler/domain/model/owner.dart';
 import 'package:vine_butler/domain/model/property.dart';
 import 'package:vine_butler/domain/model/property_deal.dart';
-import 'package:vine_butler/domain/model/property_search_condition.dart';
 import 'package:vine_butler/domain/property_type.dart';
-import 'package:vine_butler/domain/repository/property_repository.dart';
 import 'package:vine_butler/features/property_detail/presentation/property_detail_view_state.dart';
 import 'package:vine_butler/features/property_detail/property_detail_vm.dart';
 
-class _FakePropertyRepository implements PropertyRepository {
-  Property? property;
-  final List<String> deletedIds = [];
-  bool shouldFailDelete = false;
-
-  @override
-  Future<Property?> getById(String id) async => property?.id == id ? property : null;
-
-  @override
-  Stream<List<Property>> watchList() => const Stream.empty();
-
-  @override
-  Stream<List<Property>> watchFilter(PropertySearchCondition condition) => const Stream.empty();
-
-  @override
-  Future<void> save(Property property) async {}
-
-  @override
-  Future<void> delete(String id) async {
-    if (shouldFailDelete) { throw Exception('delete failed'); }
-
-    deletedIds.add(id);
-  }
-}
+import '../../helpers/fakes/fake_property_repository.dart';
 
 Property _property({
   bool? hasLoan,
@@ -77,7 +52,7 @@ Property _property({
 }
 
 void main() {
-  late _FakePropertyRepository repository;
+  late FakePropertyRepository repository;
   late ProviderContainer container;
 
   PropertyDetailViewState state() => container.read(propertyDetailVMProvider('a'));
@@ -88,7 +63,7 @@ void main() {
   }
 
   setUp(() {
-    repository = _FakePropertyRepository();
+    repository = FakePropertyRepository();
     container = ProviderContainer(
       overrides: [
         propertyRepositoryProvider.overrideWithValue(repository),

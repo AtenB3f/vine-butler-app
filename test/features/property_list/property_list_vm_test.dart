@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vine_butler/core/di/providers.dart';
@@ -9,33 +7,10 @@ import 'package:vine_butler/domain/model/property.dart';
 import 'package:vine_butler/domain/model/property_deal.dart';
 import 'package:vine_butler/domain/model/property_search_condition.dart';
 import 'package:vine_butler/domain/property_type.dart';
-import 'package:vine_butler/domain/repository/property_repository.dart';
 import 'package:vine_butler/features/property_list/presentation/property_filter_view_state.dart';
 import 'package:vine_butler/features/property_list/property_list_vm.dart';
 
-class _FakePropertyRepository implements PropertyRepository {
-  final List<PropertySearchCondition> requests = [];
-  StreamController<List<Property>> controller = StreamController<List<Property>>();
-
-  @override
-  Stream<List<Property>> watchList() => controller.stream;
-
-  @override
-  Stream<List<Property>> watchFilter(PropertySearchCondition condition) {
-    requests.add(condition);
-    controller = StreamController<List<Property>>();
-    return controller.stream;
-  }
-
-  @override
-  Future<void> save(Property property) async {}
-
-  @override
-  Future<Property?> getById(String id) async => null;
-
-  @override
-  Future<void> delete(String id) async {}
-}
+import '../../helpers/fakes/fake_property_repository.dart';
 
 Property _property({String detailAddress = '', int? roomCount, bool? isParkingAvailable, bool? isSuretyInsuranceAvailable}) {
   return Property(
@@ -62,7 +37,7 @@ Property _property({String detailAddress = '', int? roomCount, bool? isParkingAv
 }
 
 void main() {
-  late _FakePropertyRepository repository;
+  late FakePropertyRepository repository;
   late ProviderContainer container;
 
   PropertyListViewState state() => container.read(propertyListVMProvider);
@@ -74,7 +49,7 @@ void main() {
   }
 
   setUp(() {
-    repository = _FakePropertyRepository();
+    repository = FakePropertyRepository();
     container = ProviderContainer(overrides: [propertyRepositoryProvider.overrideWithValue(repository)]);
     container.listen(propertyListVMProvider, (_, _) {});
   });
