@@ -45,7 +45,7 @@ class _FakeAddressRepository implements AddressRepository {
   }
 }
 
-const _afterDebounce = Duration(milliseconds: 500);
+const _afterDebounce = Duration(milliseconds: 600);
 
 void main() {
   late _FakeAddressRepository repository;

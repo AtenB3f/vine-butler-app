@@ -85,7 +85,7 @@ class _FakePropertyRepository implements PropertyRepository {
   Future<void> delete(String id) async {}
 }
 
-const _afterDebounce = Duration(milliseconds: 400);
+const _afterDebounce = Duration(milliseconds: 600);
 
 void main() {
   late _FakeAddressRepository addressRepository;
