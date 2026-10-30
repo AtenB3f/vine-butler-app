@@ -5,50 +5,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:vine_butler/core/di/providers.dart';
 import 'package:vine_butler/domain/exception/api_exception.dart';
 import 'package:vine_butler/domain/model/address_candidate.dart';
-import 'package:vine_butler/domain/model/address_page.dart';
-import 'package:vine_butler/domain/repository/address_repository.dart';
 import 'package:vine_butler/features/apply_property/apply_property_address_vm.dart';
 import 'package:vine_butler/features/apply_property/presentation/apply_property_address_view_state.dart';
 
-const _address = AddressCandidate(
-  zipCode: '13561',
-  roadAddress: '경기도 성남시 분당구 불정로 6 (정자동)',
-  baseRoadAddress: '경기도 성남시 분당구 불정로 6',
-  lotAddress: '경기도 성남시 분당구 정자동 178-1 NAVER그린팩토리',
-  sido: '경기도',
-  sigungu: '성남시 분당구',
-  dongMyeon: '정자동',
-);
-
-class _FakeAddressRepository implements AddressRepository {
-  final List<String> queries = [];
-  final List<int> pages = [];
-  final List<String> locatedAddresses = [];
-  int? totalCount;
-  Future<List<AddressCandidate>> Function(String query, int page) respond = (_, _) async => const [_address];
-  Future<({double latitude, double longitude})?> Function(String roadAddress) respondLocate = (_) async =>
-      (latitude: 37.3595033, longitude: 127.105216);
-
-  @override
-  Future<AddressPage> search(String query, {int page = 1}) async {
-    queries.add(query);
-    pages.add(page);
-    final addresses = await respond(query, page);
-
-    return AddressPage(addresses: addresses, totalCount: totalCount ?? addresses.length);
-  }
-
-  @override
-  Future<({double latitude, double longitude})?> locate(String roadAddress) {
-    locatedAddresses.add(roadAddress);
-    return respondLocate(roadAddress);
-  }
-}
-
-const _afterDebounce = Duration(milliseconds: 500);
+import '../../helpers/fakes/fake_address_repository.dart';
+import '../../helpers/fixtures.dart';
 
 void main() {
-  late _FakeAddressRepository repository;
+  late FakeAddressRepository repository;
   late ProviderContainer container;
 
   ApplyPropertyAddressViewState state() => container.read(applyPropertyAddressVMProvider);
@@ -56,7 +20,7 @@ void main() {
       container.read(applyPropertyAddressVMProvider.notifier).action(action);
 
   setUp(() {
-    repository = _FakeAddressRepository();
+    repository = FakeAddressRepository(addresses: const [bundangCandidate]);
     container = ProviderContainer(overrides: [addressRepositoryProvider.overrideWithValue(repository)]);
     container.listen(applyPropertyAddressVMProvider, (_, _) {});
   });
@@ -67,7 +31,7 @@ void main() {
     action(const ApplyPropertyAddressAction.search('불'));
     action(const ApplyPropertyAddressAction.search('불정'));
     action(const ApplyPropertyAddressAction.search('불정로 6'));
-    await Future<void>.delayed(_afterDebounce);
+    await Future<void>.delayed(afterDebounce);
 
     expect(repository.queries, ['불정로 6']);
   });
@@ -81,20 +45,20 @@ void main() {
 
   test('검색 결과를 화면 값으로 매핑하고 도메인 주소를 보존한다', () async {
     action(const ApplyPropertyAddressAction.search('불정로 6'));
-    await Future<void>.delayed(_afterDebounce);
+    await Future<void>.delayed(afterDebounce);
 
     final result = state().results.single;
 
     expect(state().isSearching, isFalse);
     expect(result.zipCode, '13561');
-    expect(result.address, _address.roadAddress);
-    expect(result.lotAddress, _address.lotAddress);
-    expect(result.source, _address);
+    expect(result.address, bundangCandidate.roadAddress);
+    expect(result.lotAddress, bundangCandidate.lotAddress);
+    expect(result.source, bundangCandidate);
   });
 
   test('검색 중에는 이전 결과를 유지하고 찾을 수 없음 상태가 아니다', () async {
     action(const ApplyPropertyAddressAction.search('불정로 6'));
-    await Future<void>.delayed(_afterDebounce);
+    await Future<void>.delayed(afterDebounce);
     repository.respond = (_, _) async => const [];
 
     action(const ApplyPropertyAddressAction.search('없는 주소'));
@@ -115,7 +79,7 @@ void main() {
     repository.respond = (_, _) async => const [];
 
     action(const ApplyPropertyAddressAction.search('동작구청'));
-    await Future<void>.delayed(_afterDebounce);
+    await Future<void>.delayed(afterDebounce);
 
     expect(state().results, isEmpty);
     expect(state().isNotFound, isTrue);
@@ -123,14 +87,14 @@ void main() {
 
   test('공백만 입력하면 검색하지 않고 결과를 비운다', () async {
     action(const ApplyPropertyAddressAction.search('불정로 6'));
-    await Future<void>.delayed(_afterDebounce);
+    await Future<void>.delayed(afterDebounce);
 
     action(const ApplyPropertyAddressAction.search('  '));
 
     expect(state().results, isEmpty);
     expect(state().isSearching, isFalse);
 
-    await Future<void>.delayed(_afterDebounce);
+    await Future<void>.delayed(afterDebounce);
 
     expect(repository.queries, ['불정로 6']);
     expect(state().results, isEmpty);
@@ -141,7 +105,7 @@ void main() {
     repository.respond = (_, _) async => throw const ApiException.quotaExceeded();
 
     action(const ApplyPropertyAddressAction.search('불정로 6'));
-    await Future<void>.delayed(_afterDebounce);
+    await Future<void>.delayed(afterDebounce);
 
     expect(state().errorMessage, isNotNull);
     expect(state().isSearching, isFalse);
@@ -155,12 +119,12 @@ void main() {
   test('먼저 보낸 요청의 응답이 늦게 오면 무시한다', () async {
     final slow = Completer<List<AddressCandidate>>();
 
-    repository.respond = (query, _) => query == '불정로' ? slow.future : Future.value(const [_address]);
+    repository.respond = (query, _) => query == '불정로' ? slow.future : Future.value(const [bundangCandidate]);
 
     action(const ApplyPropertyAddressAction.search('불정로'));
-    await Future<void>.delayed(_afterDebounce);
+    await Future<void>.delayed(afterDebounce);
     action(const ApplyPropertyAddressAction.search('불정로 6'));
-    await Future<void>.delayed(_afterDebounce);
+    await Future<void>.delayed(afterDebounce);
     slow.complete(const []);
     await Future<void>.delayed(Duration.zero);
 
@@ -172,12 +136,12 @@ void main() {
     final slow = Completer<List<AddressCandidate>>();
 
     repository.respond = (_, _) => slow.future;
-    final selected = AddressResultViewState.fromDomain(_address);
+    final selected = AddressResultViewState.fromDomain(bundangCandidate);
 
     action(const ApplyPropertyAddressAction.search('불정로 6'));
-    await Future<void>.delayed(_afterDebounce);
+    await Future<void>.delayed(afterDebounce);
     action(ApplyPropertyAddressAction.select(selected));
-    slow.complete(const [_address, _address]);
+    slow.complete(const [bundangCandidate, bundangCandidate]);
     await Future<void>.delayed(Duration.zero);
 
     expect(state().selected, selected);
@@ -186,18 +150,18 @@ void main() {
 
   test('선택하면 대기 중인 검색을 취소한다', () async {
     action(const ApplyPropertyAddressAction.search('불정로 6'));
-    action(ApplyPropertyAddressAction.select(AddressResultViewState.fromDomain(_address)));
-    await Future<void>.delayed(_afterDebounce);
+    action(ApplyPropertyAddressAction.select(AddressResultViewState.fromDomain(bundangCandidate)));
+    await Future<void>.delayed(afterDebounce);
 
     expect(repository.queries, isEmpty);
   });
 
   group('다음 페이지', () {
-    List<AddressCandidate> pageOf(int count) => List.filled(count, _address);
+    List<AddressCandidate> pageOf(int count) => List.filled(count, bundangCandidate);
 
     Future<void> searchFirstPage() async {
       action(const ApplyPropertyAddressAction.search('불정로'));
-      await Future<void>.delayed(_afterDebounce);
+      await Future<void>.delayed(afterDebounce);
     }
 
     setUp(() {
@@ -245,7 +209,7 @@ void main() {
 
       action(const ApplyPropertyAddressAction.loadMore());
       action(const ApplyPropertyAddressAction.search('테헤란로'));
-      await Future<void>.delayed(_afterDebounce);
+      await Future<void>.delayed(afterDebounce);
       slow.complete(pageOf(10));
       await Future<void>.delayed(Duration.zero);
 
@@ -293,7 +257,7 @@ void main() {
   });
 
   group('좌표 조회', () {
-    final selected = AddressResultViewState.fromDomain(_address);
+    final selected = AddressResultViewState.fromDomain(bundangCandidate);
 
     test('주소를 선택하면 참고항목을 뺀 도로명주소로 좌표를 찾고 다음으로 갈 수 있다', () async {
       action(ApplyPropertyAddressAction.select(selected));
@@ -305,7 +269,7 @@ void main() {
 
       expect(repository.locatedAddresses, ['경기도 성남시 분당구 불정로 6']);
       expect(state().isLocating, isFalse);
-      expect(state().located!.roadAddress, _address.roadAddress);
+      expect(state().located!.roadAddress, bundangCandidate.roadAddress);
       expect(state().located!.latitude, 37.3595033);
       expect(state().located!.longitude, 127.105216);
       expect(state().canProceed, isTrue);
@@ -367,7 +331,7 @@ void main() {
   });
 
   group('상세 주소', () {
-    final selected = AddressResultViewState.fromDomain(_address);
+    final selected = AddressResultViewState.fromDomain(bundangCandidate);
 
     test('입력하면 상세 주소가 바뀌고 공백만 있으면 입력되지 않은 것으로 본다', () {
       action(ApplyPropertyAddressAction.select(selected));

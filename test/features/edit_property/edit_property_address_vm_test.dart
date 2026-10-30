@@ -3,97 +3,22 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vine_butler/core/di/providers.dart';
-import 'package:vine_butler/domain/model/address.dart';
-import 'package:vine_butler/domain/model/address_candidate.dart';
-import 'package:vine_butler/domain/model/address_page.dart';
-import 'package:vine_butler/domain/model/blog_post.dart';
 import 'package:vine_butler/domain/model/owner.dart';
 import 'package:vine_butler/domain/model/property.dart';
 import 'package:vine_butler/domain/model/property_deal.dart';
-import 'package:vine_butler/domain/model/property_search_condition.dart';
 import 'package:vine_butler/domain/property_type.dart';
-import 'package:vine_butler/domain/repository/address_repository.dart';
-import 'package:vine_butler/domain/repository/property_repository.dart';
 import 'package:vine_butler/features/apply_property/presentation/apply_property_address_view_state.dart';
 import 'package:vine_butler/features/edit_property/edit_property_address_vm.dart';
 import 'package:vine_butler/features/edit_property/edit_property_vm.dart';
 import 'package:vine_butler/features/edit_property/presentation/edit_property_address_view_state.dart';
 
-const _candidate = AddressCandidate(
-  zipCode: '13561',
-  roadAddress: '경기도 성남시 분당구 불정로 6 (정자동)',
-  baseRoadAddress: '경기도 성남시 분당구 불정로 6',
-  lotAddress: '경기도 성남시 분당구 정자동 178-1',
-  sido: '경기도',
-  sigungu: '성남시 분당구',
-  dongMyeon: '정자동',
-);
-
-const _currentAddress = Address(
-  zipCode: '06236',
-  roadAddress: '서울 강남구 테헤란로 1',
-  lotAddress: '서울특별시 강남구 역삼동 1-1',
-  sido: '서울특별시',
-  sigungu: '강남구',
-  dongMyeon: '역삼동',
-  detailAddress: '202호',
-  latitude: 37.5006,
-  longitude: 127.0364,
-);
-
-class _FakeAddressRepository implements AddressRepository {
-  final List<String> queries = [];
-
-  @override
-  Future<AddressPage> search(String query, {int page = 1}) async {
-    queries.add(query);
-    return const AddressPage(addresses: [_candidate], totalCount: 1);
-  }
-
-  @override
-  Future<({double latitude, double longitude})?> locate(String roadAddress) async =>
-      (latitude: 37.3595033, longitude: 127.105216);
-}
-
-class _FakePropertyRepository implements PropertyRepository {
-  final List<Property> saved = [];
-  bool shouldFailSave = false;
-
-  @override
-  Future<Property?> getById(String id) async => Property(
-        id: id,
-        owner: const Owner(name: '홍길동', phone: '010-1234-5678'),
-        propertyType: PropertyType.villa,
-        deal: const PropertyDeal(transactionType: PropertyTransactionType.buy, price: 300000000),
-        address: _currentAddress,
-        updatedAt: DateTime(2020),
-      );
-
-  @override
-  Future<void> save(Property property) async {
-    if (shouldFailSave) { throw Exception('save failed'); }
-
-    saved.add(property);
-  }
-
-  @override
-  Stream<List<Property>> watchList() => const Stream.empty();
-
-  @override
-  Stream<List<Property>> watchFilter(PropertySearchCondition condition) => const Stream.empty();
-
-  @override
-  Future<void> delete(String id) async {}
-
-  @override
-  Future<void> saveBlogPost(String propertyId, BlogPost post) async {}
-}
-
-const _afterDebounce = Duration(milliseconds: 400);
+import '../../helpers/fakes/fake_address_repository.dart';
+import '../../helpers/fakes/fake_property_repository.dart';
+import '../../helpers/fixtures.dart';
 
 void main() {
-  late _FakeAddressRepository addressRepository;
-  late _FakePropertyRepository propertyRepository;
+  late FakeAddressRepository addressRepository;
+  late FakePropertyRepository propertyRepository;
   late ProviderContainer container;
 
   EditPropertyAddressViewState state() => container.read(editPropertyAddressVMProvider('a'));
@@ -103,14 +28,22 @@ void main() {
   Future<void> selectCandidate() async {
     action(const EditPropertyAddressAction.resetAddress());
     action(const EditPropertyAddressAction.search('불정로 6'));
-    await Future<void>.delayed(_afterDebounce);
-    action(EditPropertyAddressAction.select(AddressResultViewState.fromDomain(_candidate)));
+    await Future<void>.delayed(afterDebounce);
+    action(EditPropertyAddressAction.select(AddressResultViewState.fromDomain(bundangCandidate)));
     await Future<void>.delayed(Duration.zero);
   }
 
   setUp(() async {
-    addressRepository = _FakeAddressRepository();
-    propertyRepository = _FakePropertyRepository();
+    addressRepository = FakeAddressRepository(addresses: const [bundangCandidate]);
+    propertyRepository = FakePropertyRepository()
+      ..property = Property(
+        id: 'a',
+        owner: const Owner(name: '홍길동', phone: '010-1234-5678'),
+        propertyType: PropertyType.villa,
+        deal: const PropertyDeal(transactionType: PropertyTransactionType.buy, price: 300000000),
+        address: gangnamAddress,
+        updatedAt: DateTime(2020),
+      );
     container = ProviderContainer(
       overrides: [
         addressRepositoryProvider.overrideWithValue(addressRepository),
@@ -152,7 +85,7 @@ void main() {
     action(const EditPropertyAddressAction.saveDetail());
     await Future<void>.delayed(Duration.zero);
 
-    expect(propertyRepository.saved.single.address, _currentAddress.copyWith(detailAddress: '303호'));
+    expect(propertyRepository.saved.single.address, gangnamAddress.copyWith(detailAddress: '303호'));
     expect(container.read(editPropertyVMProvider('a')).address!.detailAddress, '303호');
     expect(state().isCompleted, isTrue);
   });
@@ -164,7 +97,7 @@ void main() {
 
     action(const EditPropertyAddressAction.search('불'));
     action(const EditPropertyAddressAction.search('불정로 6'));
-    await Future<void>.delayed(_afterDebounce);
+    await Future<void>.delayed(afterDebounce);
 
     expect(addressRepository.queries, ['불정로 6']);
     expect(state().results.single.zipCode, '13561');
@@ -205,7 +138,7 @@ void main() {
 
     final saved = propertyRepository.saved.single.address;
 
-    expect(saved.roadAddress, _candidate.roadAddress);
+    expect(saved.roadAddress, bundangCandidate.roadAddress);
     expect(saved.detailAddress, '101호');
     expect(saved.latitude, 37.3595033);
     expect(container.read(editPropertyVMProvider('a')).address, saved);

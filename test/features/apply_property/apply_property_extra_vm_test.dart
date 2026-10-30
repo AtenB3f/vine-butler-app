@@ -2,16 +2,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vine_butler/core/di/providers.dart';
 import 'package:vine_butler/core/router/app_router.dart';
-import 'package:vine_butler/domain/model/address_candidate.dart';
-import 'package:vine_butler/domain/model/address_page.dart';
-import 'package:vine_butler/domain/model/blog_post.dart';
 import 'package:vine_butler/domain/model/owner.dart';
-import 'package:vine_butler/domain/model/property.dart';
 import 'package:vine_butler/domain/model/property_deal.dart';
-import 'package:vine_butler/domain/model/property_search_condition.dart';
 import 'package:vine_butler/domain/property_type.dart';
-import 'package:vine_butler/domain/repository/address_repository.dart';
-import 'package:vine_butler/domain/repository/property_repository.dart';
 import 'package:vine_butler/features/apply_property/apply_property_address_vm.dart';
 import 'package:vine_butler/features/apply_property/apply_property_extra_vm.dart';
 import 'package:vine_butler/features/apply_property/apply_property_owner_vm.dart';
@@ -20,55 +13,12 @@ import 'package:vine_butler/features/apply_property/presentation/apply_property_
 import 'package:vine_butler/features/property_list/presentation/property_filter_view_state.dart';
 import 'package:vine_butler/features/property_list/property_list_event_vm.dart';
 
-const _candidate = AddressCandidate(
-  zipCode: '13561',
-  roadAddress: '경기도 성남시 분당구 불정로 6 (정자동)',
-  baseRoadAddress: '경기도 성남시 분당구 불정로 6',
-  lotAddress: '경기도 성남시 분당구 정자동 178-1 NAVER그린팩토리',
-  sido: '경기도',
-  sigungu: '성남시 분당구',
-  dongMyeon: '정자동',
-);
-
-class _FakeAddressRepository implements AddressRepository {
-  @override
-  Future<AddressPage> search(String query, {int page = 1}) async =>
-      const AddressPage(addresses: [_candidate], totalCount: 1);
-
-  @override
-  Future<({double latitude, double longitude})?> locate(String roadAddress) async =>
-      (latitude: 37.3595033, longitude: 127.105216);
-}
-
-class _FakePropertyRepository implements PropertyRepository {
-  final List<Property> saved = [];
-  bool shouldFail = false;
-
-  @override
-  Future<void> save(Property property) async {
-    if (shouldFail) { throw Exception('save failed'); }
-
-    saved.add(property);
-  }
-
-  @override
-  Stream<List<Property>> watchList() => Stream.value(saved);
-
-  @override
-  Stream<List<Property>> watchFilter(PropertySearchCondition condition) => watchList();
-
-  @override
-  Future<Property?> getById(String id) async => null;
-
-  @override
-  Future<void> delete(String id) async {}
-
-  @override
-  Future<void> saveBlogPost(String propertyId, BlogPost post) async {}
-}
+import '../../helpers/fakes/fake_address_repository.dart';
+import '../../helpers/fakes/fake_property_repository.dart';
+import '../../helpers/fixtures.dart';
 
 void main() {
-  late _FakePropertyRepository repository;
+  late FakePropertyRepository repository;
   late ProviderContainer container;
 
   void extra(ApplyPropertyExtraAction action) => container.read(applyPropertyExtraVMProvider.notifier).action(action);
@@ -83,7 +33,7 @@ void main() {
     type.action(const ApplyPropertyTypeAction.changePrice(10000000));
     type.action(const ApplyPropertyTypeAction.changeMonthlyRent(500000));
     type.action(const ApplyPropertyTypeAction.changeMaintenanceCost(100000));
-    address.action(ApplyPropertyAddressAction.select(AddressResultViewState.fromDomain(_candidate)));
+    address.action(ApplyPropertyAddressAction.select(AddressResultViewState.fromDomain(bundangCandidate)));
     await Future<void>.delayed(Duration.zero);
     address.action(const ApplyPropertyAddressAction.inputDetail(' 202호 '));
     owner.action(const ApplyPropertyOwnerAction.changeName('홍길동'));
@@ -96,10 +46,10 @@ void main() {
   }
 
   setUp(() {
-    repository = _FakePropertyRepository();
+    repository = FakePropertyRepository();
     container = ProviderContainer(
       overrides: [
-        addressRepositoryProvider.overrideWithValue(_FakeAddressRepository()),
+        addressRepositoryProvider.overrideWithValue(FakeAddressRepository(addresses: const [bundangCandidate])),
         propertyRepositoryProvider.overrideWithValue(repository),
       ],
     );
@@ -127,7 +77,7 @@ void main() {
     expect(property.propertyType, PropertyType.detachedHouse);
     expect(property.deal, const PropertyDeal(transactionType: PropertyTransactionType.rent, price: 10000000, monthlyRent: 500000));
     expect(property.maintenanceCost, 100000);
-    expect(property.address.roadAddress, _candidate.roadAddress);
+    expect(property.address.roadAddress, bundangCandidate.roadAddress);
     expect(property.address.detailAddress, '202호');
     expect(property.address.latitude, 37.3595033);
     expect(property.hasLoan, isTrue);
@@ -177,7 +127,7 @@ void main() {
   });
 
   test('저장에 실패하면 오류 메시지를 보내고 입력값을 유지한다', () async {
-    repository.shouldFail = true;
+    repository.shouldFailSave = true;
     await fillRequired();
 
     await save();

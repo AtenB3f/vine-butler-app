@@ -2,48 +2,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vine_butler/core/di/providers.dart';
 import 'package:vine_butler/domain/model/address.dart';
-import 'package:vine_butler/domain/model/blog_post.dart';
 import 'package:vine_butler/domain/model/owner.dart';
 import 'package:vine_butler/domain/model/property.dart';
 import 'package:vine_butler/domain/model/property_deal.dart';
 import 'package:vine_butler/domain/model/property_image.dart';
-import 'package:vine_butler/domain/model/property_search_condition.dart';
 import 'package:vine_butler/domain/property_type.dart';
 import 'package:vine_butler/domain/repository/image_storage.dart';
-import 'package:vine_butler/domain/repository/property_repository.dart';
 import 'package:vine_butler/features/edit_property/edit_property_vm.dart';
 import 'package:vine_butler/features/edit_property/presentation/edit_property_view_state.dart';
 import 'package:vine_butler/features/property_detail/presentation/property_detail_view_state.dart';
 import 'package:vine_butler/features/property_detail/property_detail_vm.dart';
 
-class _FakePropertyRepository implements PropertyRepository {
-  Property? property;
-  final List<Property> saved = [];
-  bool shouldFailSave = false;
-
-  @override
-  Future<Property?> getById(String id) async => property?.id == id ? property : null;
-
-  @override
-  Future<void> save(Property property) async {
-    if (shouldFailSave) { throw Exception('save failed'); }
-
-    saved.add(property);
-    this.property = property;
-  }
-
-  @override
-  Stream<List<Property>> watchList() => const Stream.empty();
-
-  @override
-  Stream<List<Property>> watchFilter(PropertySearchCondition condition) => const Stream.empty();
-
-  @override
-  Future<void> delete(String id) async {}
-
-  @override
-  Future<void> saveBlogPost(String propertyId, BlogPost post) async {}
-}
+import '../../helpers/fakes/fake_property_repository.dart';
+import '../../helpers/fixtures.dart';
 
 class _FakeImageStorage implements ImageStorage {
   final List<String> deleted = [];
@@ -59,18 +30,6 @@ class _FakeImageStorage implements ImageStorage {
   String path(String fileName) => 'images/$fileName';
 }
 
-const _address = Address(
-  zipCode: '06236',
-  roadAddress: '서울 강남구 테헤란로 1',
-  lotAddress: '서울특별시 강남구 역삼동 1-1',
-  sido: '서울특별시',
-  sigungu: '강남구',
-  dongMyeon: '역삼동',
-  detailAddress: '202호',
-  latitude: 37.5006,
-  longitude: 127.0364,
-);
-
 Property _property() {
   return Property(
     id: 'a',
@@ -78,7 +37,7 @@ Property _property() {
     propertyType: PropertyType.villa,
     deal: const PropertyDeal(transactionType: PropertyTransactionType.rent, price: 10000000, monthlyRent: 500000),
     maintenanceCost: 70000,
-    address: _address,
+    address: gangnamAddress,
     hasLoan: false,
     isParkingAvailable: true,
     roomCount: 1,
@@ -93,7 +52,7 @@ Property _property() {
 }
 
 void main() {
-  late _FakePropertyRepository repository;
+  late FakePropertyRepository repository;
   late _FakeImageStorage imageStorage;
   late ProviderContainer container;
 
@@ -113,7 +72,7 @@ void main() {
   }
 
   setUp(() {
-    repository = _FakePropertyRepository()..property = _property();
+    repository = FakePropertyRepository()..property = _property();
     imageStorage = _FakeImageStorage();
     container = ProviderContainer(
       overrides: [
@@ -180,7 +139,7 @@ void main() {
     expect(property.hasLoan, isTrue);
     expect(property.furnitureOptions, unorderedEquals(['냉장고', '세탁기']));
     expect(property.memo, '새 메모');
-    expect(property.address, _address);
+    expect(property.address, gangnamAddress);
     expect(state().event, EditPropertyEvent.save);
   });
 
@@ -239,10 +198,10 @@ void main() {
     await load();
     repository.shouldFailSave = true;
 
-    final isSaved = await container.read(editPropertyVMProvider('a').notifier).saveAddress(_address.copyWith(detailAddress: '303호'));
+    final isSaved = await container.read(editPropertyVMProvider('a').notifier).saveAddress(gangnamAddress.copyWith(detailAddress: '303호'));
 
     expect(isSaved, isFalse);
-    expect(state().address, _address);
+    expect(state().address, gangnamAddress);
   });
 
   test('월세가 아니면 월세 금액을 저장하지 않는다', () async {

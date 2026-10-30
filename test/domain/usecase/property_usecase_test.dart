@@ -1,54 +1,19 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vine_butler/domain/model/address.dart';
-import 'package:vine_butler/domain/model/blog_post.dart';
 import 'package:vine_butler/domain/model/owner.dart';
-import 'package:vine_butler/domain/model/property.dart';
 import 'package:vine_butler/domain/model/property_deal.dart';
-import 'package:vine_butler/domain/model/property_search_condition.dart';
 import 'package:vine_butler/domain/model/property_image.dart';
 import 'package:vine_butler/domain/property_type.dart';
-import 'package:vine_butler/domain/repository/property_repository.dart';
 import 'package:vine_butler/domain/usecase/property_usecase.dart';
 
-class _FakePropertyRepository implements PropertyRepository {
-  final List<Property> saved = [];
-
-  @override
-  Future<void> save(Property property) async => saved.add(property);
-
-  @override
-  Stream<List<Property>> watchList() => Stream.value(saved);
-
-  @override
-  Stream<List<Property>> watchFilter(PropertySearchCondition condition) => watchList();
-
-  @override
-  Future<Property?> getById(String id) async => null;
-
-  @override
-  Future<void> delete(String id) async {}
-
-  @override
-  Future<void> saveBlogPost(String propertyId, BlogPost post) async {}
-}
-
-const _address = Address(
-  zipCode: '06236',
-  roadAddress: '서울 강남구 테헤란로 1',
-  lotAddress: '역삼동 1-1',
-  sido: '서울특별시',
-  sigungu: '강남구',
-  dongMyeon: '역삼동',
-  latitude: 37.5006,
-  longitude: 127.0364,
-);
+import '../../helpers/fakes/fake_property_repository.dart';
+import '../../helpers/fixtures.dart';
 
 void main() {
-  late _FakePropertyRepository repository;
+  late FakePropertyRepository repository;
   late PropertyUseCase useCase;
 
   setUp(() {
-    repository = _FakePropertyRepository();
+    repository = FakePropertyRepository();
     useCase = PropertyUseCase(repository);
   });
 
@@ -57,7 +22,7 @@ void main() {
       owner: const Owner(name: '홍길동', phone: '010-1234-5678'),
       propertyType: PropertyType.apartment,
       deal: const PropertyDeal(transactionType: PropertyTransactionType.rent, price: 10000000, monthlyRent: 500000),
-      address: _address,
+      address: gangnamAddress,
     );
   }
 
@@ -83,7 +48,7 @@ void main() {
       owner: const Owner(name: '홍길동', phone: '010-1234-5678'),
       propertyType: PropertyType.apartment,
       deal: const PropertyDeal(transactionType: PropertyTransactionType.buy, price: 500000000),
-      address: _address,
+      address: gangnamAddress,
       images: [image],
     );
 

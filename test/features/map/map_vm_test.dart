@@ -5,17 +5,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:vine_butler/components/components.dart';
 import 'package:vine_butler/core/di/providers.dart';
 import 'package:vine_butler/domain/model/address.dart';
-import 'package:vine_butler/domain/model/blog_post.dart';
 import 'package:vine_butler/domain/model/owner.dart';
 import 'package:vine_butler/domain/model/property.dart';
 import 'package:vine_butler/domain/model/property_deal.dart';
 import 'package:vine_butler/domain/model/property_search_condition.dart';
 import 'package:vine_butler/domain/property_type.dart';
 import 'package:vine_butler/domain/repository/location_repository.dart';
-import 'package:vine_butler/domain/repository/property_repository.dart';
 import 'package:vine_butler/features/map/map_vm.dart';
 import 'package:vine_butler/features/map/presentation/map_view_state.dart';
 import 'package:vine_butler/features/property_list/presentation/property_filter_view_state.dart';
+
+import '../../helpers/fakes/fake_property_repository.dart';
 
 class _FakeLocationRepository implements LocationRepository {
   final Completer<({double latitude, double longitude})?> completer = Completer();
@@ -31,33 +31,6 @@ class _FakeLocationRepository implements LocationRepository {
 
   @override
   Future<void> openSettings() async => openSettingsCount++;
-}
-
-class _FakePropertyRepository implements PropertyRepository {
-  final List<PropertySearchCondition> requests = [];
-  StreamController<List<Property>> controller = StreamController<List<Property>>();
-
-  @override
-  Stream<List<Property>> watchList() => controller.stream;
-
-  @override
-  Stream<List<Property>> watchFilter(PropertySearchCondition condition) {
-    requests.add(condition);
-    controller = StreamController<List<Property>>();
-    return controller.stream;
-  }
-
-  @override
-  Future<Property?> getById(String id) async => null;
-
-  @override
-  Future<void> save(Property property) async {}
-
-  @override
-  Future<void> delete(String id) async {}
-
-  @override
-  Future<void> saveBlogPost(String propertyId, BlogPost post) async {}
 }
 
 Property _property(String id, PropertyDeal deal, {String detailAddress = '', double latitude = 37.5006, double longitude = 127.0364}) {
@@ -86,7 +59,7 @@ const _depositOnly = PropertyDeal(transactionType: PropertyTransactionType.depos
 const _buy = PropertyDeal(transactionType: PropertyTransactionType.buy, price: 1200000000);
 
 void main() {
-  late _FakePropertyRepository repository;
+  late FakePropertyRepository repository;
   late _FakeLocationRepository location;
   late ProviderContainer container;
 
@@ -99,7 +72,7 @@ void main() {
   }
 
   setUp(() {
-    repository = _FakePropertyRepository();
+    repository = FakePropertyRepository();
     location = _FakeLocationRepository()..completer.complete(null);
     container = ProviderContainer(
       overrides: [

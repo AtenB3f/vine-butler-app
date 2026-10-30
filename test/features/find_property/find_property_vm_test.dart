@@ -2,50 +2,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vine_butler/core/di/providers.dart';
 import 'package:vine_butler/core/router/app_router.dart';
-import 'package:vine_butler/domain/model/blog_post.dart';
-import 'package:vine_butler/domain/model/property.dart';
 import 'package:vine_butler/domain/model/property_search_condition.dart';
 import 'package:vine_butler/domain/property_type.dart';
-import 'package:vine_butler/domain/repository/property_repository.dart';
 import 'package:vine_butler/features/find_property/find_property_vm.dart';
 import 'package:vine_butler/features/find_property/presentation/find_property_view_state.dart';
 import 'package:vine_butler/features/property_list/presentation/property_filter_view_state.dart';
 import 'package:vine_butler/features/property_list/property_list_vm.dart';
 
-class _FakePropertyRepository implements PropertyRepository {
-  final List<PropertySearchCondition> requests = [];
-
-  @override
-  Stream<List<Property>> watchFilter(PropertySearchCondition condition) {
-    requests.add(condition);
-    return const Stream.empty();
-  }
-
-  @override
-  Stream<List<Property>> watchList() => const Stream.empty();
-
-  @override
-  Future<Property?> getById(String id) async => null;
-
-  @override
-  Future<void> save(Property property) async {}
-
-  @override
-  Future<void> delete(String id) async {}
-
-  @override
-  Future<void> saveBlogPost(String propertyId, BlogPost post) async {}
-}
+import '../../helpers/fakes/fake_property_repository.dart';
 
 void main() {
-  late _FakePropertyRepository repository;
+  late FakePropertyRepository repository;
   late ProviderContainer container;
 
   FindPropertyViewState state() => container.read(findPropertyVMProvider);
   void action(FindPropertyAction action) => container.read(findPropertyVMProvider.notifier).action(action);
 
   setUp(() {
-    repository = _FakePropertyRepository();
+    repository = FakePropertyRepository();
     container = ProviderContainer(overrides: [propertyRepositoryProvider.overrideWithValue(repository)]);
     container.listen(findPropertyVMProvider, (_, _) {});
     container.listen(propertyListVMProvider, (_, _) {});
