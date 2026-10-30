@@ -7,6 +7,11 @@ import 'dart:io';
 /// - `NAVER_MAPS_CLIENT_ID`: 네이버 지도·Geocoding 클라이언트 ID
 /// - `NAVER_MAPS_CLIENT_SECRET`: 네이버 Geocoding 클라이언트 시크릿
 const requiredKeys = ['JUSO_CONFM_KEY', 'NAVER_MAPS_CLIENT_ID', 'NAVER_MAPS_CLIENT_SECRET'];
+
+/// 릴리즈 빌드에 들어가면 안 되는 키 (앱 바이너리에서 추출될 수 있는 개발용 키)
+///
+/// - `CLOVA_STUDIO_API_KEY`: CLOVA Studio 테스트 API 키
+const forbiddenKeys = ['CLOVA_STUDIO_API_KEY'];
 const envFile = 'env.json';
 
 Future<void> main(List<String> args) async {
@@ -57,6 +62,13 @@ void _checkEnvFile() {
   ];
 
   if (missingKeys.isNotEmpty) { _fail('$envFile에 값이 없는 키가 있습니다: ${missingKeys.join(', ')}'); }
+
+  final includedForbiddenKeys = [
+    for (final key in forbiddenKeys)
+      if (json[key] is String && (json[key] as String).trim().isNotEmpty) key,
+  ];
+
+  if (includedForbiddenKeys.isNotEmpty) { _fail('$envFile에 릴리즈 빌드에 넣을 수 없는 개발용 키가 있습니다: ${includedForbiddenKeys.join(', ')}. 값을 비우고 다시 실행해 주세요.'); }
 }
 
 void _checkAndroidSigning() {

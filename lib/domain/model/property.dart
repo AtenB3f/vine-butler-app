@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:vine_butler/domain/model/address.dart';
+import 'package:vine_butler/domain/model/blog_post.dart';
 import 'package:vine_butler/domain/model/owner.dart';
 import 'package:vine_butler/domain/model/property_deal.dart';
 import 'package:vine_butler/domain/model/property_image.dart';
@@ -27,6 +28,7 @@ abstract class Property with _$Property {
     @Default(<String>[]) List<String> furnitureOptions,
     @Default('') String memo,
     @Default(<PropertyImage>[]) List<PropertyImage> images,
+    BlogPost? blogPost,
     required DateTime updatedAt,
     DateTime? deletedAt,
     DateTime? syncedAt,

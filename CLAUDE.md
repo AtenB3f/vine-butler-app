@@ -62,10 +62,11 @@ lib/
   core/
     router/              # go_router 설정
     di/                  # Riverpod provider (DB, Repository 구현체를 인터페이스 타입으로 노출)
-    network/             # dio 인스턴스, 인터셉터, API 키(api_env), ApiException
+    network/             # dio 인스턴스, 인터셉터, API 키(api_env)
     shared/              # 앱 전체 싱글톤 상태 (AppManager)
   domain/                # 순수 Dart (Drift/Flutter 의존 금지)
     model/               # 도메인 모델(Freezed)
+    exception/           # 도메인 예외 (ApiException, 권한 거부 등)
     repository/          # Repository 인터페이스
     usecase/             # UseCase
   data/
@@ -74,7 +75,7 @@ lib/
       tables/            # Drift 테이블 정의
     remote/              # 외부 API (juso: 도로명주소, naver: Geocode) + dto
     storage/             # 이미지 파일 저장 구현체
-    mapper/              # Drift Row / DTO <-> 도메인 모델
+    mapper/              # Drift Row / DTO / DioException <-> 도메인 모델
     repository/          # Repository 구현체
   features/
     apply_property/ edit_property/ find_property/ home/ map/ property_detail/ property_list/

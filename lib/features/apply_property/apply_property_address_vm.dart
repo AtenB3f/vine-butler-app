@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vine_butler/core/di/providers.dart';
-import 'package:vine_butler/core/network/api_exception.dart';
 import 'package:vine_butler/core/router/app_router.dart';
+import 'package:vine_butler/domain/exception/api_exception.dart';
 import 'package:vine_butler/features/apply_property/presentation/apply_property_address_view_state.dart';
 
 final applyPropertyAddressVMProvider = NotifierProvider.autoDispose<ApplyPropertyAddressVM, ApplyPropertyAddressViewState>(

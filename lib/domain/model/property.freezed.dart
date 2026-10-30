@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Property {
 
- String get id; Owner get owner; PropertyType get propertyType; PropertyDeal get deal; Address get address; int? get maintenanceCost; bool? get isSuretyInsuranceAvailable; bool? get hasLoan; bool? get isParkingAvailable; DateTime? get moveInDate; bool get isFlexibleMoveInDate; int? get roomCount; List<String> get furnitureOptions; String get memo; List<PropertyImage> get images; DateTime get updatedAt; DateTime? get deletedAt; DateTime? get syncedAt;
+ String get id; Owner get owner; PropertyType get propertyType; PropertyDeal get deal; Address get address; int? get maintenanceCost; bool? get isSuretyInsuranceAvailable; bool? get hasLoan; bool? get isParkingAvailable; DateTime? get moveInDate; bool get isFlexibleMoveInDate; int? get roomCount; List<String> get furnitureOptions; String get memo; List<PropertyImage> get images; BlogPost? get blogPost; DateTime get updatedAt; DateTime? get deletedAt; DateTime? get syncedAt;
 /// Create a copy of Property
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -27,20 +27,20 @@ $PropertyCopyWith<Property> get copyWith => _$PropertyCopyWithImpl<Property>(thi
 @override
 bool operator ==(Object other) {
   final _this = this as Property;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Property&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.owner, _this.owner) || other.owner == _this.owner)&&(identical(other.propertyType, _this.propertyType) || other.propertyType == _this.propertyType)&&(identical(other.deal, _this.deal) || other.deal == _this.deal)&&(identical(other.address, _this.address) || other.address == _this.address)&&(identical(other.maintenanceCost, _this.maintenanceCost) || other.maintenanceCost == _this.maintenanceCost)&&(identical(other.isSuretyInsuranceAvailable, _this.isSuretyInsuranceAvailable) || other.isSuretyInsuranceAvailable == _this.isSuretyInsuranceAvailable)&&(identical(other.hasLoan, _this.hasLoan) || other.hasLoan == _this.hasLoan)&&(identical(other.isParkingAvailable, _this.isParkingAvailable) || other.isParkingAvailable == _this.isParkingAvailable)&&(identical(other.moveInDate, _this.moveInDate) || other.moveInDate == _this.moveInDate)&&(identical(other.isFlexibleMoveInDate, _this.isFlexibleMoveInDate) || other.isFlexibleMoveInDate == _this.isFlexibleMoveInDate)&&(identical(other.roomCount, _this.roomCount) || other.roomCount == _this.roomCount)&&const DeepCollectionEquality().equals(other.furnitureOptions, _this.furnitureOptions)&&(identical(other.memo, _this.memo) || other.memo == _this.memo)&&const DeepCollectionEquality().equals(other.images, _this.images)&&(identical(other.updatedAt, _this.updatedAt) || other.updatedAt == _this.updatedAt)&&(identical(other.deletedAt, _this.deletedAt) || other.deletedAt == _this.deletedAt)&&(identical(other.syncedAt, _this.syncedAt) || other.syncedAt == _this.syncedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Property&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.owner, _this.owner) || other.owner == _this.owner)&&(identical(other.propertyType, _this.propertyType) || other.propertyType == _this.propertyType)&&(identical(other.deal, _this.deal) || other.deal == _this.deal)&&(identical(other.address, _this.address) || other.address == _this.address)&&(identical(other.maintenanceCost, _this.maintenanceCost) || other.maintenanceCost == _this.maintenanceCost)&&(identical(other.isSuretyInsuranceAvailable, _this.isSuretyInsuranceAvailable) || other.isSuretyInsuranceAvailable == _this.isSuretyInsuranceAvailable)&&(identical(other.hasLoan, _this.hasLoan) || other.hasLoan == _this.hasLoan)&&(identical(other.isParkingAvailable, _this.isParkingAvailable) || other.isParkingAvailable == _this.isParkingAvailable)&&(identical(other.moveInDate, _this.moveInDate) || other.moveInDate == _this.moveInDate)&&(identical(other.isFlexibleMoveInDate, _this.isFlexibleMoveInDate) || other.isFlexibleMoveInDate == _this.isFlexibleMoveInDate)&&(identical(other.roomCount, _this.roomCount) || other.roomCount == _this.roomCount)&&const DeepCollectionEquality().equals(other.furnitureOptions, _this.furnitureOptions)&&(identical(other.memo, _this.memo) || other.memo == _this.memo)&&const DeepCollectionEquality().equals(other.images, _this.images)&&(identical(other.blogPost, _this.blogPost) || other.blogPost == _this.blogPost)&&(identical(other.updatedAt, _this.updatedAt) || other.updatedAt == _this.updatedAt)&&(identical(other.deletedAt, _this.deletedAt) || other.deletedAt == _this.deletedAt)&&(identical(other.syncedAt, _this.syncedAt) || other.syncedAt == _this.syncedAt));
 }
 
 
 @override
 int get hashCode {
   final _this = this as Property;
-  return Object.hash(runtimeType,_this.id,_this.owner,_this.propertyType,_this.deal,_this.address,_this.maintenanceCost,_this.isSuretyInsuranceAvailable,_this.hasLoan,_this.isParkingAvailable,_this.moveInDate,_this.isFlexibleMoveInDate,_this.roomCount,const DeepCollectionEquality().hash(_this.furnitureOptions),_this.memo,const DeepCollectionEquality().hash(_this.images),_this.updatedAt,_this.deletedAt,_this.syncedAt);
+  return Object.hashAll([runtimeType,_this.id,_this.owner,_this.propertyType,_this.deal,_this.address,_this.maintenanceCost,_this.isSuretyInsuranceAvailable,_this.hasLoan,_this.isParkingAvailable,_this.moveInDate,_this.isFlexibleMoveInDate,_this.roomCount,const DeepCollectionEquality().hash(_this.furnitureOptions),_this.memo,const DeepCollectionEquality().hash(_this.images),_this.blogPost,_this.updatedAt,_this.deletedAt,_this.syncedAt]);
 }
 
 @override
 String toString() {
   final _this = this as Property;
-  return 'Property(id: ${_this.id}, owner: ${_this.owner}, propertyType: ${_this.propertyType}, deal: ${_this.deal}, address: ${_this.address}, maintenanceCost: ${_this.maintenanceCost}, isSuretyInsuranceAvailable: ${_this.isSuretyInsuranceAvailable}, hasLoan: ${_this.hasLoan}, isParkingAvailable: ${_this.isParkingAvailable}, moveInDate: ${_this.moveInDate}, isFlexibleMoveInDate: ${_this.isFlexibleMoveInDate}, roomCount: ${_this.roomCount}, furnitureOptions: ${_this.furnitureOptions}, memo: ${_this.memo}, images: ${_this.images}, updatedAt: ${_this.updatedAt}, deletedAt: ${_this.deletedAt}, syncedAt: ${_this.syncedAt})';
+  return 'Property(id: ${_this.id}, owner: ${_this.owner}, propertyType: ${_this.propertyType}, deal: ${_this.deal}, address: ${_this.address}, maintenanceCost: ${_this.maintenanceCost}, isSuretyInsuranceAvailable: ${_this.isSuretyInsuranceAvailable}, hasLoan: ${_this.hasLoan}, isParkingAvailable: ${_this.isParkingAvailable}, moveInDate: ${_this.moveInDate}, isFlexibleMoveInDate: ${_this.isFlexibleMoveInDate}, roomCount: ${_this.roomCount}, furnitureOptions: ${_this.furnitureOptions}, memo: ${_this.memo}, images: ${_this.images}, blogPost: ${_this.blogPost}, updatedAt: ${_this.updatedAt}, deletedAt: ${_this.deletedAt}, syncedAt: ${_this.syncedAt})';
 }
 
 
@@ -51,11 +51,11 @@ abstract mixin class $PropertyCopyWith<$Res>  {
   factory $PropertyCopyWith(Property value, $Res Function(Property) _then) = _$PropertyCopyWithImpl;
 @useResult
 $Res call({
- String id, Owner owner, PropertyType propertyType, PropertyDeal deal, Address address, int? maintenanceCost, bool? isSuretyInsuranceAvailable, bool? hasLoan, bool? isParkingAvailable, DateTime? moveInDate, bool isFlexibleMoveInDate, int? roomCount, List<String> furnitureOptions, String memo, List<PropertyImage> images, DateTime updatedAt, DateTime? deletedAt, DateTime? syncedAt
+ String id, Owner owner, PropertyType propertyType, PropertyDeal deal, Address address, int? maintenanceCost, bool? isSuretyInsuranceAvailable, bool? hasLoan, bool? isParkingAvailable, DateTime? moveInDate, bool isFlexibleMoveInDate, int? roomCount, List<String> furnitureOptions, String memo, List<PropertyImage> images, BlogPost? blogPost, DateTime updatedAt, DateTime? deletedAt, DateTime? syncedAt
 });
 
 
-$OwnerCopyWith<$Res> get owner;$PropertyDealCopyWith<$Res> get deal;$AddressCopyWith<$Res> get address;
+$OwnerCopyWith<$Res> get owner;$PropertyDealCopyWith<$Res> get deal;$AddressCopyWith<$Res> get address;$BlogPostCopyWith<$Res>? get blogPost;
 
 }
 /// @nodoc
@@ -68,7 +68,7 @@ class _$PropertyCopyWithImpl<$Res>
 
 /// Create a copy of Property
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? owner = null,Object? propertyType = null,Object? deal = null,Object? address = null,Object? maintenanceCost = freezed,Object? isSuretyInsuranceAvailable = freezed,Object? hasLoan = freezed,Object? isParkingAvailable = freezed,Object? moveInDate = freezed,Object? isFlexibleMoveInDate = null,Object? roomCount = freezed,Object? furnitureOptions = null,Object? memo = null,Object? images = null,Object? updatedAt = null,Object? deletedAt = freezed,Object? syncedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? owner = null,Object? propertyType = null,Object? deal = null,Object? address = null,Object? maintenanceCost = freezed,Object? isSuretyInsuranceAvailable = freezed,Object? hasLoan = freezed,Object? isParkingAvailable = freezed,Object? moveInDate = freezed,Object? isFlexibleMoveInDate = null,Object? roomCount = freezed,Object? furnitureOptions = null,Object? memo = null,Object? images = null,Object? blogPost = freezed,Object? updatedAt = null,Object? deletedAt = freezed,Object? syncedAt = freezed,}) {
   return _then(Property(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,owner: null == owner ? _self.owner : owner // ignore: cast_nullable_to_non_nullable
@@ -85,7 +85,8 @@ as bool,roomCount: freezed == roomCount ? _self.roomCount : roomCount // ignore:
 as int?,furnitureOptions: null == furnitureOptions ? _self.furnitureOptions : furnitureOptions // ignore: cast_nullable_to_non_nullable
 as List<String>,memo: null == memo ? _self.memo : memo // ignore: cast_nullable_to_non_nullable
 as String,images: null == images ? _self.images : images // ignore: cast_nullable_to_non_nullable
-as List<PropertyImage>,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as List<PropertyImage>,blogPost: freezed == blogPost ? _self.blogPost : blogPost // ignore: cast_nullable_to_non_nullable
+as BlogPost?,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,deletedAt: freezed == deletedAt ? _self.deletedAt : deletedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,syncedAt: freezed == syncedAt ? _self.syncedAt : syncedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,
@@ -117,6 +118,18 @@ $AddressCopyWith<$Res> get address {
   
   return $AddressCopyWith<$Res>(_self.address, (value) {
     return _then(_self.copyWith(address: value));
+  });
+}/// Create a copy of Property
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$BlogPostCopyWith<$Res>? get blogPost {
+    if (_self.blogPost == null) {
+    return null;
+  }
+
+  return $BlogPostCopyWith<$Res>(_self.blogPost!, (value) {
+    return _then(_self.copyWith(blogPost: value));
   });
 }
 }
@@ -200,10 +213,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  Owner owner,  PropertyType propertyType,  PropertyDeal deal,  Address address,  int? maintenanceCost,  bool? isSuretyInsuranceAvailable,  bool? hasLoan,  bool? isParkingAvailable,  DateTime? moveInDate,  bool isFlexibleMoveInDate,  int? roomCount,  List<String> furnitureOptions,  String memo,  List<PropertyImage> images,  DateTime updatedAt,  DateTime? deletedAt,  DateTime? syncedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  Owner owner,  PropertyType propertyType,  PropertyDeal deal,  Address address,  int? maintenanceCost,  bool? isSuretyInsuranceAvailable,  bool? hasLoan,  bool? isParkingAvailable,  DateTime? moveInDate,  bool isFlexibleMoveInDate,  int? roomCount,  List<String> furnitureOptions,  String memo,  List<PropertyImage> images,  BlogPost? blogPost,  DateTime updatedAt,  DateTime? deletedAt,  DateTime? syncedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Property() when $default != null:
-return $default(_that.id,_that.owner,_that.propertyType,_that.deal,_that.address,_that.maintenanceCost,_that.isSuretyInsuranceAvailable,_that.hasLoan,_that.isParkingAvailable,_that.moveInDate,_that.isFlexibleMoveInDate,_that.roomCount,_that.furnitureOptions,_that.memo,_that.images,_that.updatedAt,_that.deletedAt,_that.syncedAt);case _:
+return $default(_that.id,_that.owner,_that.propertyType,_that.deal,_that.address,_that.maintenanceCost,_that.isSuretyInsuranceAvailable,_that.hasLoan,_that.isParkingAvailable,_that.moveInDate,_that.isFlexibleMoveInDate,_that.roomCount,_that.furnitureOptions,_that.memo,_that.images,_that.blogPost,_that.updatedAt,_that.deletedAt,_that.syncedAt);case _:
   return orElse();
 
 }
@@ -221,10 +234,10 @@ return $default(_that.id,_that.owner,_that.propertyType,_that.deal,_that.address
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  Owner owner,  PropertyType propertyType,  PropertyDeal deal,  Address address,  int? maintenanceCost,  bool? isSuretyInsuranceAvailable,  bool? hasLoan,  bool? isParkingAvailable,  DateTime? moveInDate,  bool isFlexibleMoveInDate,  int? roomCount,  List<String> furnitureOptions,  String memo,  List<PropertyImage> images,  DateTime updatedAt,  DateTime? deletedAt,  DateTime? syncedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  Owner owner,  PropertyType propertyType,  PropertyDeal deal,  Address address,  int? maintenanceCost,  bool? isSuretyInsuranceAvailable,  bool? hasLoan,  bool? isParkingAvailable,  DateTime? moveInDate,  bool isFlexibleMoveInDate,  int? roomCount,  List<String> furnitureOptions,  String memo,  List<PropertyImage> images,  BlogPost? blogPost,  DateTime updatedAt,  DateTime? deletedAt,  DateTime? syncedAt)  $default,) {final _that = this;
 switch (_that) {
 case _Property():
-return $default(_that.id,_that.owner,_that.propertyType,_that.deal,_that.address,_that.maintenanceCost,_that.isSuretyInsuranceAvailable,_that.hasLoan,_that.isParkingAvailable,_that.moveInDate,_that.isFlexibleMoveInDate,_that.roomCount,_that.furnitureOptions,_that.memo,_that.images,_that.updatedAt,_that.deletedAt,_that.syncedAt);case _:
+return $default(_that.id,_that.owner,_that.propertyType,_that.deal,_that.address,_that.maintenanceCost,_that.isSuretyInsuranceAvailable,_that.hasLoan,_that.isParkingAvailable,_that.moveInDate,_that.isFlexibleMoveInDate,_that.roomCount,_that.furnitureOptions,_that.memo,_that.images,_that.blogPost,_that.updatedAt,_that.deletedAt,_that.syncedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -241,10 +254,10 @@ return $default(_that.id,_that.owner,_that.propertyType,_that.deal,_that.address
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  Owner owner,  PropertyType propertyType,  PropertyDeal deal,  Address address,  int? maintenanceCost,  bool? isSuretyInsuranceAvailable,  bool? hasLoan,  bool? isParkingAvailable,  DateTime? moveInDate,  bool isFlexibleMoveInDate,  int? roomCount,  List<String> furnitureOptions,  String memo,  List<PropertyImage> images,  DateTime updatedAt,  DateTime? deletedAt,  DateTime? syncedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  Owner owner,  PropertyType propertyType,  PropertyDeal deal,  Address address,  int? maintenanceCost,  bool? isSuretyInsuranceAvailable,  bool? hasLoan,  bool? isParkingAvailable,  DateTime? moveInDate,  bool isFlexibleMoveInDate,  int? roomCount,  List<String> furnitureOptions,  String memo,  List<PropertyImage> images,  BlogPost? blogPost,  DateTime updatedAt,  DateTime? deletedAt,  DateTime? syncedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _Property() when $default != null:
-return $default(_that.id,_that.owner,_that.propertyType,_that.deal,_that.address,_that.maintenanceCost,_that.isSuretyInsuranceAvailable,_that.hasLoan,_that.isParkingAvailable,_that.moveInDate,_that.isFlexibleMoveInDate,_that.roomCount,_that.furnitureOptions,_that.memo,_that.images,_that.updatedAt,_that.deletedAt,_that.syncedAt);case _:
+return $default(_that.id,_that.owner,_that.propertyType,_that.deal,_that.address,_that.maintenanceCost,_that.isSuretyInsuranceAvailable,_that.hasLoan,_that.isParkingAvailable,_that.moveInDate,_that.isFlexibleMoveInDate,_that.roomCount,_that.furnitureOptions,_that.memo,_that.images,_that.blogPost,_that.updatedAt,_that.deletedAt,_that.syncedAt);case _:
   return null;
 
 }
@@ -256,7 +269,7 @@ return $default(_that.id,_that.owner,_that.propertyType,_that.deal,_that.address
 
 
 class _Property extends Property {
-  const _Property({required this.id, required this.owner, required this.propertyType, required this.deal, required this.address, this.maintenanceCost, this.isSuretyInsuranceAvailable, this.hasLoan, this.isParkingAvailable, this.moveInDate, this.isFlexibleMoveInDate = false, this.roomCount,  List<String> furnitureOptions = const <String>[], this.memo = '',  List<PropertyImage> images = const <PropertyImage>[], required this.updatedAt, this.deletedAt, this.syncedAt}): _furnitureOptions = furnitureOptions,_images = images,super._();
+  const _Property({required this.id, required this.owner, required this.propertyType, required this.deal, required this.address, this.maintenanceCost, this.isSuretyInsuranceAvailable, this.hasLoan, this.isParkingAvailable, this.moveInDate, this.isFlexibleMoveInDate = false, this.roomCount,  List<String> furnitureOptions = const <String>[], this.memo = '',  List<PropertyImage> images = const <PropertyImage>[], this.blogPost, required this.updatedAt, this.deletedAt, this.syncedAt}): _furnitureOptions = furnitureOptions,_images = images,super._();
   
 
 @override final  String id;
@@ -286,6 +299,7 @@ class _Property extends Property {
   return EqualUnmodifiableListView(_images);
 }
 
+@override final  BlogPost? blogPost;
 @override final  DateTime updatedAt;
 @override final  DateTime? deletedAt;
 @override final  DateTime? syncedAt;
@@ -300,18 +314,18 @@ _$PropertyCopyWith<_Property> get copyWith => __$PropertyCopyWithImpl<_Property>
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Property&&(identical(other.id, id) || other.id == id)&&(identical(other.owner, owner) || other.owner == owner)&&(identical(other.propertyType, propertyType) || other.propertyType == propertyType)&&(identical(other.deal, deal) || other.deal == deal)&&(identical(other.address, address) || other.address == address)&&(identical(other.maintenanceCost, maintenanceCost) || other.maintenanceCost == maintenanceCost)&&(identical(other.isSuretyInsuranceAvailable, isSuretyInsuranceAvailable) || other.isSuretyInsuranceAvailable == isSuretyInsuranceAvailable)&&(identical(other.hasLoan, hasLoan) || other.hasLoan == hasLoan)&&(identical(other.isParkingAvailable, isParkingAvailable) || other.isParkingAvailable == isParkingAvailable)&&(identical(other.moveInDate, moveInDate) || other.moveInDate == moveInDate)&&(identical(other.isFlexibleMoveInDate, isFlexibleMoveInDate) || other.isFlexibleMoveInDate == isFlexibleMoveInDate)&&(identical(other.roomCount, roomCount) || other.roomCount == roomCount)&&const DeepCollectionEquality().equals(other.furnitureOptions, _furnitureOptions)&&(identical(other.memo, memo) || other.memo == memo)&&const DeepCollectionEquality().equals(other.images, _images)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.deletedAt, deletedAt) || other.deletedAt == deletedAt)&&(identical(other.syncedAt, syncedAt) || other.syncedAt == syncedAt));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Property&&(identical(other.id, id) || other.id == id)&&(identical(other.owner, owner) || other.owner == owner)&&(identical(other.propertyType, propertyType) || other.propertyType == propertyType)&&(identical(other.deal, deal) || other.deal == deal)&&(identical(other.address, address) || other.address == address)&&(identical(other.maintenanceCost, maintenanceCost) || other.maintenanceCost == maintenanceCost)&&(identical(other.isSuretyInsuranceAvailable, isSuretyInsuranceAvailable) || other.isSuretyInsuranceAvailable == isSuretyInsuranceAvailable)&&(identical(other.hasLoan, hasLoan) || other.hasLoan == hasLoan)&&(identical(other.isParkingAvailable, isParkingAvailable) || other.isParkingAvailable == isParkingAvailable)&&(identical(other.moveInDate, moveInDate) || other.moveInDate == moveInDate)&&(identical(other.isFlexibleMoveInDate, isFlexibleMoveInDate) || other.isFlexibleMoveInDate == isFlexibleMoveInDate)&&(identical(other.roomCount, roomCount) || other.roomCount == roomCount)&&const DeepCollectionEquality().equals(other.furnitureOptions, _furnitureOptions)&&(identical(other.memo, memo) || other.memo == memo)&&const DeepCollectionEquality().equals(other.images, _images)&&(identical(other.blogPost, blogPost) || other.blogPost == blogPost)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.deletedAt, deletedAt) || other.deletedAt == deletedAt)&&(identical(other.syncedAt, syncedAt) || other.syncedAt == syncedAt));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,owner,propertyType,deal,address,maintenanceCost,isSuretyInsuranceAvailable,hasLoan,isParkingAvailable,moveInDate,isFlexibleMoveInDate,roomCount,const DeepCollectionEquality().hash(_furnitureOptions),memo,const DeepCollectionEquality().hash(_images),updatedAt,deletedAt,syncedAt);
+    return Object.hashAll([runtimeType,id,owner,propertyType,deal,address,maintenanceCost,isSuretyInsuranceAvailable,hasLoan,isParkingAvailable,moveInDate,isFlexibleMoveInDate,roomCount,const DeepCollectionEquality().hash(_furnitureOptions),memo,const DeepCollectionEquality().hash(_images),blogPost,updatedAt,deletedAt,syncedAt]);
 }
 
 @override
 String toString() {
-    return 'Property(id: $id, owner: $owner, propertyType: $propertyType, deal: $deal, address: $address, maintenanceCost: $maintenanceCost, isSuretyInsuranceAvailable: $isSuretyInsuranceAvailable, hasLoan: $hasLoan, isParkingAvailable: $isParkingAvailable, moveInDate: $moveInDate, isFlexibleMoveInDate: $isFlexibleMoveInDate, roomCount: $roomCount, furnitureOptions: $furnitureOptions, memo: $memo, images: $images, updatedAt: $updatedAt, deletedAt: $deletedAt, syncedAt: $syncedAt)';
+    return 'Property(id: $id, owner: $owner, propertyType: $propertyType, deal: $deal, address: $address, maintenanceCost: $maintenanceCost, isSuretyInsuranceAvailable: $isSuretyInsuranceAvailable, hasLoan: $hasLoan, isParkingAvailable: $isParkingAvailable, moveInDate: $moveInDate, isFlexibleMoveInDate: $isFlexibleMoveInDate, roomCount: $roomCount, furnitureOptions: $furnitureOptions, memo: $memo, images: $images, blogPost: $blogPost, updatedAt: $updatedAt, deletedAt: $deletedAt, syncedAt: $syncedAt)';
 }
 
 
@@ -322,11 +336,11 @@ abstract mixin class _$PropertyCopyWith<$Res> implements $PropertyCopyWith<$Res>
   factory _$PropertyCopyWith(_Property value, $Res Function(_Property) _then) = __$PropertyCopyWithImpl;
 @override @useResult
 $Res call({
- String id, Owner owner, PropertyType propertyType, PropertyDeal deal, Address address, int? maintenanceCost, bool? isSuretyInsuranceAvailable, bool? hasLoan, bool? isParkingAvailable, DateTime? moveInDate, bool isFlexibleMoveInDate, int? roomCount, List<String> furnitureOptions, String memo, List<PropertyImage> images, DateTime updatedAt, DateTime? deletedAt, DateTime? syncedAt
+ String id, Owner owner, PropertyType propertyType, PropertyDeal deal, Address address, int? maintenanceCost, bool? isSuretyInsuranceAvailable, bool? hasLoan, bool? isParkingAvailable, DateTime? moveInDate, bool isFlexibleMoveInDate, int? roomCount, List<String> furnitureOptions, String memo, List<PropertyImage> images, BlogPost? blogPost, DateTime updatedAt, DateTime? deletedAt, DateTime? syncedAt
 });
 
 
-@override $OwnerCopyWith<$Res> get owner;@override $PropertyDealCopyWith<$Res> get deal;@override $AddressCopyWith<$Res> get address;
+@override $OwnerCopyWith<$Res> get owner;@override $PropertyDealCopyWith<$Res> get deal;@override $AddressCopyWith<$Res> get address;@override $BlogPostCopyWith<$Res>? get blogPost;
 
 }
 /// @nodoc
@@ -339,7 +353,7 @@ class __$PropertyCopyWithImpl<$Res>
 
 /// Create a copy of Property
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? owner = null,Object? propertyType = null,Object? deal = null,Object? address = null,Object? maintenanceCost = freezed,Object? isSuretyInsuranceAvailable = freezed,Object? hasLoan = freezed,Object? isParkingAvailable = freezed,Object? moveInDate = freezed,Object? isFlexibleMoveInDate = null,Object? roomCount = freezed,Object? furnitureOptions = null,Object? memo = null,Object? images = null,Object? updatedAt = null,Object? deletedAt = freezed,Object? syncedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? owner = null,Object? propertyType = null,Object? deal = null,Object? address = null,Object? maintenanceCost = freezed,Object? isSuretyInsuranceAvailable = freezed,Object? hasLoan = freezed,Object? isParkingAvailable = freezed,Object? moveInDate = freezed,Object? isFlexibleMoveInDate = null,Object? roomCount = freezed,Object? furnitureOptions = null,Object? memo = null,Object? images = null,Object? blogPost = freezed,Object? updatedAt = null,Object? deletedAt = freezed,Object? syncedAt = freezed,}) {
   return _then(_Property(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,owner: null == owner ? _self.owner : owner // ignore: cast_nullable_to_non_nullable
@@ -356,7 +370,8 @@ as bool,roomCount: freezed == roomCount ? _self.roomCount : roomCount // ignore:
 as int?,furnitureOptions: null == furnitureOptions ? _self._furnitureOptions : furnitureOptions // ignore: cast_nullable_to_non_nullable
 as List<String>,memo: null == memo ? _self.memo : memo // ignore: cast_nullable_to_non_nullable
 as String,images: null == images ? _self._images : images // ignore: cast_nullable_to_non_nullable
-as List<PropertyImage>,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as List<PropertyImage>,blogPost: freezed == blogPost ? _self.blogPost : blogPost // ignore: cast_nullable_to_non_nullable
+as BlogPost?,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,deletedAt: freezed == deletedAt ? _self.deletedAt : deletedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,syncedAt: freezed == syncedAt ? _self.syncedAt : syncedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,
@@ -389,6 +404,18 @@ $AddressCopyWith<$Res> get address {
   
   return $AddressCopyWith<$Res>(_self.address, (value) {
     return _then(_self.copyWith(address: value));
+  });
+}/// Create a copy of Property
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$BlogPostCopyWith<$Res>? get blogPost {
+    if (_self.blogPost == null) {
+    return null;
+  }
+
+  return $BlogPostCopyWith<$Res>(_self.blogPost!, (value) {
+    return _then(_self.copyWith(blogPost: value));
   });
 }
 }

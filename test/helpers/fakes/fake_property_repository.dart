@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:vine_butler/domain/model/property.dart';
 import 'package:vine_butler/domain/model/property_search_condition.dart';
 import 'package:vine_butler/domain/repository/property_repository.dart';
+import 'package:vine_butler/domain/model/blog_post.dart';
 
 class FakePropertyRepository implements PropertyRepository {
   Property? property;
@@ -40,4 +41,7 @@ class FakePropertyRepository implements PropertyRepository {
 
     deletedIds.add(id);
   }
+
+  @override
+  Future<void> saveBlogPost(String propertyId, BlogPost post) async {}
 }

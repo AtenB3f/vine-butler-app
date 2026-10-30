@@ -1,9 +1,10 @@
 import 'package:dio/dio.dart';
-import 'package:vine_butler/core/network/api_exception.dart';
+import 'package:vine_butler/data/mapper/dio_exception_mapper.dart';
 import 'package:vine_butler/data/mapper/juso_mapper.dart';
 import 'package:vine_butler/data/remote/juso/dto/juso_response_dto.dart';
 import 'package:vine_butler/data/remote/juso/juso_api.dart';
 import 'package:vine_butler/data/remote/naver/geocode_api.dart';
+import 'package:vine_butler/domain/exception/api_exception.dart';
 import 'package:vine_butler/domain/model/address_page.dart';
 import 'package:vine_butler/domain/repository/address_repository.dart';
 
@@ -31,7 +32,7 @@ class AddressRepositoryImpl implements AddressRepository {
         totalCount: response.totalCount,
       );
     } on DioException catch (e) {
-      throw ApiException.fromDio(e);
+      throw e.toDomain();
     }
   }
 
@@ -51,7 +52,7 @@ class AddressRepositoryImpl implements AddressRepository {
 
       return (latitude: latitude, longitude: longitude);
     } on DioException catch (e) {
-      throw ApiException.fromDio(e);
+      throw e.toDomain();
     }
   }
 

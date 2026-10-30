@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vine_butler/core/di/providers.dart';
-import 'package:vine_butler/core/network/api_exception.dart';
+import 'package:vine_butler/domain/exception/api_exception.dart';
 import 'package:vine_butler/domain/model/address_candidate.dart';
 import 'package:vine_butler/features/apply_property/apply_property_address_vm.dart';
 import 'package:vine_butler/features/apply_property/presentation/apply_property_address_view_state.dart';
