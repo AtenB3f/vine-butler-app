@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vine_butler/domain/model/address.dart';
+import 'package:vine_butler/domain/model/blog_post.dart';
 import 'package:vine_butler/domain/model/owner.dart';
 import 'package:vine_butler/domain/model/property.dart';
 import 'package:vine_butler/domain/model/property_deal.dart';
@@ -26,6 +27,9 @@ class _FakePropertyRepository implements PropertyRepository {
 
   @override
   Future<void> delete(String id) async {}
+
+  @override
+  Future<void> saveBlogPost(String propertyId, BlogPost post) async {}
 }
 
 const _address = Address(

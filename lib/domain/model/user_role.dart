@@ -1,0 +1,4 @@
+enum UserRole {
+  master,
+  none
+}

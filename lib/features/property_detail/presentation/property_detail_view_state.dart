@@ -8,6 +8,7 @@ class PropertyDetailViewState {
   final PropertyDetailEvent? event;
   final String? navigateTo;
   final bool isMapVisible;
+  final bool canWrite;
 
   const PropertyDetailViewState({
     this.data,
@@ -15,6 +16,7 @@ class PropertyDetailViewState {
     this.event,
     this.navigateTo,
     this.isMapVisible = false,
+    this.canWrite = false,
   });
 
   PropertyDetailViewState copyWith({
@@ -23,6 +25,7 @@ class PropertyDetailViewState {
     PropertyDetailEvent? Function()? event,
     String? Function()? navigateTo,
     bool? isMapVisible,
+    bool? canWrite,
   }) {
     return PropertyDetailViewState(
       data: data ?? this.data,
@@ -30,6 +33,7 @@ class PropertyDetailViewState {
       event: event != null ? event() : this.event,
       navigateTo: navigateTo != null ? navigateTo() : this.navigateTo,
       isMapVisible: isMapVisible ?? this.isMapVisible,
+      canWrite: canWrite ?? this.canWrite,
     );
   }
 }
@@ -73,6 +77,7 @@ class PropertyDetailData {
   final bool isFlexibleMoveInDate; // 입주일 협의 가능 여부
   final List<String> furnitureOptions;  // 가구 옵션
   final String? memo; // 메모
+  final String? postTitle; // 저장된 블로그 포스트 제목
   final double latitude;
   final double longitude;
 
@@ -98,6 +103,7 @@ class PropertyDetailData {
     required this.isFlexibleMoveInDate,
     required this.furnitureOptions,
     this.memo,
+    this.postTitle,
     required this.latitude,
     required this.longitude,
   });
@@ -125,6 +131,7 @@ class PropertyDetailData {
       isFlexibleMoveInDate: property.isFlexibleMoveInDate,
       furnitureOptions: property.furnitureOptions,
       memo: property.memo.isEmpty ? null : property.memo,
+      postTitle: property.blogPost?.title,
       latitude: address.latitude,
       longitude: address.longitude,
     );

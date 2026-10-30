@@ -1,7 +1,9 @@
 import 'package:drift/drift.dart';
 import 'package:vine_butler/data/local/app_database.dart';
+import 'package:vine_butler/data/mapper/blog_post_mapper.dart';
 import 'package:vine_butler/data/mapper/property_image_mapper.dart';
 import 'package:vine_butler/data/mapper/property_mapper.dart';
+import 'package:vine_butler/domain/model/blog_post.dart';
 import 'package:vine_butler/domain/model/property.dart';
 import 'package:vine_butler/domain/model/property_image.dart';
 import 'package:vine_butler/domain/model/property_search_condition.dart';
@@ -102,7 +104,13 @@ class PropertyRepositoryImpl implements PropertyRepository {
       ..where(_db.propertyTable.id.equals(id) & _db.propertyTable.deletedAt.isNull())
       ..orderBy([OrderingTerm.asc(_db.propertyImageTable.order)]);
 
-    return _toProperties(await query.get()).firstOrNull;
+    final property = _toProperties(await query.get()).firstOrNull;
+
+    if (property == null) { return null; }
+
+    final postRow = await (_db.select(_db.propertyBlogPostTable)..where((t) => t.propertyId.equals(id))).getSingleOrNull();
+
+    return property.copyWith(blogPost: postRow?.toDomain());
   }
 
   @override
@@ -131,5 +139,17 @@ class PropertyRepositoryImpl implements PropertyRepository {
         updatedAt: Value(now),
       ),
     );
+  }
+
+  /// 매물의 블로그 포스트 저장
+  /// 
+  /// 매물의 `updatedAt`은 바꾸지 않음
+  @override
+  Future<void> saveBlogPost(String propertyId, BlogPost post) async {
+    final propertyUpdatedAt = post.propertyUpdatedAt ??
+        (await (_db.select(_db.propertyTable)..where((t) => t.id.equals(propertyId))).getSingle()).updatedAt;
+    final companion = post.toCompanion(propertyId, propertyUpdatedAt: propertyUpdatedAt, updatedAt: DateTime.now());
+
+    await _db.into(_db.propertyBlogPostTable).insertOnConflictUpdate(companion);
   }
 }

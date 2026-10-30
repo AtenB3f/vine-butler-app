@@ -16,6 +16,7 @@ import 'package:vine_butler/shared/utils/utils.dart';
 enum _DetailMenu {
   edit,
   delete,
+  aiWrite,
   // export,
   // sync,
 }
@@ -28,6 +29,7 @@ class PropertyDetailScreen extends ConsumerWidget {
   static final List<({_DetailMenu menu, String text, Widget Function(Color color) image})> _menuItems = [
     (menu: _DetailMenu.edit, text: '수정', image: AppIcons.editMD),
     (menu: _DetailMenu.delete, text: '삭제', image: AppIcons.trashMD),
+    (menu: _DetailMenu.aiWrite, text: 'AI 글쓰기', image: (color) => AppIcons.iconMD('Text_MD', color)),
     // (menu: _DetailMenu.export, text: '내보내기', image: AppIcons.linkMD),
     // (menu: _DetailMenu.sync, text: '동기화', image: AppIcons.reloadMD),
   ];
@@ -65,12 +67,12 @@ class PropertyDetailScreen extends ConsumerWidget {
         final index = await showAppBottomSheet(
           context,
           AppBottomSheetViewState(
-            items: [for (final item in _menuItems) AppSheetItemViewState(text: item.text, image: item.image)],
+            items: [for (final item in _visibleMenuItems(state)) AppSheetItemViewState(text: item.text, image: item.image)],
             selectedIndex: -1,
           ),
         );
 
-        if (index != null && context.mounted) { _onMenuSelect(context, ref, index); }
+        if (index != null && context.mounted) { _onMenuSelect(context, ref, _visibleMenuItems(state)[index].menu); }
       },
       body: _body(context, ref, state),
     );
@@ -86,21 +88,30 @@ class PropertyDetailScreen extends ConsumerWidget {
         final index = await showAppDropdown(
           context,
           AppDropdownViewState(
-            items: [for (final item in _menuItems) AppDropdownItemViewState(text: item.text, image: item.image)],
+            items: [for (final item in _visibleMenuItems(state)) AppDropdownItemViewState(text: item.text, image: item.image)],
             selectedIndex: -1,
           ),
           topRight: Offset(context.screenWidth - 16, MediaQuery.paddingOf(context).top + 58),
         );
 
-        if (index != null && context.mounted) { _onMenuSelect(context, ref, index); }
+        if (index != null && context.mounted) { _onMenuSelect(context, ref, _visibleMenuItems(state)[index].menu); }
       },
       body: _body(context, ref, state),
     );
   }
 
-  Future<void> _onMenuSelect(BuildContext context, WidgetRef ref, int index) async {
-    final menu = _menuItems[index].menu;
+  List<({_DetailMenu menu, String text, Widget Function(Color color) image})> _visibleMenuItems(PropertyDetailViewState state) {
+    return [
+      for (final item in _menuItems)
+        if (item.menu != _DetailMenu.aiWrite || state.canWrite) item,
+    ];
+  }
 
+  Future<void> _onMenuSelect(BuildContext context, WidgetRef ref, _DetailMenu menu) async {
+    if (menu == _DetailMenu.aiWrite) {
+      await _openPost(context, ref, PropertyWriteRoute(id: id));
+      return;
+    }
     if (menu == _DetailMenu.edit) {
       EditPropertyRoute(id: id).push(context);
       return;
@@ -165,6 +176,7 @@ class PropertyDetailScreen extends ConsumerWidget {
             _options(data),
             _furnitures(data),
             if (data.memo != null) _memo(data),
+            if (data.postTitle != null) _post(context, ref, data),
           ],
         ),
       ),
@@ -437,6 +449,41 @@ class PropertyDetailScreen extends ConsumerWidget {
         AppFontStyle.body3.text(data.memo!, TextColor.dark),
       ],
     );
+  }
+
+  Widget _post(BuildContext context, WidgetRef ref, PropertyDetailData data) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 10,
+      children: [
+        AppFontStyle.body1.text('포스트', TextColor.light),
+        Pressable(
+          onTap: () => _openPost(context, ref, PropertyPostRoute(id: id)),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  data.postTitle!,
+                  style: AppFontStyle.sub2.style(TextColor.dark),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              SizedBox.square(dimension: 30, child: Center(child: AppIcons.chevronRightSM(TextColor.dark))),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 포스트 화면 이동 함수 (돌아오면 새로 저장된 포스트를 반영하도록 다시 조회)
+  Future<void> _openPost(BuildContext context, WidgetRef ref, GoRouteData route) async {
+    await route.push(context);
+
+    if (!context.mounted) { return; }
+
+    ref.read(propertyDetailVMProvider(id).notifier).action(PropertyDetailAction.fetch);
   }
 
   AppImagePageViewState _imagePageViewState(PropertyDetailData data, {BoxFit fit = BoxFit.cover, int index = 0}) {

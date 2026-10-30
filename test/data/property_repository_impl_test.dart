@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:vine_butler/data/local/app_database.dart';
 import 'package:vine_butler/data/repository/property_repository_impl.dart';
 import 'package:vine_butler/domain/model/address.dart';
+import 'package:vine_butler/domain/model/blog_post.dart';
 import 'package:vine_butler/domain/model/owner.dart';
 import 'package:vine_butler/domain/model/property.dart';
 import 'package:vine_butler/domain/model/property_deal.dart';
@@ -241,6 +242,62 @@ void main() {
       await repository.save(listed('middle', price: 30000000));
 
       expect(await ids(const PropertySearchCondition(price: 50000000)), ['near', 'middle', 'far']);
+    });
+  });
+
+  group('블로그 포스트', () {
+    Future<void> setUpdatedAt(String id, DateTime updatedAt) {
+      return (db.update(db.propertyTable)..where((t) => t.id.equals(id))).write(PropertyTableCompanion(updatedAt: Value(updatedAt)));
+    }
+
+    test('저장한 포스트가 매물 조회에 포함된다', () async {
+      await repository.save(_property('a'));
+      await setUpdatedAt('a', DateTime(2021));
+      await repository.saveBlogPost('a', BlogPost(title: '제목', body: '본문', propertyUpdatedAt: DateTime(2021)));
+
+      final post = (await repository.getById('a'))!.blogPost;
+
+      expect(post, BlogPost(title: '제목', body: '본문', propertyUpdatedAt: DateTime(2021)));
+    });
+
+    test('다시 저장하면 마지막 포스트만 남는다', () async {
+      await repository.save(_property('a'));
+      await repository.saveBlogPost('a', const BlogPost(title: '처음', body: '본문'));
+      await repository.saveBlogPost('a', const BlogPost(title: '두 번째', body: '새 본문'));
+
+      final post = (await repository.getById('a'))!.blogPost;
+      final rows = await db.select(db.propertyBlogPostTable).get();
+
+      expect(post?.title, '두 번째');
+      expect(post?.body, '새 본문');
+      expect(rows, hasLength(1));
+    });
+
+    test('포스트를 저장해도 매물의 updatedAt은 바뀌지 않는다', () async {
+      await repository.save(_property('a'));
+      await setUpdatedAt('a', DateTime(2021));
+      await repository.saveBlogPost('a', const BlogPost(title: '제목', body: '본문'));
+
+      final property = await repository.getById('a');
+
+      expect(property!.updatedAt, DateTime(2021));
+      expect(property.blogPost?.propertyUpdatedAt, DateTime(2021));
+    });
+
+    test('매물을 수정하면 updatedAt이 바뀌어 포스트와 달라지고 포스트는 유지된다', () async {
+      await repository.save(_property('a'));
+      await setUpdatedAt('a', DateTime(2021));
+      await repository.saveBlogPost('a', BlogPost(title: '제목', body: '본문', propertyUpdatedAt: DateTime(2021)));
+
+      final before = (await repository.getById('a'))!;
+
+      await repository.save(before.copyWith(memo: '수정'));
+
+      final after = (await repository.getById('a'))!;
+
+      expect(after.updatedAt, isNot(DateTime(2021)));
+      expect(after.blogPost?.propertyUpdatedAt, DateTime(2021));
+      expect(after.blogPost?.title, '제목');
     });
   });
 }

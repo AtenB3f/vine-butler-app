@@ -12,6 +12,8 @@ import 'package:vine_butler/features/home/presentation/screens/home_screen.dart'
 import 'package:vine_butler/features/map/presentation/screens/map_screen.dart';
 import 'package:vine_butler/features/property_detail/presentation/screens/property_detail_screen.dart';
 import 'package:vine_butler/features/property_list/presentation/screens/property_list_screen.dart';
+import 'package:vine_butler/features/property_write/presentation/property_write_view_state.dart';
+import 'package:vine_butler/features/property_write/presentation/screens/property_write_screen.dart';
 
 part 'app_router.g.dart';
 
@@ -153,4 +155,24 @@ class EditPropertyAddressRoute extends GoRouteData with $EditPropertyAddressRout
 
   @override
   Widget build(BuildContext context, GoRouterState state) => EditPropertyAddressScreen(id: id);
+}
+
+@TypedGoRoute<PropertyWriteRoute>(path: '/property/:id/write')
+class PropertyWriteRoute extends GoRouteData with $PropertyWriteRoute {
+  const PropertyWriteRoute({required this.id});
+
+  final String id;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => PropertyWriteScreen(id: id, source: PostSource.generate);
+}
+
+@TypedGoRoute<PropertyPostRoute>(path: '/property/:id/post')
+class PropertyPostRoute extends GoRouteData with $PropertyPostRoute {
+  const PropertyPostRoute({required this.id});
+
+  final String id;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => PropertyWriteScreen(id: id, source: PostSource.db);
 }

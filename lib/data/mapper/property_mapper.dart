@@ -1,13 +1,14 @@
 import 'package:drift/drift.dart';
 import 'package:vine_butler/data/local/app_database.dart';
 import 'package:vine_butler/domain/model/address.dart';
+import 'package:vine_butler/domain/model/blog_post.dart';
 import 'package:vine_butler/domain/model/owner.dart';
 import 'package:vine_butler/domain/model/property.dart';
 import 'package:vine_butler/domain/model/property_deal.dart';
 import 'package:vine_butler/domain/model/property_image.dart';
 
 extension PropertyRowMapper on PropertyTableData {
-  Property toDomain({List<PropertyImage> images = const []}) {
+  Property toDomain({List<PropertyImage> images = const [], BlogPost? blogPost}) {
     return Property(
       id: id,
       owner: Owner(name: ownerName, phone: ownerPhone),
@@ -34,6 +35,7 @@ extension PropertyRowMapper on PropertyTableData {
       furnitureOptions: furnitureOptions,
       memo: memo,
       images: images,
+      blogPost: blogPost,
       updatedAt: updatedAt,
       deletedAt: deletedAt,
       syncedAt: syncedAt,

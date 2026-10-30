@@ -3,11 +3,11 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vine_butler/core/network/api_exception.dart';
 import 'package:vine_butler/core/network/dio_factory.dart';
 import 'package:vine_butler/data/remote/juso/juso_api.dart';
 import 'package:vine_butler/data/remote/naver/geocode_api.dart';
 import 'package:vine_butler/data/repository/address_repository_impl.dart';
+import 'package:vine_butler/domain/exception/api_exception.dart';
 
 class _FakeAdapter implements HttpClientAdapter {
   _FakeAdapter(this._respond);

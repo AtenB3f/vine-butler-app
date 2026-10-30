@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vine_butler/core/di/providers.dart';
+import 'package:vine_butler/core/network/api_env.dart';
 import 'package:vine_butler/features/property_detail/presentation/property_detail_view_state.dart';
 
 final propertyDetailVMProvider =
@@ -13,6 +14,7 @@ class PropertyDetailVM extends Notifier<PropertyDetailViewState> {
   @override
   PropertyDetailViewState build() {
     _fetch();
+    _checkWritable();
     return const PropertyDetailViewState();
   }
 
@@ -45,6 +47,16 @@ class PropertyDetailVM extends Notifier<PropertyDetailViewState> {
     state = property == null
         ? state.copyWith(status: PropertyDetailStatus.notFound)
         : state.copyWith(data: PropertyDetailData.fromDomain(property, imagePath: ref.read(imageStorageProvider).path), status: PropertyDetailStatus.loaded);
+  }
+
+  Future<void> _checkWritable() async {
+    if (!ApiEnv.isAiEnabled) { return; }
+
+    final isAuthorized = await ref.read(blogUseCaseProvider).isAuthorized();
+
+    if (!ref.mounted) { return; }
+
+    state = state.copyWith(canWrite: isAuthorized);
   }
 
   Future<void> _delete() async {

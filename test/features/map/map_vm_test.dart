@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:vine_butler/components/components.dart';
 import 'package:vine_butler/core/di/providers.dart';
 import 'package:vine_butler/domain/model/address.dart';
+import 'package:vine_butler/domain/model/blog_post.dart';
 import 'package:vine_butler/domain/model/owner.dart';
 import 'package:vine_butler/domain/model/property.dart';
 import 'package:vine_butler/domain/model/property_deal.dart';
@@ -54,6 +55,9 @@ class _FakePropertyRepository implements PropertyRepository {
 
   @override
   Future<void> delete(String id) async {}
+
+  @override
+  Future<void> saveBlogPost(String propertyId, BlogPost post) async {}
 }
 
 Property _property(String id, PropertyDeal deal, {String detailAddress = '', double latitude = 37.5006, double longitude = 127.0364}) {

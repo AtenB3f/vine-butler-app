@@ -6,6 +6,7 @@ import 'package:vine_butler/core/di/providers.dart';
 import 'package:vine_butler/domain/model/address.dart';
 import 'package:vine_butler/domain/model/address_candidate.dart';
 import 'package:vine_butler/domain/model/address_page.dart';
+import 'package:vine_butler/domain/model/blog_post.dart';
 import 'package:vine_butler/domain/model/owner.dart';
 import 'package:vine_butler/domain/model/property.dart';
 import 'package:vine_butler/domain/model/property_deal.dart';
@@ -83,6 +84,9 @@ class _FakePropertyRepository implements PropertyRepository {
 
   @override
   Future<void> delete(String id) async {}
+
+  @override
+  Future<void> saveBlogPost(String propertyId, BlogPost post) async {}
 }
 
 const _afterDebounce = Duration(milliseconds: 400);
