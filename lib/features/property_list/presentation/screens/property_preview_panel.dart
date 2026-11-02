@@ -4,29 +4,32 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:vine_butler/components/components.dart';
 import 'package:vine_butler/core/network/api_env.dart';
+import 'package:vine_butler/features/map/presentation/screens/map_property_card.dart';
 import 'package:vine_butler/features/property_list/presentation/property_preview_view_state.dart';
 
 class PropertyPreviewPanel extends StatelessWidget {
   final PropertyPreviewViewState viewState;
   final PropertyPreviewMedia media;
   final ValueChanged<PropertyPreviewMedia> onMediaChange;
+  final VoidCallback onCardTap;
 
   const PropertyPreviewPanel({
     super.key,
     required this.viewState,
     required this.media,
     required this.onMediaChange,
+    required this.onCardTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    if (!viewState.hasImages) { return _map(); }
+    if (!viewState.hasImages) { return _mapWithCard(); }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _mediaButtons(),
-        Expanded(child: media == PropertyPreviewMedia.map ? _map() : _images()),
+        Expanded(child: media == PropertyPreviewMedia.map ? _mapWithCard() : _images()),
       ],
     );
   }
@@ -79,6 +82,20 @@ class PropertyPreviewPanel extends StatelessWidget {
         images: [for (final path in viewState.imagePaths) FileImage(File(path))],
         fit: BoxFit.contain,
       ),
+    );
+  }
+
+  Widget _mapWithCard() {
+    return Stack(
+      children: [
+        Positioned.fill(child: _map()),
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: MapPropertyCard(viewState: viewState.card, onTap: onCardTap),
+        ),
+      ],
     );
   }
 

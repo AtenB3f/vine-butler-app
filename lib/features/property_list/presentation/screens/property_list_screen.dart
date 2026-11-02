@@ -105,7 +105,7 @@ class PropertyListScreen extends ConsumerWidget {
                       alignment: Alignment.centerLeft,
                       minWidth: panelWidth,
                       maxWidth: panelWidth,
-                      child: _previewPanel(ref, state),
+                      child: _previewPanel(context, ref, state),
                     ),
                   ),
                 ),
@@ -116,12 +116,13 @@ class PropertyListScreen extends ConsumerWidget {
     );
   }
 
-  Widget _previewPanel(WidgetRef ref, PropertyListViewState state) {
+  Widget _previewPanel(BuildContext context, WidgetRef ref, PropertyListViewState state) {
     return _PreviewSlot(
       selectId: state.selectId,
       preview: state.preview,
       media: state.media,
       onMediaChange: (media) => ref.read(propertyListVMProvider.notifier).action(PropertyListAction.changeMedia(media)),
+      onCardTap: (id) => PropertyDetailRoute(id: id).push(context),
     );
   }
 
@@ -188,12 +189,14 @@ class _PreviewSlot extends StatefulWidget {
   final PropertyPreviewViewState? preview;
   final PropertyPreviewMedia media;
   final ValueChanged<PropertyPreviewMedia> onMediaChange;
+  final ValueChanged<String> onCardTap;
 
   const _PreviewSlot({
     required this.selectId,
     required this.preview,
     required this.media,
     required this.onMediaChange,
+    required this.onCardTap,
   });
 
   @override
@@ -234,6 +237,7 @@ class _PreviewSlotState extends State<_PreviewSlot> {
       viewState: preview,
       media: widget.media,
       onMediaChange: widget.onMediaChange,
+      onCardTap: () => widget.onCardTap(preview.card.id),
     );
   }
 }
