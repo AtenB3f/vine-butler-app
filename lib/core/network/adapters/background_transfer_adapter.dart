@@ -27,10 +27,12 @@ class BackgroundTransferAdapter implements HttpClientAdapter {
   @override
   void close({bool force = false}) => _fallback.close(force: force);
 
-  /// 네이티브 채널 `request` 호출 함수 (OS 전송을 쓸 수 없으면 null)
+  /// 네이티브 채널 `request` 호출 함수
   ///
-  /// - returns: `statusCode`
-  ///   - `UNAVAILABLE`: OS 전송을 쓸 수 없음 (Android 14 미만, 작업 예약 실패)
+  /// - 인자: `url`, `method`, `headers`, `body`, `connectTimeoutMs`, `receiveTimeoutMs`
+  /// - returns: `statusCode`, `headers`, `body`로 만든 응답 (OS 전송을 쓸 수 없으면 `null`)
+  /// - 오류 코드 (`PlatformException.code`)
+  ///   - `UNAVAILABLE`: OS 전송을 쓸 수 없음 (Android 14 미만, 작업 예약 실패, iOS 본문 없는 요청)
   ///   - `TIMEOUT`: 연결·응답 시간 초과
   ///   - `NETWORK`: 네트워크 오류
   ///   - `STOPPED`: 시스템이 전송 작업을 중지
