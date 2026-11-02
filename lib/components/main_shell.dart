@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vine_butler/components/responsive.dart';
 import 'package:vine_butler/components/widgets/tab/tabbar.dart';
 
 class MainShell extends StatelessWidget {
@@ -13,13 +14,15 @@ class MainShell extends StatelessWidget {
       primary: false,
       backgroundColor: Colors.white,
       body: SafeArea(bottom: false, child: navigationShell),
-      bottomNavigationBar: Tabbar(
-        currentIndex: navigationShell.currentIndex,
-        onTap: (index) => navigationShell.goBranch(
-          index,
-          initialLocation: index == navigationShell.currentIndex,
-        ),
-      ),
+      bottomNavigationBar: context.isDesktop
+          ? null
+          : Tabbar(
+              currentIndex: navigationShell.currentIndex,
+              onTap: (index) => navigationShell.goBranch(
+                index,
+                initialLocation: index == navigationShell.currentIndex,
+              ),
+            ),
     );
   }
 }
