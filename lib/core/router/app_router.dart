@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vine_butler/components/main_shell.dart';
@@ -17,8 +19,9 @@ import 'package:vine_butler/features/property_write/presentation/screens/propert
 
 part 'app_router.g.dart';
 
+/// 첫 화면 (데스크톱은 홈 탭이 없어 매물 목록)
 final GoRouter appRouter = GoRouter(
-  initialLocation: '/home',
+  initialLocation: Platform.isMacOS || Platform.isWindows ? const PropertyListRoute().location : const HomeRoute().location,
   routes: $appRoutes,
 );
 
