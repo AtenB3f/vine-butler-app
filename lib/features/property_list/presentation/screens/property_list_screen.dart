@@ -79,6 +79,7 @@ class PropertyListScreen extends ConsumerWidget {
             state,
             listTopPadding: 16,
             onItemTap: (id) => ref.read(propertyListVMProvider.notifier).action(PropertyListAction.selectItem(id)),
+            onItemDetailTap: (id) => PropertyDetailRoute(id: id).push(context),
           ),
         ),
       ],
@@ -133,6 +134,7 @@ class PropertyListScreen extends ConsumerWidget {
     PropertyListViewState state, {
     required double listTopPadding,
     required ValueChanged<String> onItemTap,
+    ValueChanged<String>? onItemDetailTap,
   }) {
     final viewModel = ref.read(propertyListVMProvider.notifier);
 
@@ -171,6 +173,7 @@ class PropertyListScreen extends ConsumerWidget {
                 itemBuilder: (context, index) => PropertyListItem(
                   viewState: state.items[index],
                   onTap: () => onItemTap(state.items[index].id),
+                  onDetailTap: onItemDetailTap == null ? null : () => onItemDetailTap(state.items[index].id),
                 ),
               ),
             ),

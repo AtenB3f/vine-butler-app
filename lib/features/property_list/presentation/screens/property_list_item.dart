@@ -7,15 +7,36 @@ import 'package:vine_butler/shared/extensions/extensions.dart';
 class PropertyListItem extends StatelessWidget {
   final PropertyListItemViewState viewState;
   final VoidCallback onTap;
+  final VoidCallback? onDetailTap;
 
   const PropertyListItem({
     super.key,
     required this.viewState,
     required this.onTap,
+    this.onDetailTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final onDetailTap = this.onDetailTap;
+
+    if (onDetailTap == null) { return _item(); }
+
+    return Stack(
+      children: [
+        _item(),
+        Positioned(
+          right: 0,
+          top: 0,
+          bottom: 0,
+          width: 92,
+          child: _DetailButton(onTap: onDetailTap),
+        ),
+      ],
+    );
+  }
+
+  Widget _item() {
     return Pressable(
       onTap: onTap,
       child: Container(
@@ -83,6 +104,55 @@ class PropertyListItem extends StatelessWidget {
       children: [
         for (final tag in viewState.tag) GrayTag(text: tag, size: GrayTagSize.small),
       ],
+    );
+  }
+}
+
+class _DetailButton extends StatefulWidget {
+  final VoidCallback onTap;
+
+  const _DetailButton({required this.onTap});
+
+  @override
+  State<_DetailButton> createState() => _DetailButtonState();
+}
+
+class _DetailButtonState extends State<_DetailButton> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: widget.onTap,
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          opacity: _isHovered ? 1 : 0,
+          child: Container(
+            padding: const EdgeInsets.only(left: 12),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.centerRight,
+                end: Alignment.centerLeft,
+                colors: [StateColor.overlay, Colors.transparent],
+              ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              spacing: 8,
+              children: [
+                AppIcons.chevronRightLG(TextColor.dark),
+                AppFontStyle.body2.text('상세', TextColor.dark),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
