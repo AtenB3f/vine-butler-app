@@ -1,17 +1,18 @@
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vine_butler/components/components.dart';
-import 'package:vine_butler/core/network/api_env.dart';
 import 'package:vine_butler/core/router/app_router.dart';
-import 'package:vine_butler/core/shared/app_manager.dart';
 import 'package:vine_butler/features/property_detail/presentation/property_detail_view_state.dart';
+import 'package:vine_butler/features/property_detail/presentation/screens/property_detail_address.dart';
+import 'package:vine_butler/features/property_detail/presentation/screens/property_detail_map.dart';
+import 'package:vine_butler/features/property_detail/presentation/screens/property_detail_media.dart';
+import 'package:vine_butler/features/property_detail/presentation/screens/property_detail_options.dart';
+import 'package:vine_butler/features/property_detail/presentation/screens/property_detail_owner.dart';
+import 'package:vine_butler/features/property_detail/presentation/screens/property_detail_post.dart';
+import 'package:vine_butler/features/property_detail/presentation/screens/property_detail_price_info.dart';
 import 'package:vine_butler/features/property_detail/property_detail_vm.dart';
 import 'package:vine_butler/shared/extensions/extensions.dart';
-import 'package:vine_butler/shared/utils/utils.dart';
 
 enum _DetailMenu {
   edit,
@@ -109,19 +110,11 @@ class PropertyDetailScreen extends ConsumerWidget {
                 body: _body(context, ref, state),
               ),
             ),
-            Expanded(child: _desktopMap(state)),
+            Expanded(child: PropertyDetailMap(data: state.data)),
           ],
         );
       },
     );
-  }
-
-  Widget _desktopMap(PropertyDetailViewState state) {
-    final data = state.data;
-
-    if (state.status != PropertyDetailStatus.loaded || data == null) { return const ColoredBox(color: BaseColor.light); }
-
-    return _map(data);
   }
 
   List<({_DetailMenu menu, String text, Widget Function(Color color) image})> _visibleMenuItems(PropertyDetailViewState state) {
@@ -189,315 +182,36 @@ class PropertyDetailScreen extends ConsumerWidget {
   Widget _contents(BuildContext context, WidgetRef ref, PropertyDetailData data, bool isMapVisible) {
     return SingleChildScrollView(
       child: Padding(
-        padding: EdgeInsetsGeometry.only(left: 16, right: 16, top: 20, bottom: 40),
+        padding: EdgeInsetsGeometry.only(left: 20, right: 20, top: 20, bottom: 40),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 44,
+          spacing: 40,
           children: [
-            _basicInfo(context, ref, data, isMapVisible),
-            _call(data),
-            _options(data),
-            _furnitures(data),
-            if (data.memo != null) _memo(data),
-            if (data.postTitle != null) _post(context, ref, data),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _basicInfo(BuildContext context, WidgetRef ref, PropertyDetailData data, bool isMapVisible) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 14,
-      children: [
-        if (context.isMobile || data.hasImages) _media(context, ref, data, isMapVisible),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: context.isMobile ? 40 : 44,
-          children: [
-            _address(data),
-            _priceInfo(data),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _media(BuildContext context, WidgetRef ref, PropertyDetailData data, bool isMapVisible) {
-    final height = context.isMobile ? 246.0 : 240.0;
-
-    if (!data.hasImages) { return SizedBox(height: height, width: double.infinity, child: _map(data)); }
-
-    if (!context.isMobile) {
-      return SizedBox(
-        height: height,
-        width: double.infinity,
-        child: AppImagePage(
-          viewState: _imagePageViewState(data),
-          onTap: (index) => _showImages(context, data, index),
-        ),
-      );
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      spacing: 4,
-      children: [
-        _mediaButtons(ref, isMapVisible),
-        SizedBox(height: height, width: double.infinity, child: _imageMap(context, data, isMapVisible)),
-      ],
-    );
-  }
-
-  Widget _mediaButtons(WidgetRef ref, bool isMapVisible) {
-    void toggle() => ref.read(propertyDetailVMProvider(id).notifier).action(PropertyDetailAction.toggleMap);
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _mediaButton(icon: AppIcons.mapSM, text: '지도', isSelected: isMapVisible, onTap: toggle),
-        _mediaButton(icon: AppIcons.imageSM, text: '이미지', isSelected: !isMapVisible, onTap: toggle),
-      ],
-    );
-  }
-
-  Widget _mediaButton({
-    required Widget Function(Color color) icon,
-    required String text,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    final color = isSelected ? TextColor.dark : GrayColor.light;
-    final button = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-      decoration: BoxDecoration(
-        color: StateColor.white,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        spacing: 6,
-        children: [
-          icon(color),
-          (isSelected ? AppFontStyle.bold2 : AppFontStyle.body2).text(text, color),
-        ],
-      ),
-    );
-
-    if (isSelected) { return button; }
-
-    return Pressable(onTap: onTap, child: button);
-  }
-
-  Widget _address(PropertyDetailData data) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 4,
-      children: [
-        if (data.unitAddress.isNotEmpty)
-          Text(
-            data.unitAddress,
-            style: AppFontStyle.header1.style(TextColor.dark),
-          ),
-        Text(
-          data.address,
-          style: AppFontStyle.sub1.style(TextColor.dark),
-        ),
-      ],
-    );
-  }
-
-  Widget _priceInfo(PropertyDetailData data) {
-    final areaExclusive = data.areaExclusive;
-    final roomCount = data.roomCount;
-    final spaceInfo = [
-      if (areaExclusive != null) ...['${calculatePyeong(areaExclusive)}평', '${areaExclusive}m²'],
-      if (roomCount != null) '방 $roomCount개',
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 6,
-      children: [
-        LineTag(
-          text: data.transactionType.label,
-          type: data.transactionType.tagType
-        ),
-        Row(
-          spacing: 6,
-          children: [
-            AppFontStyle.header1.text(data.amount.formattedKRW, TextColor.dark),
-            if (data.monthlyAmount case final monthlyAmount?) ... [
-              const Circle(size: 3, color: TextColor.medium),
-              AppFontStyle.header1.text(monthlyAmount.formattedKRW, TextColor.dark),
-            ],
-          ],
-        ),
-        if (data.maintenanceCost case final maintenanceCost?)
-          Row(
-            spacing: 6,
-            children: [
-              AppFontStyle.sub1.text('관리비', TextColor.light),
-              AppFontStyle.header3.text(maintenanceCost == 0 ? '없음' : maintenanceCost.formattedKRW, TextColor.dark),
-            ],
-          ),
-        if (spaceInfo.isNotEmpty)
-          Row(
-            spacing: 6,
-            children: [
-              for (final (index, text) in spaceInfo.indexed) ...[
-                if (index > 0) const Circle(size: 3, color: BaseColor.medium),
-                AppFontStyle.sub1.text(text, TextColor.medium),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 8,
+              children: [
+                if (context.isMobile || data.hasImages)
+                  PropertyDetailMedia(
+                    data: data,
+                    isMapVisible: isMapVisible,
+                    onToggleMap: () => ref.read(propertyDetailVMProvider(id).notifier).action(PropertyDetailAction.toggleMap),
+                  ),
+                PropertyDetailAddress(data: data),
               ],
-            ],
-          ),
-      ],
-    );
-  }
-
-  Widget _call(PropertyDetailData data) {
-    return Column(
-      spacing: 14,
-      children: [
-        Row(
-          spacing: 8,
-          children: [
-            _optionTitle('집주인'),
-            const Spacer(),
-            AppIcons.callSM(BaseColor.dark),
-            AppFontStyle.body3.text(data.ownerPhone, TextColor.dark),
-          ],
-        ),
-        if (data.agentPhone != null) ... [
-          Row(
-            spacing: 8,
-            children: [
-              _optionTitle('공인중개'),
-              const Spacer(),
-              if (data.agentCompany case final agentCompany?) ... [
-                AppFontStyle.body2.text(agentCompany, TextColor.medium),
-              ],
-              AppIcons.callSM(),
-              if (data.agentPhone case final agentPhone?) ... [
-                AppFontStyle.body3.text(agentPhone, TextColor.dark),
-              ]
-            ],
-          )
-        ]
-      ],
-    );
-  }
-
-  Widget _options(PropertyDetailData data) {
-    return Column(
-      spacing: 14,
-      children: [
-        if (data.vicinity.isNotEmpty) _optionItem('교통', data.vicinity.join(', ')),
-        if (data.isAvailableParking) _optionItem('주차', '주차 가능'),
-        if (data.isAvailableLoan case final isAvailableLoan?) _optionItem('융자', isAvailableLoan ? '융자 있음' : '융자 없음'),
-        if (data.isAvailableSuretyInsurance) _optionItem('보증보험', '보증보험 가입 가능'),
-        _moveInRow(data),
-      ],
-    );
-  }
-
-  Widget _optionItem(String title, String description) {
-    return Row(
-      spacing: 8,
-      children: [
-        _optionTitle(title),
-        const Spacer(),
-        _optionDescription(description)
-      ],
-    );
-  }
-
-  Text _optionTitle(String title) {
-    return AppFontStyle.body1.text(title, TextColor.light);
-  }
-
-  Text _optionDescription(String description) {
-    return AppFontStyle.sub2.text(description, TextColor.dark);
-  }
-
-  Widget _moveInRow(PropertyDetailData data) {
-    final valueText = formatMoveInDate(data.moveInDate);
-
-    return Row(
-      spacing: 8,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        AppFontStyle.body1.text('입주 가능일', TextColor.light),
-        const Spacer(),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          spacing: 2,
-          children: [
-            _optionDescription(valueText),
-            if (data.isFlexibleMoveInDate) AppFontStyle.body1.text('협의 가능', TextColor.light),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _furnitures(PropertyDetailData data) {
-    if (data.furnitureOptions.isEmpty) { return const SizedBox.shrink(); }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 12,
-      children: [
-        AppFontStyle.body1.text('가구 옵션', TextColor.light),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            for (final option in data.furnitureOptions) GrayTag(text: option, size: GrayTagSize.medium),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _memo(PropertyDetailData data) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 12,
-      children: [
-        AppFontStyle.body1.text('메모', TextColor.light),
-        AppFontStyle.body3.text(data.memo!, TextColor.dark),
-      ],
-    );
-  }
-
-  Widget _post(BuildContext context, WidgetRef ref, PropertyDetailData data) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 10,
-      children: [
-        AppFontStyle.body1.text('포스트', TextColor.light),
-        Pressable(
-          onTap: () => _openPost(context, ref, PropertyPostRoute(id: id)),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  data.postTitle!,
-                  style: AppFontStyle.sub2.style(TextColor.dark),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+            ),
+            PropertyDetailPriceInfo(data: data),
+            PropertyDetailOwner(data: data),
+            PropertyDetailOptions(data: data),
+            if (data.postTitle case final postTitle?)
+              PropertyDetailPost(
+                title: postTitle,
+                onTap: () => _openPost(context, ref, PropertyPostRoute(id: id)),
               ),
-              SizedBox.square(dimension: 30, child: Center(child: AppIcons.chevronRightSM(TextColor.dark))),
-            ],
-          ),
+          ],
         ),
-      ],
+      ),
     );
   }
 
@@ -508,70 +222,5 @@ class PropertyDetailScreen extends ConsumerWidget {
     if (!context.mounted) { return; }
 
     ref.read(propertyDetailVMProvider(id).notifier).action(PropertyDetailAction.fetch);
-  }
-
-  AppImagePageViewState _imagePageViewState(PropertyDetailData data, {BoxFit fit = BoxFit.cover, int index = 0}) {
-    return AppImagePageViewState(
-      images: [for (final path in data.imagePaths) FileImage(File(path))],
-      fit: fit,
-      index: index,
-    );
-  }
-
-  Widget _imageMap(BuildContext context, PropertyDetailData data, bool isMapVisible) {
-    if (isMapVisible) { return _map(data); }
-
-    return AppImagePage(
-      viewState: _imagePageViewState(data),
-      onTap: (index) => _showImages(context, data, index),
-    );
-  }
-
-  void _showImages(BuildContext context, PropertyDetailData data, int index) {
-    showGeneralDialog<void>(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: '사진 닫기',
-      barrierColor: StateColor.dimmed,
-      pageBuilder: (dialogContext, animation, secondaryAnimation) => _imageViewer(dialogContext, data, index),
-    );
-  }
-
-  Widget _imageViewer(BuildContext dialogContext, PropertyDetailData data, int index) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          spacing: 10,
-          children: [
-            Pressable(
-              onTap: () => Navigator.of(dialogContext).pop(),
-              child: AppIcons.closeLG(StateColor.white),
-            ),
-            Expanded(
-              child: AppImagePage(viewState: _imagePageViewState(data, fit: BoxFit.contain, index: index)),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _map(PropertyDetailData data) {
-    final viewState = NaverMapViewState(
-      cameraLocation: (latitude: data.latitude, longitude: data.longitude),
-      markers: [NaverMarkerViewState(id: 'position', latitude: data.latitude, longitude: data.longitude)],
-      selectedMarkerId: 'position',
-      clientId: ApiEnv.naverMapsClientId,
-      webServiceUrl: ApiEnv.naverMapsWebServiceUrl,
-    );
-
-    return switch (defaultTargetPlatform) {
-      TargetPlatform.android || TargetPlatform.iOS => NativeMap(viewState: viewState, onInit: () => AppManager.shared.mapImagesReady),
-      TargetPlatform.macOS => MacMap(viewState: viewState),
-      TargetPlatform.windows => WindowsMap(viewState: viewState),
-      _ => const ColoredBox(color: BaseColor.light),
-    };
   }
 }
