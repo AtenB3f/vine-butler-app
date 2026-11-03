@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vine_butler/components/main_shell.dart';
+import 'package:vine_butler/components/responsive.dart';
 import 'package:vine_butler/features/apply_property/presentation/screens/apply_property_address_screen.dart';
 import 'package:vine_butler/features/apply_property/presentation/screens/apply_property_extra_screen.dart';
 import 'package:vine_butler/features/apply_property/presentation/screens/apply_property_owner_screen.dart';
+import 'package:vine_butler/features/apply_property/presentation/screens/apply_property_tab.dart';
 import 'package:vine_butler/features/apply_property/presentation/screens/apply_property_type_screen.dart';
 import 'package:vine_butler/features/edit_property/presentation/screens/edit_property_address_screen.dart';
 import 'package:vine_butler/features/edit_property/presentation/screens/edit_property_screen.dart';
@@ -103,7 +105,7 @@ class ApplyPropertyRoute extends GoRouteData with $ApplyPropertyRoute {
   const ApplyPropertyRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => const ApplyPropertyTypeScreen();
+  Widget build(BuildContext context, GoRouterState state) => context.isDesktop ? const ApplyPropertyTab() : const ApplyPropertyTypeScreen();
 }
 
 @TypedGoRoute<ApplyPropertyAddressRoute>(path: '/apply-property/address')
