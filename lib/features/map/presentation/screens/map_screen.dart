@@ -8,6 +8,7 @@ import 'package:vine_butler/core/shared/app_manager.dart';
 import 'package:vine_butler/features/map/map_vm.dart';
 import 'package:vine_butler/features/map/presentation/map_property_card_view_state.dart';
 import 'package:vine_butler/features/map/presentation/map_view_state.dart';
+import 'package:vine_butler/features/map/presentation/screens/map_detail_side.dart';
 import 'package:vine_butler/features/map/presentation/screens/map_property_card.dart';
 import 'package:vine_butler/features/map/presentation/screens/map_top_section.dart';
 import 'package:vine_butler/features/property_list/presentation/property_filter_view_state.dart';
@@ -32,50 +33,48 @@ class MapScreen extends ConsumerWidget {
       onEvent: (event) => _onEvent(context, viewModel, event),
     );
 
-    return Scaffold(
-      primary: false,
-      backgroundColor: StateColor.white,
-      body: Column(
-        children: [
-          _MapBanner(status: state.bndStatus, isOpen: state.status == PropertySearchStatus.open),
-          Expanded(
-            child: PropertySearchOverlay(
-              isVisible: state.status == PropertySearchStatus.open,
-              onDismiss: () => viewModel.action(const MapAction.panel(false)),
-              searchResults: [
-                for (final item in state.searchResults)
-                  PropertySearchResultItem(
-                    viewState: item,
+    final map = Column(
+      children: [
+        _MapBanner(status: state.bndStatus, isOpen: state.status == PropertySearchStatus.open),
+        Expanded(
+          child: PropertySearchOverlay(
+            isVisible: state.status == PropertySearchStatus.open,
+            onDismiss: () => viewModel.action(const MapAction.panel(false)),
+            searchResults: [
+              for (final item in state.searchResults)
+                PropertySearchResultItem(
+                  viewState: item,
+                  query: state.query,
+                  onTap: () => viewModel.action(MapAction.select(item.id)),
+                ),
+            ],
+            filterPanel: PropertyFilterPanel(
+              data: state.filter,
+              onFilter: (data) => viewModel.action(MapAction.filtering(data)),
+              onCollapse: () => viewModel.action(const MapAction.panel(false)),
+            ),
+            child: Column(
+              children: [
+                if (context.isMobile)
+                  MapTopSection(
                     query: state.query,
-                    onTap: () => viewModel.action(MapAction.select(item.id)),
+                    filter: state.filter,
+                    onFilter: (data) => viewModel.action(MapAction.filtering(data)),
+                    onClearQuery: () => viewModel.action(const MapAction.search('')),
+                    onMyLocationTap: () => viewModel.action(const MapAction.locate()),
+                  )
+                else
+                  PropertyFilterTags(
+                    query: state.query,
+                    filter: state.filter,
+                    onFilter: (data) => viewModel.action(MapAction.filtering(data)),
+                    onClearQuery: () => viewModel.action(const MapAction.search('')),
                   ),
-              ],
-              filterPanel: PropertyFilterPanel(
-                data: state.filter,
-                onFilter: (data) => viewModel.action(MapAction.filtering(data)),
-                onCollapse: () => viewModel.action(const MapAction.panel(false)),
-              ),
-              child: Column(
-                children: [
-                  if (context.isMobile)
-                    MapTopSection(
-                      query: state.query,
-                      filter: state.filter,
-                      onFilter: (data) => viewModel.action(MapAction.filtering(data)),
-                      onClearQuery: () => viewModel.action(const MapAction.search('')),
-                      onMyLocationTap: () => viewModel.action(const MapAction.locate()),
-                    )
-                  else
-                    PropertyFilterTags(
-                      query: state.query,
-                      filter: state.filter,
-                      onFilter: (data) => viewModel.action(MapAction.filtering(data)),
-                      onClearQuery: () => viewModel.action(const MapAction.search('')),
-                    ),
-                  Expanded(
-                    child: Stack(
-                      children: [
-                        Positioned.fill(child: _map(state, viewModel)),
+                Expanded(
+                  child: Stack(
+                    children: [
+                      Positioned.fill(child: _map(state, viewModel)),
+                      if (context.isMobile)
                         Positioned(
                           left: 0,
                           right: 0,
@@ -85,14 +84,50 @@ class MapScreen extends ConsumerWidget {
                             onTap: (id) => PropertyDetailRoute(id: id).push(context),
                           ),
                         ),
-                      ],
-                    ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
+      ],
+    );
+
+    return Scaffold(
+      primary: false,
+      backgroundColor: StateColor.white,
+      body: context.isMobile ? map : _desktopScreen(selected?.id, map),
+    );
+  }
+
+  /// 데스크톱 지도 화면
+  Widget _desktopScreen(String? selectedId, Widget map) {
+    const sideWidth = 360.0;
+
+    return LayoutBuilder(
+      builder: (context, constraints) => TweenAnimationBuilder<double>(
+        tween: Tween(end: selectedId != null ? 1 : 0),
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInOut,
+        child: map,
+        builder: (context, progress, child) => Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(width: constraints.maxWidth - sideWidth * progress, child: child),
+            if (progress > 0)
+              Expanded(
+                child: ClipRect(
+                  child: OverflowBox(
+                    alignment: Alignment.centerLeft,
+                    minWidth: sideWidth,
+                    maxWidth: sideWidth,
+                    child: _SideSlot(id: selectedId),
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -225,5 +260,35 @@ class _AnimatedCardState extends State<_AnimatedCard> {
         child: card == null ? const SizedBox.shrink() : MapPropertyCard(viewState: card, onTap: () => widget.onTap(card.id)),
       ),
     );
+  }
+}
+
+/// 닫히는 동안에도 마지막으로 선택한 매물을 보여주는 Side
+class _SideSlot extends StatefulWidget {
+  final String? id;
+
+  const _SideSlot({required this.id});
+
+  @override
+  State<_SideSlot> createState() => _SideSlotState();
+}
+
+class _SideSlotState extends State<_SideSlot> {
+  late String? _id = widget.id;
+
+  @override
+  void didUpdateWidget(covariant _SideSlot oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.id != null) { _id = widget.id; }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final id = _id;
+
+    if (id == null) { return const SizedBox.shrink(); }
+
+    return MapDetailSide(id: id);
   }
 }
