@@ -59,7 +59,7 @@ class PropertyDetailScreen extends ConsumerWidget {
 
   AppScaffold _mobileScreen(BuildContext context, WidgetRef ref, PropertyDetailViewState state) {
     return AppScaffold(
-      title: '매물 찾기',
+      title: '매물 정보',
       leftIcon: AppIcons.chevronLeftMD,
       rightIcon: AppIcons.moreMD,
       onLeftTap: () => context.pop(),
@@ -78,26 +78,50 @@ class PropertyDetailScreen extends ConsumerWidget {
     );
   }
 
-  AppScaffold _desktopScreen(BuildContext context, WidgetRef ref, PropertyDetailViewState state) {
-    return AppScaffold(
-      title: '매물 찾기',
-      leftIcon: AppIcons.chevronLeftMD,
-      rightIcon: AppIcons.moreMD,
-      onLeftTap: () => context.pop(),
-      onRightTap: () async {
-        final index = await showAppDropdown(
-          context,
-          AppDropdownViewState(
-            items: [for (final item in _visibleMenuItems(state)) AppDropdownItemViewState(text: item.text, image: item.image)],
-            selectedIndex: -1,
-          ),
-          topRight: Offset(context.screenWidth - 16, MediaQuery.paddingOf(context).top + 58),
-        );
+  /// 데스크톱 상세 화면
+  Widget _desktopScreen(BuildContext context, WidgetRef ref, PropertyDetailViewState state) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final mapWidth = constraints.maxWidth - 360;
 
-        if (index != null && context.mounted) { _onMenuSelect(context, ref, _visibleMenuItems(state)[index].menu); }
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(
+              width: 360,
+              child: AppScaffold(
+                title: '매물 정보',
+                leftIcon: AppIcons.chevronLeftMD,
+                rightIcon: AppIcons.moreMD,
+                onLeftTap: () => context.pop(),
+                onRightTap: () async {
+                  final index = await showAppDropdown(
+                    context,
+                    AppDropdownViewState(
+                      items: [for (final item in _visibleMenuItems(state)) AppDropdownItemViewState(text: item.text, image: item.image)],
+                      selectedIndex: -1,
+                    ),
+                    topRight: Offset(context.screenWidth - mapWidth - 16, MediaQuery.paddingOf(context).top + 58),
+                  );
+
+                  if (index != null && context.mounted) { _onMenuSelect(context, ref, _visibleMenuItems(state)[index].menu); }
+                },
+                body: _body(context, ref, state),
+              ),
+            ),
+            Expanded(child: _desktopMap(state)),
+          ],
+        );
       },
-      body: _body(context, ref, state),
     );
+  }
+
+  Widget _desktopMap(PropertyDetailViewState state) {
+    final data = state.data;
+
+    if (state.status != PropertyDetailStatus.loaded || data == null) { return const ColoredBox(color: BaseColor.light); }
+
+    return _map(data);
   }
 
   List<({_DetailMenu menu, String text, Widget Function(Color color) image})> _visibleMenuItems(PropertyDetailViewState state) {
@@ -189,7 +213,7 @@ class PropertyDetailScreen extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 14,
       children: [
-        _media(context, ref, data, isMapVisible),
+        if (context.isMobile || data.hasImages) _media(context, ref, data, isMapVisible),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: context.isMobile ? 40 : 44,
