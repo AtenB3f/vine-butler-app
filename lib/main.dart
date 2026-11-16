@@ -35,6 +35,8 @@ Future<void> main() async {
 
   final container = ProviderContainer(overrides: [imageDirectoryProvider.overrideWithValue(imageDirectory)]);
 
+  await AppManager.shared.loadSettings(container.read(appSettingsRepositoryProvider));
+
   runApp(UncontrolledProviderScope(container: container, child: const VineButlerApp()));
   _preloadPropertyList(container);
 }
