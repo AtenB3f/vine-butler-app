@@ -101,33 +101,19 @@ class MapScreen extends ConsumerWidget {
     );
   }
 
-  /// 데스크톱 지도 화면
+  /// 데스크톱 지도 화면 (매물을 선택하면 오른쪽에 상세 정보가 열림)
   Widget _desktopScreen(String? selectedId, Widget map) {
-    const sideWidth = 360.0;
-
-    return LayoutBuilder(
-      builder: (context, constraints) => TweenAnimationBuilder<double>(
-        tween: Tween(end: selectedId != null ? 1 : 0),
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeInOut,
-        child: map,
-        builder: (context, progress, child) => Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(width: constraints.maxWidth - sideWidth * progress, child: child),
-            if (progress > 0)
-              Expanded(
-                child: ClipRect(
-                  child: OverflowBox(
-                    alignment: Alignment.centerLeft,
-                    minWidth: sideWidth,
-                    maxWidth: sideWidth,
-                    child: _SideSlot(id: selectedId),
-                  ),
-                ),
-              ),
-          ],
+    return ValueListenableBuilder<double>(
+      valueListenable: AppManager.shared.windowSideWidth,
+      builder: (context, sideWidth, _) => DesktopSplitView(
+        viewState: DesktopSplitViewState(
+          sideWidth: sideWidth,
+          type: selectedId != null ? DesktopSplitType.two : DesktopSplitType.one,
         ),
+        onResize: (width) => AppManager.shared.windowSideWidth.value = width,
+        onResizeEnd: AppManager.shared.saveWindowSideWidth,
+        side: selectedId == null ? const SizedBox.shrink() : MapDetailSide(id: selectedId),
+        content: map,
       ),
     );
   }
@@ -260,35 +246,5 @@ class _AnimatedCardState extends State<_AnimatedCard> {
         child: card == null ? const SizedBox.shrink() : MapPropertyCard(viewState: card, onTap: () => widget.onTap(card.id)),
       ),
     );
-  }
-}
-
-/// 닫히는 동안에도 마지막으로 선택한 매물을 보여주는 Side
-class _SideSlot extends StatefulWidget {
-  final String? id;
-
-  const _SideSlot({required this.id});
-
-  @override
-  State<_SideSlot> createState() => _SideSlotState();
-}
-
-class _SideSlotState extends State<_SideSlot> {
-  late String? _id = widget.id;
-
-  @override
-  void didUpdateWidget(covariant _SideSlot oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (widget.id != null) { _id = widget.id; }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final id = _id;
-
-    if (id == null) { return const SizedBox.shrink(); }
-
-    return MapDetailSide(id: id);
   }
 }

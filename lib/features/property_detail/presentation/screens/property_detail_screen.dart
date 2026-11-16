@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vine_butler/components/components.dart';
 import 'package:vine_butler/core/router/app_router.dart';
+import 'package:vine_butler/core/shared/app_manager.dart';
 import 'package:vine_butler/features/property_detail/presentation/property_detail_view_state.dart';
 import 'package:vine_butler/features/property_detail/presentation/screens/property_detail_body.dart';
 import 'package:vine_butler/features/property_detail/presentation/screens/property_detail_map.dart';
@@ -76,39 +77,37 @@ class PropertyDetailScreen extends ConsumerWidget {
 
   /// 데스크톱 상세 화면
   Widget _desktopScreen(BuildContext context, WidgetRef ref, PropertyDetailViewState state) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final mapWidth = constraints.maxWidth - 360;
+    return ValueListenableBuilder<double>(
+      valueListenable: AppManager.shared.windowSideWidth,
+      builder: (context, sideWidth, _) => DesktopSplitView(
+        viewState: DesktopSplitViewState(sideWidth: sideWidth),
+        onResize: (width) => AppManager.shared.windowSideWidth.value = width,
+        onResizeEnd: AppManager.shared.saveWindowSideWidth,
+        content: Builder(
+          builder: (infoContext) => AppScaffold(
+            title: '매물 정보',
+            leftIcon: AppIcons.chevronLeftMD,
+            rightIcon: AppIcons.moreMD,
+            onLeftTap: () => context.pop(),
+            onRightTap: () async {
+              final info = infoContext.findRenderObject() as RenderBox;
+              final infoRight = info.localToGlobal(Offset(info.size.width, 0)).dx;
+              final index = await showAppDropdown(
+                context,
+                AppDropdownViewState(
+                  items: [for (final item in _visibleMenuItems(state)) AppDropdownItemViewState(text: item.text, image: item.image)],
+                  selectedIndex: -1,
+                ),
+                topRight: Offset(infoRight - 16, MediaQuery.paddingOf(context).top + 58),
+              );
 
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(
-              width: 360,
-              child: AppScaffold(
-                title: '매물 정보',
-                leftIcon: AppIcons.chevronLeftMD,
-                rightIcon: AppIcons.moreMD,
-                onLeftTap: () => context.pop(),
-                onRightTap: () async {
-                  final index = await showAppDropdown(
-                    context,
-                    AppDropdownViewState(
-                      items: [for (final item in _visibleMenuItems(state)) AppDropdownItemViewState(text: item.text, image: item.image)],
-                      selectedIndex: -1,
-                    ),
-                    topRight: Offset(context.screenWidth - mapWidth - 16, MediaQuery.paddingOf(context).top + 58),
-                  );
-
-                  if (index != null && context.mounted) { _onMenuSelect(context, ref, _visibleMenuItems(state)[index].menu); }
-                },
-                body: PropertyDetailBody(id: id),
-              ),
-            ),
-            Expanded(child: PropertyDetailMap(data: state.data)),
-          ],
-        );
-      },
+              if (index != null && context.mounted) { _onMenuSelect(context, ref, _visibleMenuItems(state)[index].menu); }
+            },
+            body: PropertyDetailBody(id: id),
+          ),
+        ),
+        side: PropertyDetailMap(data: state.data),
+      ),
     );
   }
 

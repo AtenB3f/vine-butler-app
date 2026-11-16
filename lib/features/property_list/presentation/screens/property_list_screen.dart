@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vine_butler/components/components.dart';
 import 'package:vine_butler/core/router/app_router.dart';
+import 'package:vine_butler/core/shared/app_manager.dart';
 import 'package:vine_butler/features/property_list/presentation/property_filter_view_state.dart';
 import 'package:vine_butler/features/property_list/presentation/property_preview_view_state.dart';
 import 'package:vine_butler/features/property_list/presentation/screens/property_filter_panel.dart';
@@ -85,34 +86,18 @@ class PropertyListScreen extends ConsumerWidget {
       ],
     );
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final panelWidth = constraints.maxWidth - 360;
-
-        return TweenAnimationBuilder<double>(
-          tween: Tween(end: state.selectId != null ? 1 : 0),
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeInOut,
-          child: list,
-          builder: (context, progress, child) => Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SizedBox(width: constraints.maxWidth - panelWidth * progress, child: child),
-              if (progress > 0)
-                Expanded(
-                  child: ClipRect(
-                    child: OverflowBox(
-                      alignment: Alignment.centerLeft,
-                      minWidth: panelWidth,
-                      maxWidth: panelWidth,
-                      child: _previewPanel(context, ref, state),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        );
-      },
+    return ValueListenableBuilder<double>(
+      valueListenable: AppManager.shared.windowSideWidth,
+      builder: (context, sideWidth, _) => DesktopSplitView(
+        viewState: DesktopSplitViewState(
+          sideWidth: sideWidth,
+          type: state.selectId != null ? DesktopSplitType.two : DesktopSplitType.one,
+        ),
+        onResize: (width) => AppManager.shared.windowSideWidth.value = width,
+        onResizeEnd: AppManager.shared.saveWindowSideWidth,
+        side: _previewPanel(context, ref, state),
+        content: list,
+      ),
     );
   }
 
