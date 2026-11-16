@@ -30,15 +30,15 @@ class _ApplyPropertyTabState extends ConsumerState<ApplyPropertyTab> {
 
     return ColoredBox(
       color: StateColor.white,
-      child: Column(
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _title(),
+            Expanded(
+              child: Column(
                 children: [
-                  _title(),
                   Expanded(
                     child: AppKeyboardScrollView(
                       padding: const EdgeInsets.all(40),
@@ -61,12 +61,21 @@ class _ApplyPropertyTabState extends ConsumerState<ApplyPropertyTab> {
                       ),
                     ),
                   ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 400),
+                        child: PriceKeypad.animated(keypad: ApplyPropertyContent.keypad(state, viewModel)),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
-          ),
-          PriceKeypad.animated(keypad: ApplyPropertyContent.keypad(state, viewModel)),
-        ],
+          ],
+        ),
       ),
     );
   }
