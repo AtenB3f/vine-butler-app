@@ -50,6 +50,8 @@ export 'widgets/tag/line_tag.dart';
 export 'widgets/tag/icon_tag.dart';
 export 'widgets/layout/app_keyboard_scroll_view.dart';
 export 'widgets/layout/app_scaffold.dart';
+export 'widgets/layout/desktop_split_view.dart';
+export 'widgets/layout/desktop_split_view_state.dart';
 export 'widgets/textfield/app_text_field.dart';
 export 'widgets/textfield/app_text_field_view_state.dart';
 export 'widgets/textfield/basic_text_field.dart';
