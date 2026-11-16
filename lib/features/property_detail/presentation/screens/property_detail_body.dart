@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vine_butler/components/components.dart';
-import 'package:vine_butler/core/router/app_router.dart';
+// import 'package:vine_butler/core/router/app_router.dart';
 import 'package:vine_butler/features/property_detail/presentation/property_detail_view_state.dart';
 import 'package:vine_butler/features/property_detail/presentation/screens/property_detail_address.dart';
 import 'package:vine_butler/features/property_detail/presentation/screens/property_detail_media.dart';
 import 'package:vine_butler/features/property_detail/presentation/screens/property_detail_options.dart';
 import 'package:vine_butler/features/property_detail/presentation/screens/property_detail_owner.dart';
-import 'package:vine_butler/features/property_detail/presentation/screens/property_detail_post.dart';
+// import 'package:vine_butler/features/property_detail/presentation/screens/property_detail_post.dart';
 import 'package:vine_butler/features/property_detail/presentation/screens/property_detail_price_info.dart';
 import 'package:vine_butler/features/property_detail/property_detail_vm.dart';
 
@@ -60,11 +60,11 @@ class PropertyDetailBody extends ConsumerWidget {
             PropertyDetailPriceInfo(data: data),
             PropertyDetailOwner(data: data),
             PropertyDetailOptions(data: data),
-            if (data.postTitle case final postTitle?)
-              PropertyDetailPost(
-                title: postTitle,
-                onTap: () => openPost(context, ref, id, PropertyPostRoute(id: id)),
-              ),
+            // if (data.postTitle case final postTitle?)
+            //   PropertyDetailPost(
+            //     title: postTitle,
+            //     onTap: () => openPost(context, ref, id, PropertyPostRoute(id: id)),
+            //   ),
           ],
         ),
       ),

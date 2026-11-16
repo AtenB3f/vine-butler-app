@@ -13,7 +13,7 @@ import 'package:vine_butler/shared/extensions/extensions.dart';
 enum _DetailMenu {
   edit,
   delete,
-  aiWrite,
+  // aiWrite,
   // export,
   // sync,
 }
@@ -26,7 +26,7 @@ class PropertyDetailScreen extends ConsumerWidget {
   static final List<({_DetailMenu menu, String text, Widget Function(Color color) image})> _menuItems = [
     (menu: _DetailMenu.edit, text: '수정', image: AppIcons.editMD),
     (menu: _DetailMenu.delete, text: '삭제', image: AppIcons.trashMD),
-    (menu: _DetailMenu.aiWrite, text: 'AI 글쓰기', image: (color) => AppIcons.iconMD('Text_MD', color)),
+    // (menu: _DetailMenu.aiWrite, text: 'AI 글쓰기', image: (color) => AppIcons.iconMD('Text_MD', color)),
     // (menu: _DetailMenu.export, text: '내보내기', image: AppIcons.linkMD),
     // (menu: _DetailMenu.sync, text: '동기화', image: AppIcons.reloadMD),
   ];
@@ -114,15 +114,16 @@ class PropertyDetailScreen extends ConsumerWidget {
   List<({_DetailMenu menu, String text, Widget Function(Color color) image})> _visibleMenuItems(PropertyDetailViewState state) {
     return [
       for (final item in _menuItems)
-        if (item.menu != _DetailMenu.aiWrite || state.canWrite) item,
+        // if (item.menu != _DetailMenu.aiWrite || state.canWrite) item,
+        item,
     ];
   }
 
   Future<void> _onMenuSelect(BuildContext context, WidgetRef ref, _DetailMenu menu) async {
-    if (menu == _DetailMenu.aiWrite) {
-      await PropertyDetailBody.openPost(context, ref, id, PropertyWriteRoute(id: id));
-      return;
-    }
+    // if (menu == _DetailMenu.aiWrite) {
+    //   await PropertyDetailBody.openPost(context, ref, id, PropertyWriteRoute(id: id));
+    //   return;
+    // }
     if (menu == _DetailMenu.edit) {
       EditPropertyRoute(id: id).push(context);
       return;
