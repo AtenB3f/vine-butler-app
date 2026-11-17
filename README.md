@@ -5,7 +5,7 @@
 ![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter)
 ![Dart](https://img.shields.io/badge/Dart-3.9-0175C2?logo=dart)
 ![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20Android%20%7C%20macOS%20%7C%20Windows-lightgrey)
-![Version](https://img.shields.io/badge/version-1.1.0-green)
+![Version](https://img.shields.io/badge/version-1.2.0-green)
 
 | 홈 | 매물 검색 · 필터 | 지도 | 매물 등록 |
 |:---:|:---:|:---:|:---:|
@@ -22,7 +22,7 @@
 |---|---|
 | 개발 기간 | 2026.09 ~ 진행 중 |
 | 개발 인원 | 1인 (기획 · 디자인 · 개발 · 배포) |
-| 현재 상태 | iOS App Store 1.1.0 / Google Play 비공개 테스트 1.0.0 출시 준비 |
+| 현재 상태 | iOS App Store 1.1.0 / Google Play 비공개 테스트 1.1.0 / Windows·macOS 1.2.0 출시 준비 |
 
 ### 목차
 
@@ -35,6 +35,9 @@
   - [기술적 고민과 해결](#기술적-고민과-해결)
     - [1. 매물 탭 첫 진입 시 빈 화면](#1-매물-탭-첫-진입-시-빈-화면)
     - [2. 지도 마커 표시 개수 제한](#2-지도-마커-표시-개수-제한)
+    - [3. 로컬 DB 선택](#3-로컬-db-선택)
+    - [4. 같은 API 요청 중복 전송](#4-같은-api-요청-중복-전송)
+    - [5. 백그라운드 전환 시 AI 요청 끊김](#5-백그라운드-전환-시-ai-요청-끊김)
   - [멀티 플랫폼 대응](#멀티-플랫폼-대응)
   - [개발 프로세스](#개발-프로세스)
   - [로드맵](#로드맵)
@@ -57,7 +60,11 @@
 - 현재 위치 기반 지도 표시
 - 화면 범위 안 매물만 zoom별 최대 개수만큼 표시
 
-**AI를 활용한 블로그 글쓰기 기능**
+**데스크톱 화면** — 목록·상세·지도를 2열(콘텐츠 + 오른쪽 사이드)로 표시
+- 경계선을 드래그해 너비 조절 (양쪽 최소 360)
+- 조절한 너비는 저장해 다음 실행에도 유지
+
+**AI를 활용한 블로그 글쓰기 기능 (1.3.0 공개 예정, 현재 진입점 숨김)**
 - 매물 상세 정보 + 사진으로 장점을 뽑아 글 생성
 
 **이미지 텍스트 인식(OCR) AI 매물 등록(예정)**
@@ -78,6 +85,8 @@
 | 네트워크 | Dio | 인터셉터로 API별 인증 헤더 분리 |
 | 지도 | flutter_naver_map / webview_flutter / webview_windows | 모바일: 네이버 지도 SDK, 데스크톱: 웹뷰 + 네이버 지도 JS |
 | 위치 | geolocator | 현재 위치 기반 지도 표시 |
+| 데스크톱 창 | window_manager | 데스크톱 창 최소 크기·타이틀바 제어 |
+| 설정 저장 | shared_preferences | 사이드 너비 등 앱 설정 저장 |
 
 <br>
 
@@ -160,6 +169,41 @@ ref.read(propertyListVMProvider.notifier).action(PropertyListAction.search(query
 
 → [ADR 0002: zoom별 마커 개수 제한](docs/adr/0002-map-marker-limit-by-zoom.md)
 
+### 3. 로컬 DB 선택
+
+| | |
+|---|---|
+| **문제** | 출시 후에도 스키마를 바꿀 수 있어야 하고, 거래 유형·금액·면적·지역을 조합한 필터 검색과 이후 서버(MySQL) 동기화가 필요 |
+| **검토한 대안** | Drift(SQLite), Isar, sqflite, ObjectBox, Hive, Realm |
+| **해결** | Drift 선택. 마이그레이션 도구가 있어 배포 후 컬럼 추가가 안전하고, SQL이라 복합 필터·범위 조건이 자연스러우며 서버 테이블과 거의 1:1로 대응 |
+| **결과** | 도메인 모델(Freezed)과 Drift 테이블을 분리하고 Mapper로 변환. 동기화용 UUID·`updatedAt`·`deletedAt`·`syncedAt`을 1.0.0부터 저장 |
+
+→ [ADR 0003: 로컬 DB Drift(SQLite) 사용](docs/adr/0003-local-db-drift.md)
+
+### 4. 같은 API 요청 중복 전송
+
+| | |
+|---|---|
+| **문제** | AI 글 생성 중 화면을 나갔다 다시 들어오면 같은 생성 요청이 한 번 더 나가 토큰 비용과 시간이 낭비됨 |
+| **원인** | 화면 VM이 autoDispose라 다시 들어올 때 새로 만들어지며 요청을 다시 보냄 |
+| **검토한 대안** | ① VM keepAlive ② UseCase에 진행 중인 Future 보관 ③ Repository 구현체에 보관 ④ Dio 인터셉터에서 합치기 |
+| **해결** | ④ 선택. `InFlightRequestInterceptor`가 `method + uri + body`가 같은 요청이 진행 중이면 전송하지 않고 앞선 응답을 함께 받음 |
+| **결과** | CLOVA·도로명주소·Geocode 세 API에 한 번에 적용, domain·화면 코드 변경 없음. 단위 테스트 4개로 확인 |
+
+→ [ADR 0004: 진행 중인 같은 API 요청을 Dio 인터셉터에서 하나로 합침](docs/adr/0004-in-flight-request-interceptor.md)
+
+### 5. 백그라운드 전환 시 AI 요청 끊김
+
+| | |
+|---|---|
+| **문제** | AI 글 생성(약 20초) 중 홈으로 나가면 요청이 끊김 |
+| **원인** | iOS는 앱이 suspend되며 Dio 소켓 연결이 끊기고, Android는 Doze·메모리 부족으로 프로세스가 멈춤 |
+| **검토한 대안** | Android: 포그라운드 서비스, WorkManager, UIDT Job / iOS: `beginBackgroundTask`, `BGTaskScheduler`, background URLSession |
+| **해결** | Android UIDT Job + iOS background URLSession을 Dio `HttpClientAdapter` 하나로 연결. OS가 "사용자가 시작한 네트워크 전송"용으로 제공하는 방식이라 스토어 정책에 맞음 |
+| **결과** | 인터셉터·API 클래스·저장소·화면 코드 변경 없이 적용, 두 플랫폼이 같은 채널 계약을 써 Dart 코드는 하나 |
+
+→ [ADR 0005: 백그라운드 전환 중 AI 생성 요청 유지](docs/adr/0005-background-transfer-adapter.md)
+
 <br>
 
 ## 멀티 플랫폼 대응
@@ -173,6 +217,7 @@ ref.read(propertyListVMProvider.notifier).action(PropertyListAction.search(query
 
 - 지도 위젯을 `native_map` / `mac_map` / `windows_map`으로 분리하고 같은 `ViewState`를 받도록 맞춤
 - 웹뷰 지도는 JavaScript 채널 메시지(`marker:<id>`, `map`, `ready`)로 Flutter와 통신
+- 데스크톱용 `DesktopSplitView` 공용 컴포넌트로 2열 레이아웃을 만들고, 모바일 화면 본문(`PropertyDetailBody` 등)을 그대로 재사용
 
 <br>
 
@@ -195,9 +240,9 @@ ref.read(propertyListVMProvider.notifier).action(PropertyListAction.search(query
 
 | 버전 | 상태 | 내용 |
 |---|---|---|
-| 1.0.0 | App Store 출시, Play Console 심사 진행 중 | 매물 등록·검색·상세·지도, 로컬 저장, iOS·Android 스토어 출시 |
-| 1.1.0 | App Store 출시 | 금액 입력 키패드, 사진 크게 보기, 현재 위치 기준 지도, zoom별 마커 제한 |
-| 1.2.0 | 예정 | 데스크톱 UI, macOS·Windows 배포, Windows 자동 업데이트 |
+| 1.0.0 | App Store 출시 | 매물 등록·검색·상세·지도, 로컬 저장, iOS·Android 스토어 출시 |
+| 1.1.0 | App Store 출시, Google Play 비공개 테스트 | 금액 입력 키패드, 사진 크게 보기, 현재 위치 기준 지도, zoom별 마커 제한 |
+| 1.2.0 | 진행 중 | 데스크톱 UI(완료), macOS App Store 배포, Windows 배포·Velopack 자동 업데이트 |
 | 1.3.0 | 예정 | (데스크톱) 사진·녹음 파일 AI 분석으로 매물 등록, 매물 소개 블로그 글 AI 작성 |
 | 2.0.0 | 예정 | 백엔드 연동, 회원가입·로그인, 서버 저장, 인앱결제 |
 | 2.1.0 | 예정 | 로컬 ↔ 서버 데이터 동기화 |
@@ -207,7 +252,8 @@ ref.read(propertyListVMProvider.notifier).action(PropertyListAction.search(query
 **미리 준비해 둔 설계**
 - **AI 기능(1.3.0)** — API 키를 앱에 넣지 않고 서버리스 프록시 + 초대 코드로 호출, 2.0.0에서 백엔드 구현체로 교체
 - **백엔드 전환(2.0.0)** — Repository 인터페이스 뒤에 구현체를 두어, 로컬 → 원격 전환 시 presentation 코드 수정 없음
-- - **서버 동기화(2.1.0)** — 1.0.0부터 UUID 기본키, `updatedAt`, `deletedAt`, `syncedAt`을 저장해 `syncedAt == null || updatedAt > syncedAt`이면 동기화 대상으로 판단
+- **서버 동기화(2.1.0)** — 1.0.0부터 UUID 기본키, `updatedAt`, `deletedAt`, `syncedAt`을 저장해 `syncedAt == null || updatedAt > syncedAt`이면 동기화 대상으로 판단
+
 <br>
 
 ## 프로젝트 구조

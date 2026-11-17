@@ -33,12 +33,13 @@
 - 지도 탭 추가 — 검색 BND·필터 패널, 필터 조건에 따른 마커 필터링
 - 매물 위치 표시 — 가격 마커, 마커 선택 시 매물 카드
 
-**6단계: 스토어 배포 (1차 릴리즈, 진행 중)**
-- iOS: App Store 심사 중
-- Android: 비공개 테스트 중 → 12명 이상 × 14일 연속 테스트 충족 후 프로덕션 신청
-- 세부 항목·출시 후 할 일(크래시 수집 도구 결정, 리뷰 대응)은 `.claude/RELEASE_CHECKLIST.md` 참고
+**6단계: 스토어 배포 (1차 릴리즈, 완료)**
+- iOS: App Store 출시
+- 출시 후 할 일: 크래시 수집 도구 결정, 리뷰 대응
 
-## 1.1.0
+## 1.1.0 (App Store 출시, Google Play 비공개 테스트)
+
+- Android: 비공개 테스트 중 → 12명 이상 × 14일 연속 테스트 충족 후 프로덕션 신청
 
 - 금액 변경 시 슬라이더 대신 커스텀 금액 입력 컴포넌트로 변경 (현재 `AppSlider` 사용처 교체)
 - 금액 입력용 키보드 UI 컴포넌트 추가
@@ -50,13 +51,20 @@
   - 현재 위치 조회 패키지 필요 (새 패키지 → 추가 전 승인), iOS 위치 권한 문구는 이미 있음
   - SQLite에 삼각함수가 없어 거리 정렬은 Dart 계산 또는 위경도 범위 근사로 처리
 
-## 1.2.0
+## 1.2.0 (진행 중)
 
-- 데스크톱 UI 적용 (범위는 별도 기획)
-- Windows 자동 업데이트 (업데이트 패키지 + 업데이트 파일 호스팅 필요, 새 패키지 → 추가 전 승인)
-- Windows 배포 (설치 파일 또는 Microsoft Store, 코드 서명 인증서 검토)
-- macOS 배포 (Mac App Store 또는 Developer ID 서명·공증)
-- 확인 필요: macOS 자동 업데이트 (Mac App Store 배포면 불필요, 스토어 밖 배포면 필요)
+- 데스크톱 UI (완료)
+  - 탭별 2열 레이아웃: 매물 목록·상세·지도 (콘텐츠 + 오른쪽 사이드)
+  - `DesktopSplitView`: 경계선 드래그로 너비 조절, 양쪽 최소 360
+  - 사이드 너비는 3페이지가 공유 (`AppManager.windowSideWidth`), `shared_preferences`로 저장
+  - 등록 탭: 금액 키패드를 오른쪽 입력 열에 배치, 포커스한 입력란으로 스크롤
+- AI 글쓰기 진입점 주석 처리 (API 키 노출 방지, 1.3.0 프록시 적용 후 다시 엶)
+- macOS: Mac App Store 배포 — 업로드 전
+  - Mac App Store 배포라 자동 업데이트 불필요
+- Windows: 특정 사용자를 위한 배포이기에 스토어 없이 Setup.exe 직접 전달
+  - 코드 서명 없음 (첫 설치 때 SmartScreen 경고 1회 감수)
+  - `velopack_flutter` 자동 업데이트: 백그라운드 다운로드 → 앱 팝업 → 재시작
+  - 미정: 업데이트 파일 호스팅(AWS S3 / Cloudflare R2), `tool/build.dart` windows 명령
 
 ## 1.3.0 (데스크톱만 업데이트)
 
@@ -117,6 +125,6 @@
 
 ## 공통 메모
 
-- 새 패키지는 추가 전 승인 (후보: 위치 조회, Windows 자동 업데이트, `record`, `receive_sharing_intent`/`share_handler`, `super_clipboard`)
+- 새 패키지는 추가 전 승인 (후보: `velopack_flutter`, `record`, `receive_sharing_intent`/`share_handler`, `super_clipboard`)
 - 브랜치는 각 버전 작업 시작 시 `main`에서 생성
 - 모바일 스토어는 데스크톱 전용 버전(1.2.0·1.3.0)에서 업데이트 없음 → 모바일 다음 버전 번호는 그때 결정
