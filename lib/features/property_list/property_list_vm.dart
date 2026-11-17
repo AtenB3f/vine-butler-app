@@ -8,6 +8,7 @@ import 'package:vine_butler/domain/model/property.dart';
 import 'package:vine_butler/domain/property_type.dart';
 import 'package:vine_butler/features/property_list/presentation/property_filter_view_state.dart';
 import 'package:vine_butler/features/property_list/presentation/property_list_item_view_state.dart';
+import 'package:vine_butler/features/property_list/presentation/property_preview_view_state.dart';
 
 final propertyListVMProvider = NotifierProvider<PropertyListVM, PropertyListViewState>(PropertyListVM.new);
 
@@ -20,12 +21,20 @@ class PropertyListViewState {
   final PropertyFilterData filter;
   final String? navigateTo;
 
+  // Desktop Only
+  final String? selectId;
+  final PropertyPreviewViewState? preview;
+  final PropertyPreviewMedia media;
+
   const PropertyListViewState({
     required this.items,
     this.query = '',
     this.status = PropertySearchStatus.close,
     this.filter = const PropertyFilterData(),
     this.navigateTo,
+    this.selectId,
+    this.preview,
+    this.media = PropertyPreviewMedia.image,
   });
 
   List<PropertyListItemViewState> get searchResults {
@@ -42,6 +51,9 @@ class PropertyListViewState {
     PropertySearchStatus? status,
     PropertyFilterData? filter,
     String? navigateTo,
+    String? Function()? selectId,
+    PropertyPreviewViewState? Function()? preview,
+    PropertyPreviewMedia? media,
   }) {
     return PropertyListViewState(
       items: items ?? this.items,
@@ -49,6 +61,9 @@ class PropertyListViewState {
       status: status ?? this.status,
       filter: filter ?? this.filter,
       navigateTo: navigateTo,
+      selectId: selectId != null ? selectId() : this.selectId,
+      preview: preview != null ? preview() : this.preview,
+      media: media ?? this.media,
     );
   }
 }
@@ -60,6 +75,8 @@ sealed class PropertyListAction {
   const factory PropertyListAction.select(String id) = _Select;
   const factory PropertyListAction.panel(bool isPresented) = _Panel;
   const factory PropertyListAction.filtering(PropertyFilterData data) = _Filtering;
+  const factory PropertyListAction.selectItem(String id) = _SelectItem;
+  const factory PropertyListAction.changeMedia(PropertyPreviewMedia media) = _ChangeMedia;
 }
 
 class _Search extends PropertyListAction {
@@ -84,6 +101,20 @@ class _Filtering extends PropertyListAction {
   final PropertyFilterData data;
 
   const _Filtering(this.data);
+}
+
+// Desktop Only
+class _SelectItem extends PropertyListAction {
+  final String id;
+
+  const _SelectItem(this.id);
+}
+
+// Desktop Only
+class _ChangeMedia extends PropertyListAction {
+  final PropertyPreviewMedia media;
+
+  const _ChangeMedia(this.media);
 }
 
 class PropertyListVM extends Notifier<PropertyListViewState> {
@@ -130,6 +161,12 @@ class PropertyListVM extends Notifier<PropertyListViewState> {
       case _Filtering(:final data):
         state = state.copyWith(filter: data);
         _filtering(state);
+
+      case _SelectItem(:final id):
+        _selectItem(id);
+
+      case _ChangeMedia(:final media):
+        state = state.copyWith(media: media);
     }
   }
 
@@ -142,10 +179,36 @@ class PropertyListVM extends Notifier<PropertyListViewState> {
 
     _subscription?.cancel();
     _subscription = ref.read(propertyUseCaseProvider).watchFilter(condition).listen((properties) {
+      final isSelectRemoved = state.selectId != null && properties.every((property) => property.id != state.selectId);
+
       state = state.copyWith(
         items: properties.map(PropertyListItemViewState.fromDomain).toList(),
         navigateTo: state.navigateTo,
+        selectId: isSelectRemoved ? () => null : null,
+        preview: isSelectRemoved ? () => null : null,
       );
     });
+  }
+
+  // Desktop Only
+  void _selectItem(String id) {
+    if (state.selectId == id) {
+      state = state.copyWith(selectId: () => null, preview: () => null);
+      return;
+    }
+
+    state = state.copyWith(selectId: () => id, preview: () => null);
+    _fetchPreview(id);
+  }
+  
+  // Desktop Only
+  Future<void> _fetchPreview(String id) async {
+    final property = await ref.read(propertyUseCaseProvider).get(id);
+
+    if (!ref.mounted || state.selectId != id) { return; }
+
+    state = property == null
+        ? state.copyWith(selectId: () => null, preview: () => null)
+        : state.copyWith(preview: () => PropertyPreviewViewState.fromDomain(property, imagePath: ref.read(imageStorageProvider).path));
   }
 }

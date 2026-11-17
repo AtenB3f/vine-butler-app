@@ -3,10 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vine_butler/components/components.dart';
 import 'package:vine_butler/core/router/app_router.dart';
+import 'package:vine_butler/core/shared/app_manager.dart';
 import 'package:vine_butler/features/property_list/presentation/property_filter_view_state.dart';
+import 'package:vine_butler/features/property_list/presentation/property_preview_view_state.dart';
 import 'package:vine_butler/features/property_list/presentation/screens/property_filter_panel.dart';
 import 'package:vine_butler/features/property_list/presentation/screens/property_filter_tags.dart';
 import 'package:vine_butler/features/property_list/presentation/screens/property_list_item.dart';
+import 'package:vine_butler/features/property_list/presentation/screens/property_preview_panel.dart';
 import 'package:vine_butler/features/property_list/presentation/screens/property_search_overlay.dart';
 import 'package:vine_butler/features/property_list/presentation/screens/property_search_result_item.dart';
 import 'package:vine_butler/features/property_list/property_list_event_vm.dart';
@@ -52,20 +55,59 @@ class PropertyListScreen extends ConsumerWidget {
       spacing: 0,
       children: [
         _homeBanner(state),
-        Expanded(child: _contents(context, ref, state)),
+        Expanded(
+          child: _contents(
+            ref,
+            state,
+            listTopPadding: 20,
+            onItemTap: (id) => PropertyDetailRoute(id: id).push(context),
+          ),
+        ),
       ],
     );
   }
 
   Widget _desktopScreen(BuildContext context, WidgetRef ref, PropertyListViewState state) {
-    return Column(
+    final list = Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
       spacing: 0,
       children: [
         _homeBanner(state),
-        Expanded(child: _contents(context, ref, state)),
+        Expanded(
+          child: _contents(
+            ref,
+            state,
+            listTopPadding: 16,
+            onItemTap: (id) => ref.read(propertyListVMProvider.notifier).action(PropertyListAction.selectItem(id)),
+            onItemDetailTap: (id) => PropertyDetailRoute(id: id).push(context),
+          ),
+        ),
       ],
+    );
+
+    return ValueListenableBuilder<double>(
+      valueListenable: AppManager.shared.windowSideWidth,
+      builder: (context, sideWidth, _) => DesktopSplitView(
+        viewState: DesktopSplitViewState(
+          sideWidth: sideWidth,
+          type: state.selectId != null ? DesktopSplitType.two : DesktopSplitType.one,
+        ),
+        onResize: (width) => AppManager.shared.windowSideWidth.value = width,
+        onResizeEnd: AppManager.shared.saveWindowSideWidth,
+        side: _previewPanel(context, ref, state),
+        content: list,
+      ),
+    );
+  }
+
+  Widget _previewPanel(BuildContext context, WidgetRef ref, PropertyListViewState state) {
+    return _PreviewSlot(
+      selectId: state.selectId,
+      preview: state.preview,
+      media: state.media,
+      onMediaChange: (media) => ref.read(propertyListVMProvider.notifier).action(PropertyListAction.changeMedia(media)),
+      onCardTap: (id) => PropertyDetailRoute(id: id).push(context),
     );
   }
 
@@ -73,7 +115,13 @@ class PropertyListScreen extends ConsumerWidget {
     return _HomeBanner(status: state.bndStatus, isOpen: state.status == PropertySearchStatus.open);
   }
 
-  Widget _contents(BuildContext context, WidgetRef ref, PropertyListViewState state) {
+  Widget _contents(
+    WidgetRef ref,
+    PropertyListViewState state, {
+    required double listTopPadding,
+    required ValueChanged<String> onItemTap,
+    ValueChanged<String>? onItemDetailTap,
+  }) {
     final viewModel = ref.read(propertyListVMProvider.notifier);
 
     return PropertySearchOverlay(
@@ -105,18 +153,76 @@ class PropertyListScreen extends ConsumerWidget {
             ),
             Expanded(
               child: ListView.separated(
-                padding: const EdgeInsets.only(top: 20, bottom: 20),
+                padding: EdgeInsets.only(top: listTopPadding, bottom: 20),
                 itemCount: state.items.length,
                 separatorBuilder: (context, index) => const SizedBox(height: 16),
                 itemBuilder: (context, index) => PropertyListItem(
                   viewState: state.items[index],
-                  onTap: () => PropertyDetailRoute(id: state.items[index].id).push(context),
+                  onTap: () => onItemTap(state.items[index].id),
+                  onDetailTap: onItemDetailTap == null ? null : () => onItemDetailTap(state.items[index].id),
                 ),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+class _PreviewSlot extends StatefulWidget {
+  final String? selectId;
+  final PropertyPreviewViewState? preview;
+  final PropertyPreviewMedia media;
+  final ValueChanged<PropertyPreviewMedia> onMediaChange;
+  final ValueChanged<String> onCardTap;
+
+  const _PreviewSlot({
+    required this.selectId,
+    required this.preview,
+    required this.media,
+    required this.onMediaChange,
+    required this.onCardTap,
+  });
+
+  @override
+  State<_PreviewSlot> createState() => _PreviewSlotState();
+}
+
+class _PreviewSlotState extends State<_PreviewSlot> {
+  String? _selectId;
+  PropertyPreviewViewState? _preview;
+
+  @override
+  void initState() {
+    super.initState();
+    _remember();
+  }
+
+  @override
+  void didUpdateWidget(covariant _PreviewSlot oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _remember();
+  }
+
+  void _remember() {
+    if (widget.preview == null) { return; }
+
+    _selectId = widget.selectId;
+    _preview = widget.preview;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final preview = _preview;
+
+    if (preview == null) { return const SizedBox.shrink(); }
+
+    return PropertyPreviewPanel(
+      key: ValueKey(_selectId),
+      viewState: preview,
+      media: widget.media,
+      onMediaChange: widget.onMediaChange,
+      onCardTap: () => widget.onCardTap(preview.card.id),
     );
   }
 }

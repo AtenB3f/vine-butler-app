@@ -13,6 +13,7 @@ const requiredKeys = ['JUSO_CONFM_KEY', 'NAVER_MAPS_CLIENT_ID', 'NAVER_MAPS_CLIE
 /// - `CLOVA_STUDIO_API_KEY`: CLOVA Studio 테스트 API 키
 const forbiddenKeys = ['CLOVA_STUDIO_API_KEY'];
 const envFile = 'env.json';
+const macosArchivePath = 'build/macos/VineButler.xcarchive';
 
 Future<void> main(List<String> args) async {
   final command = args.isEmpty ? null : args.first;
@@ -21,6 +22,7 @@ Future<void> main(List<String> args) async {
     'ipa' => ['build', 'ipa', '--release', ...extraArgs],
     'aab' => ['build', 'appbundle', '--release', ...extraArgs],
     'apk' => ['build', 'apk', '--release', ...extraArgs],
+    'macos' => ['build', 'macos', '--release', ...extraArgs],
     _ => null,
   };
 
@@ -31,14 +33,42 @@ Future<void> main(List<String> args) async {
 
   if (command == 'aab' || command == 'apk') { _checkAndroidSigning(); }
 
-  final process = await Process.start(
-    'flutter',
-    [...flutterArgs, '--dart-define-from-file=$envFile'],
-    mode: ProcessStartMode.inheritStdio,
-    runInShell: true,
-  );
+  final exitCode = await _run('flutter', [...flutterArgs, '--dart-define-from-file=$envFile']);
 
-  exit(await process.exitCode);
+  if (exitCode != 0 || command != 'macos') { exit(exitCode); }
+
+  exit(await _uploadMacos());
+}
+
+/// macOS 아카이브 후 App Store Connect 업로드 함수
+///
+/// - 아카이브는 직전 `flutter build macos`의 dart-define 값을 그대로 사용
+/// - 업로드 설정은 `macos/ExportOptions.plist` (Xcode에 Apple 계정 로그인 필요)
+Future<int> _uploadMacos() async {
+  final archiveExitCode = await _run('xcodebuild', [
+    '-workspace', 'macos/Runner.xcworkspace',
+    '-scheme', 'Runner',
+    '-configuration', 'Release',
+    '-archivePath', macosArchivePath,
+    '-allowProvisioningUpdates',
+    'archive',
+  ]);
+
+  if (archiveExitCode != 0) { return archiveExitCode; }
+
+  return _run('xcodebuild', [
+    '-exportArchive',
+    '-archivePath', macosArchivePath,
+    '-exportOptionsPlist', 'macos/ExportOptions.plist',
+    '-exportPath', 'build/macos/export',
+    '-allowProvisioningUpdates',
+  ]);
+}
+
+Future<int> _run(String executable, List<String> arguments) async {
+  final process = await Process.start(executable, arguments, mode: ProcessStartMode.inheritStdio, runInShell: true);
+
+  return process.exitCode;
 }
 
 void _checkEnvFile() {
@@ -81,7 +111,8 @@ Never _exitWithUsage() {
 
   ipa   iOS 스토어 업로드용 .ipa 빌드
   aab   Android 스토어 업로드용 .aab 빌드
-  apk   Android 직접 설치·테스트용 .apk 빌드''');
+  apk   Android 직접 설치·테스트용 .apk 빌드
+  macos macOS 빌드 후 아카이브해서 App Store Connect 업로드''');
   exit(64);
 }
 

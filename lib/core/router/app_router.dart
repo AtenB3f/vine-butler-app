@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vine_butler/components/main_shell.dart';
+import 'package:vine_butler/components/responsive.dart';
 import 'package:vine_butler/features/apply_property/presentation/screens/apply_property_address_screen.dart';
 import 'package:vine_butler/features/apply_property/presentation/screens/apply_property_extra_screen.dart';
 import 'package:vine_butler/features/apply_property/presentation/screens/apply_property_owner_screen.dart';
+import 'package:vine_butler/features/apply_property/presentation/screens/apply_property_tab.dart';
 import 'package:vine_butler/features/apply_property/presentation/screens/apply_property_type_screen.dart';
 import 'package:vine_butler/features/edit_property/presentation/screens/edit_property_address_screen.dart';
 import 'package:vine_butler/features/edit_property/presentation/screens/edit_property_screen.dart';
@@ -17,8 +21,9 @@ import 'package:vine_butler/features/property_write/presentation/screens/propert
 
 part 'app_router.g.dart';
 
+/// 첫 화면 (데스크톱은 홈 탭이 없어 매물 목록)
 final GoRouter appRouter = GoRouter(
-  initialLocation: '/home',
+  initialLocation: Platform.isMacOS || Platform.isWindows ? const PropertyListRoute().location : const HomeRoute().location,
   routes: $appRoutes,
 );
 
@@ -100,7 +105,7 @@ class ApplyPropertyRoute extends GoRouteData with $ApplyPropertyRoute {
   const ApplyPropertyRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => const ApplyPropertyTypeScreen();
+  Widget build(BuildContext context, GoRouterState state) => context.isDesktop ? const ApplyPropertyTab() : const ApplyPropertyTypeScreen();
 }
 
 @TypedGoRoute<ApplyPropertyAddressRoute>(path: '/apply-property/address')

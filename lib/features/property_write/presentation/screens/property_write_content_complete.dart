@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
@@ -16,48 +17,87 @@ class PropertyWriteContentComplete extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final viewModel = ref.read(propertyWriteVMProvider(args).notifier);
     final state = ref.watch(propertyWriteVMProvider(args));
+    final isGenerated = args.source == PostSource.generate;
+    final header = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 16,
+      children: [
+        AppFontStyle.header1.text('포스트가 생성되었습니다.', TextColor.dark),
+        AppFontStyle.body2.text(
+          context.isMobile
+              ? '생성된 포스트는 기기에 저장되어 페이지를\n나가도 다시 확인하실 수 있습니다.\n앱 삭제 시 저장된 포스트는 지워집니다.'
+              : '생성된 포스트는 기기에 저장되어 페이지를\n나가도 다시 확인하실 수 있습니다. 앱 삭제 시 저장된 포스트는 지워집니다.',
+          TextColor.medium,
+        ),
+      ],
+    );
+    final titleSection = _section(
+      label: '제목',
+      copyText: '제목 복사',
+      onCopy: () => viewModel.action(const PropertyWriteAction.copy(PostContentType.title)),
+      children: [AppFontStyle.sub3.text(state.title, TextColor.dark)],
+    );
+    final otherSections = [
+      if (state.imagePaths.isNotEmpty) _images(context, state.imagePaths, viewModel),
+      _section(
+        label: '본문',
+        copyText: '본문 복사',
+        onCopy: () => viewModel.action(const PropertyWriteAction.copy(PostContentType.body)),
+        children: [MarkdownBody(data: state.body, styleSheet: _markdownStyle())],
+      ),
+    ];
+
+    if (context.isDesktop) {
+      return Stack(
+        children: [
+          Positioned.fill(
+            child: SingleChildScrollView(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Container(
+                  width: 480,
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    spacing: 40,
+                    children: [
+                      if (isGenerated)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          spacing: 20,
+                          children: [header, const AppDivider(type: AppDividerType.medium), titleSection],
+                        )
+                      else
+                        titleSection,
+                      ...otherSections,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Positioned(right: 30, bottom: 30, child: _floatingButtons(viewModel)),
+        ],
+      );
+    }
+
+    final scroll = SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: 40,
+        children: [
+          if (isGenerated) ...[header, const AppDivider(type: AppDividerType.medium)],
+          titleSection,
+          ...otherSections,
+        ],
+      ),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              spacing: 40,
-              children: [
-                if (args.source == PostSource.generate) ...[
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    spacing: 16,
-                    children: [
-                      AppFontStyle.header1.text('포스트가 생성되었습니다.', TextColor.dark),
-                      AppFontStyle.body2.text(
-                        '생성된 포스트는 기기에 저장되어 페이지를\n나가도 다시 확인하실 수 있습니다.\n앱 삭제 시 저장된 포스트는 지워집니다.',
-                        TextColor.medium,
-                      ),
-                    ],
-                  ),
-                  const AppDivider(type: AppDividerType.medium),
-                ],
-                _section(
-                  label: '제목',
-                  copyText: '제목 복사',
-                  onCopy: () => viewModel.action(const PropertyWriteAction.copy(PostContentType.title)),
-                  children: [AppFontStyle.sub3.text(state.title, TextColor.dark)],
-                ),
-                if (state.imagePaths.isNotEmpty) _images(context, state.imagePaths, viewModel),
-                _section(
-                  label: '본문',
-                  copyText: '본문 복사',
-                  onCopy: () => viewModel.action(const PropertyWriteAction.copy(PostContentType.body)),
-                  children: [MarkdownBody(data: state.body, styleSheet: _markdownStyle())],
-                ),
-              ],
-            ),
-          ),
-        ),
+        Expanded(child: scroll),
         _bottomButtons([
           FillButton(
             type: FillButtonType.gray,
@@ -115,7 +155,7 @@ class PropertyWriteContentComplete extends ConsumerWidget {
 
   Widget _images(BuildContext context, List<String> imagePaths, PropertyWriteVM viewModel) {
     final slider = SizedBox(
-      height: 214,
+      height: context.isDesktop ? 246 : 214,
       child: AppImagePage(
         viewState: AppImagePageViewState(images: [for (final path in imagePaths) FileImage(File(path))]),
         onTap: (index) => viewModel.action(PropertyWriteAction.copyImage(index)),
@@ -131,6 +171,59 @@ class PropertyWriteContentComplete extends ConsumerWidget {
         _grayTagButton('사진 복사', () => viewModel.action(const PropertyWriteAction.copyImage(null))),
         slider,
       ],
+    );
+  }
+
+  Widget _floatingButtons(PropertyWriteVM viewModel) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      spacing: 12,
+      children: [
+        _floatingButton(
+          icon: AppIcons.iconMD('Share_MD', TextColor.dark),
+          text: '공유',
+          color: BaseColor.medium,
+          border: Border.all(color: BaseColor.light),
+          onTap: () => viewModel.action(const PropertyWriteAction.share()),
+        ),
+        _floatingButton(
+          icon: Transform.rotate(angle: math.pi, child: AppIcons.iconMD('Copy_MD', TextColor.dark)),
+          text: '전체 복사',
+          color: MainColor.light,
+          onTap: () => viewModel.action(const PropertyWriteAction.copy(PostContentType.all)),
+        ),
+      ],
+    );
+  }
+
+  Widget _floatingButton({
+    required Widget icon,
+    required String text,
+    required Color color,
+    BoxBorder? border,
+    required VoidCallback onTap,
+  }) {
+    return Pressable(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 2,
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+              border: border,
+              boxShadow: const [AppShadow.bottom],
+            ),
+            child: icon,
+          ),
+          AppFontStyle.body1.text(text, TextColor.medium),
+        ],
+      ),
     );
   }
 

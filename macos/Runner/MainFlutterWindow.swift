@@ -7,6 +7,10 @@ class MainFlutterWindow: NSWindow {
     let windowFrame = self.frame
     self.contentViewController = flutterViewController
     self.setFrame(windowFrame, display: true)
+    self.contentMinSize = NSSize(width: 800, height: 500)
+    self.titlebarAppearsTransparent = true
+    self.titleVisibility = .hidden
+    self.styleMask.insert(.fullSizeContentView)
 
     RegisterGeneratedPlugins(registry: flutterViewController)
     registerRichClipboard(messenger: flutterViewController.engine.binaryMessenger)

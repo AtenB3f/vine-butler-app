@@ -11,6 +11,38 @@ class PropertyWriteContentFail extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final viewModel = ref.read(propertyWriteVMProvider(args).notifier);
+    final guide = Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      spacing: 24,
+      children: [
+        _guide('오류가 지속된다면\n이메일 제보를 통해 문의 바랍니다.'),
+        _grayTagButton('이메일 문의하기', () => viewModel.action(const PropertyWriteAction.sendEmail())),
+      ],
+    );
+    final retryButton = FillButton(
+      type: FillButtonType.medium,
+      size: BoxButtonSize.large,
+      text: '다시 시도',
+      onTap: () => viewModel.action(const PropertyWriteAction.retry()),
+    );
+
+    if (context.isDesktop) {
+      return Center(
+        child: Container(
+          width: 480,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: 40,
+            children: [
+              _header('포스트 생성을 실패하였습니다.', '다시 시도해주세요.'),
+              Expanded(child: guide),
+              retryButton,
+            ],
+          ),
+        ),
+      );
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -21,32 +53,18 @@ class PropertyWriteContentFail extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _header('블로그 포스트를\n생성을 실패하였습니다.', '다시 시도해주세요.'),
+                _header('포스트 생성을\n실패하였습니다.', '다시 시도해주세요.'),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: 40),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      spacing: 24,
-                      children: [
-                        _guide('오류가 지속된다면\n이메일 제보를 통해 문의 바랍니다.'),
-                        _grayTagButton('이메일 문의하기', () => viewModel.action(const PropertyWriteAction.sendEmail())),
-                      ],
-                    ),
+                    child: guide,
                   ),
                 ),
               ],
             ),
           ),
         ),
-        _bottomButtons([
-          FillButton(
-            type: FillButtonType.medium,
-            size: BoxButtonSize.large,
-            text: '다시 시도',
-            onTap: () => viewModel.action(const PropertyWriteAction.retry()),
-          ),
-        ]),
+        _bottomButtons([retryButton]),
       ],
     );
   }
