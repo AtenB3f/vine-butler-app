@@ -38,13 +38,13 @@ final propertyRepositoryProvider = Provider<PropertyRepository>(
 final propertyUseCaseProvider = Provider<PropertyUseCase>((ref) => PropertyUseCase(ref.watch(propertyRepositoryProvider)));
 
 final naverMapsDioProvider = Provider<Dio>((ref) {
-  final dio = createNaverMapsDio();
+  final dio = createDio(const DioType.naverMaps());
   ref.onDispose(dio.close);
   return dio;
 });
 
 final jusoDioProvider = Provider<Dio>((ref) {
-  final dio = createJusoDio();
+  final dio = createDio(const DioType.juso());
   ref.onDispose(dio.close);
   return dio;
 });
@@ -63,7 +63,7 @@ final imageStorageProvider = Provider<ImageStorage>((ref) => ImageStorageImpl(re
 final locationRepositoryProvider = Provider<LocationRepository>((ref) => const LocationRepositoryImpl());
 
 final clovaStudioDioProvider = Provider<Dio>((ref) {
-  final dio = createClovaStudioDio();
+  final dio = createDio(const DioType.clovaStudio());
   ref.onDispose(dio.close);
   return dio;
 });

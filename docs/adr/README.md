@@ -26,3 +26,5 @@
 | [0001](0001-preload-property-list.md) | 앱 시작 직후 로컬 DB에 저장된 매물 목록을 뒷단에서 미리 로딩하도록 구조 변경 | accepted | 2026-10-27 |
 | [0002](0002-map-marker-limit-by-zoom.md) | 지도 탭 마커를 화면 범위 안에서 zoom별 최대 개수만큼만 그리도록 변경 | accepted | 2026-10-27 |
 | [0003](0003-local-db-drift.md) | 로컬 DB로 Isar 대신 Drift(SQLite)를 선택 | accepted | 2026-10-12 |
+| [0004](0004-in-flight-request-interceptor.md) | 진행 중인 같은 API 요청을 Dio 인터셉터에서 하나로 합침 | accepted | 2026-10-30 |
+| [0005](0005-background-transfer-adapter.md) | 백그라운드 전환 중 AI 생성 요청 유지를 위해 OS 전송 API를 Dio 어댑터로 연결 | accepted | 2026-11-02 |

@@ -103,8 +103,8 @@ void main() {
     jusoAdapter = _FakeAdapter(juso ?? (_) => _json(_jusoBody()));
     naverAdapter = _FakeAdapter(naver ?? (_) => _json(_geocodeBody()));
     return AddressRepositoryImpl(
-      JusoApi(createJusoDio(confmKey: 'juso-key')..httpClientAdapter = jusoAdapter),
-      GeocodeApi(createNaverMapsDio(clientId: 'id', clientSecret: 'secret')..httpClientAdapter = naverAdapter),
+      JusoApi(createDio(const DioType.juso(confmKey: 'juso-key'))..httpClientAdapter = jusoAdapter),
+      GeocodeApi(createDio(const DioType.naverMaps(clientId: 'id', clientSecret: 'secret'))..httpClientAdapter = naverAdapter),
     );
   }
 
