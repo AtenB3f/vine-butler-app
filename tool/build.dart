@@ -23,10 +23,12 @@ Future<void> main(List<String> args) async {
     'aab' => ['build', 'appbundle', '--release', ...extraArgs],
     'apk' => ['build', 'apk', '--release', ...extraArgs],
     'macos' => ['build', 'macos', '--release', ...extraArgs],
+    'windows' => ['build', 'windows', '--release', ...extraArgs],
     _ => null,
   };
 
   if (flutterArgs == null) { _exitWithUsage(); }
+  if (command == 'windows' && !Platform.isWindows) { _fail('windows 명령은 Windows에서만 실행할 수 있습니다.'); }
 
   Directory.current = File.fromUri(Platform.script).parent.parent;
   _checkEnvFile();
@@ -35,9 +37,18 @@ Future<void> main(List<String> args) async {
 
   final exitCode = await _run('flutter', [...flutterArgs, '--dart-define-from-file=$envFile']);
 
-  if (exitCode != 0 || command != 'macos') { exit(exitCode); }
+  if (exitCode != 0) { exit(exitCode); }
 
-  exit(await _uploadMacos());
+  switch (command) {
+    case 'macos':
+      exit(await _uploadMacos());
+
+    case 'windows':
+      exit(await _packWindows());
+
+    default:
+      exit(exitCode);
+  }
 }
 
 /// macOS 아카이브 후 App Store Connect 업로드 함수
@@ -62,6 +73,27 @@ Future<int> _uploadMacos() async {
     '-exportOptionsPlist', 'macos/ExportOptions.plist',
     '-exportPath', 'build/macos/export',
     '-allowProvisioningUpdates',
+  ]);
+}
+
+/// Windows 빌드 결과를 vpk로 Setup.exe·업데이트 파일로 묶는 함수
+///
+/// - 버전은 `pubspec.yaml` `version`의 build-name (Velopack이 새 버전 판단에 사용하므로 릴리스마다 올려야 함)
+/// - `--mainExe`: `windows/CMakeLists.txt`의 `BINARY_NAME`
+/// - 결과: `build/windows/releases`에 `*-Setup.exe`, `.nupkg`, `releases.win.json`
+Future<int> _packWindows() {
+  final versionLine = File('pubspec.yaml').readAsLinesSync().firstWhere((line) => line.startsWith('version:'));
+  final buildName = versionLine.substring('version:'.length).trim().split('+').first;
+
+  return _run('vpk', [
+    'pack',
+    '--packId', 'com.atenb.vinebutler',
+    '--packVersion', buildName,
+    '--packDir', 'build/windows/x64/runner/Release',
+    '--mainExe', 'vine_butler.exe',
+    '--packTitle', '넝쿨집사',
+    '--icon', 'windows/runner/resources/app_icon.ico',
+    '--outputDir', 'build/windows/releases',
   ]);
 }
 
@@ -112,7 +144,8 @@ Never _exitWithUsage() {
   ipa   iOS 스토어 업로드용 .ipa 빌드
   aab   Android 스토어 업로드용 .aab 빌드
   apk   Android 직접 설치·테스트용 .apk 빌드
-  macos macOS 빌드 후 아카이브해서 App Store Connect 업로드''');
+  macos macOS 빌드 후 아카이브해서 App Store Connect 업로드
+  windows Windows 빌드 후 vpk로 Setup.exe·업데이트 파일 생성 (Windows에서만)''');
   exit(64);
 }
 

@@ -122,6 +122,7 @@ flutter run --dart-define-from-file=env.json
 dart run tool/build.dart ipa   # iOS .ipa
 dart run tool/build.dart aab   # Android .aab (key.properties 없으면 중단)
 dart run tool/build.dart apk   # Android 직접 설치용 .apk (key.properties 없으면 중단)
+dart run tool/build.dart windows   # Windows Setup.exe·업데이트 파일 (Windows에서만, Rust·.NET SDK·vpk 필요)
 
 # 릴리즈 빌드 확인
 flutter build apk --release
