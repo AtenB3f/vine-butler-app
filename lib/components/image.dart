@@ -14,6 +14,17 @@ class AppImages {
     );
   }
 
+  static Widget splashLogo() {
+    return SizedBox(
+      width: 120,
+      height: 65,
+      child: SvgPicture.asset(
+        'assets/icons/Splash_Logo.svg',
+        fit: BoxFit.contain,
+      ),
+    );
+  }
+
   static Widget tabHome(bool isSelected) {
     return SizedBox(
       width: 57,

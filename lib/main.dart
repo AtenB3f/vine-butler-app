@@ -13,6 +13,7 @@ import 'package:vine_butler/core/network/api_env.dart';
 import 'package:vine_butler/core/router/app_router.dart';
 import 'package:vine_butler/core/shared/app_manager.dart';
 import 'package:vine_butler/features/property_list/property_list_vm.dart';
+import 'package:vine_butler/features/splash/presentation/launch_screen.dart';
 import 'package:window_manager/window_manager.dart';
 
 Future<void> main() async {
@@ -36,6 +37,8 @@ Future<void> main() async {
   final container = ProviderContainer(overrides: [imageDirectoryProvider.overrideWithValue(imageDirectory)]);
 
   await AppManager.shared.loadSettings(container.read(appSettingsRepositoryProvider));
+
+  if (Platform.isIOS || Platform.isAndroid) { LaunchScreen.hold(); }
 
   runApp(UncontrolledProviderScope(container: container, child: const VineButlerApp()));
   _preloadPropertyList(container);
@@ -119,6 +122,10 @@ class _DesktopRouterFrameState extends State<_DesktopRouterFrame> {
 
   @override
   Widget build(BuildContext context) {
+    final configuration = appRouter.routerDelegate.currentConfiguration;
+
+    if (configuration.isEmpty || configuration.uri.path == const SplashRoute().location) { return widget.child; }
+
     return DesktopFrame(
       currentTab: _currentDesktopTab(),
       onTabTap: (tab) => appRouter.go(_desktopTabLocation(tab)),

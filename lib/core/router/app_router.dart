@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vine_butler/components/main_shell.dart';
@@ -18,14 +16,22 @@ import 'package:vine_butler/features/property_detail/presentation/screens/proper
 import 'package:vine_butler/features/property_list/presentation/screens/property_list_screen.dart';
 import 'package:vine_butler/features/property_write/presentation/property_write_view_state.dart';
 import 'package:vine_butler/features/property_write/presentation/screens/property_write_screen.dart';
+import 'package:vine_butler/features/splash/presentation/screens/splash_screen.dart';
 
 part 'app_router.g.dart';
 
-/// 첫 화면 (데스크톱은 홈 탭이 없어 매물 목록)
 final GoRouter appRouter = GoRouter(
-  initialLocation: Platform.isMacOS || Platform.isWindows ? const PropertyListRoute().location : const HomeRoute().location,
+  initialLocation: const SplashRoute().location,
   routes: $appRoutes,
 );
+
+@TypedGoRoute<SplashRoute>(path: '/splash')
+class SplashRoute extends GoRouteData with $SplashRoute {
+  const SplashRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const SplashScreen();
+}
 
 @TypedStatefulShellRoute<MainShellRouteData>(
   branches: <TypedStatefulShellBranch<StatefulShellBranchData>>[
