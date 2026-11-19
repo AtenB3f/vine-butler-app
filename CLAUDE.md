@@ -113,7 +113,7 @@ flutter run
 # 특정 디바이스 지정 실행
 flutter run -d [device-id]
 
-# API 키 주입 실행 (env.json에 NAVER_MAPS_CLIENT_ID / NAVER_MAPS_CLIENT_SECRET / JUSO_CONFM_KEY 작성, env.json은 gitignore)
+# API 키 주입 실행 (env.json에 NAVER_MAPS_CLIENT_ID / NAVER_MAPS_CLIENT_SECRET / JUSO_CONFM_KEY 작성, Windows 빌드는 WINDOWS_UPDATE_URL도 필요, env.json은 gitignore)
 flutter run --dart-define-from-file=env.json
 
 # 개발 실행은 VS Code 실행(F5) 사용 — .vscode/launch.json에 --dart-define-from-file=env.json 포함
@@ -123,6 +123,7 @@ dart run tool/build.dart ipa   # iOS .ipa
 dart run tool/build.dart aab   # Android .aab (key.properties 없으면 중단)
 dart run tool/build.dart apk   # Android 직접 설치용 .apk (key.properties 없으면 중단)
 dart run tool/build.dart windows   # Windows Setup.exe·업데이트 파일 (Windows에서만, Rust·.NET SDK·vpk 필요)
+dart run tool/build.dart windows --upload   # 위 빌드 + S3에서 이전 버전 받기·업로드 (환경 변수 VPK_BUCKET·VPK_KEY_ID·VPK_SECRET 필요)
 
 # 릴리즈 빌드 확인
 flutter build apk --release
