@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vine_butler/core/di/providers.dart';
 import 'package:vine_butler/core/router/app_router.dart';
+import 'package:vine_butler/domain/usecase/app_update_usecase.dart';
 import 'package:vine_butler/features/splash/presentation/splash_view_state.dart';
 
 final splashVMProvider = NotifierProvider.autoDispose<SplashVM, SplashViewState>(SplashVM.new);
@@ -29,6 +31,8 @@ class _PopNavigation extends SplashAction {
 }
 
 class SplashVM extends Notifier<SplashViewState> {
+  late final AppUpdateUseCase _updateUseCase = ref.read(appUpdateUseCaseProvider);
+
   @override
   SplashViewState build() {
     _check();
@@ -50,7 +54,7 @@ class SplashVM extends Notifier<SplashViewState> {
 
   Future<void> _check() async {
     final display = Future<void>.delayed(_duration());
-    final isUpdateAvailable = await _isUpdateAvailable();
+    final isUpdateAvailable = await _updateUseCase.isUpdateAvailable();
 
     await display;
 
@@ -76,44 +80,24 @@ class SplashVM extends Notifier<SplashViewState> {
     }
   }
 
-  Future<bool> _isUpdateAvailable() async {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.windows:
-        return false;
-
-      case TargetPlatform.macOS:
-        return false;
-
-      case TargetPlatform.iOS:
-        return false;
-
-      case TargetPlatform.android:
-        return false;
-
-      case TargetPlatform.fuchsia:
-      case TargetPlatform.linux:
-        return false;
-    }
-  }
-
+  /// 업데이트 적용 함수
+  ///
+  /// - Windows는 재시작되어 돌아오지 않음, 스토어 이동 뒤 앱으로 돌아오면 팝업을 다시 띄움
   Future<void> _update() async {
     state = state.copyWith(status: SplashStatus.update);
 
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.windows:
-        break;
+    try {
+      await _updateUseCase.update();
 
-      case TargetPlatform.macOS:
-        break;
+      if (!ref.mounted) { return; }
 
-      case TargetPlatform.iOS:
-        break;
+      state = state.copyWith(status: SplashStatus.idle);
+    } catch (error) {
+      debugPrint('[UPDATE] update failed $error');
 
-      case TargetPlatform.android:
-        break;
+      if (!ref.mounted) { return; }
 
-      default:
-        break;
+      _navigateToHome();
     }
   }
 
