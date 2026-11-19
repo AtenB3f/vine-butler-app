@@ -28,8 +28,9 @@
 | 사진 첨부·저장 | image_picker, path_provider | ^1.2.4 / ^2.1.6 |
 | 아이콘 | flutter_svg | ^2.3.0 |
 | 위치 | geolocator | ^14.1.2 |
-| 데스크톱 창 | window_manager | ^0.6.0 |
+| 데스크톱 창 | window_manager (velopack_flutter와 hooks 버전 충돌로 0.5 사용) | ^0.5.2 |
 | 설정 저장 | shared_preferences | ^2.5.6 |
+| 자동 업데이트 (Windows) | velopack_flutter (빌드 시 Rust 필요, macOS 빌드 포함) | ^0.3.3 |
 | 외부 API | 도로명주소 API(주소 검색), 네이버 Geocode API(좌표 변환) | — |
 | 백엔드 | [추후 연동] | — |
 
