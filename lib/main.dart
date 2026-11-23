@@ -54,8 +54,13 @@ Future<void> main(List<String> args) async {
 /// - 최소 사이즈 800×500 (macOS는 `MainFlutterWindow.swift`에서 지정)
 Future<void> _setUpWindowsWindow() async {
   await windowManager.ensureInitialized();
-  await windowManager.setTitleBarStyle(TitleBarStyle.hidden);
-  await windowManager.setMinimumSize(const Size(800, 500));
+
+  const options = WindowOptions(titleBarStyle: TitleBarStyle.hidden, minimumSize: Size(800, 500));
+
+  await windowManager.waitUntilReadyToShow(options, () async {
+    await windowManager.show();
+    await windowManager.focus();
+  });
 }
 
 /// Windows 자동 업데이트(Velopack) 설정
