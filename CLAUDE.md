@@ -125,6 +125,9 @@ dart run tool/build.dart apk   # Android 직접 설치용 .apk (key.properties �
 dart run tool/build.dart windows   # Windows Setup.exe·업데이트 파일 (Windows에서만, Rust·.NET SDK·vpk 필요)
 dart run tool/build.dart windows --upload   # 위 빌드 + S3에서 이전 버전 받기·업로드 (환경 변수 VPK_BUCKET·VPK_KEY_ID·VPK_SECRET 필요)
 
+# Windows 릴리스 (GitHub Actions에서 빌드·S3 업로드, Setup.exe는 Actions 산출물로 1일 보관, 키는 저장소 Secrets)
+git tag windows/1.2.0 && git push origin windows/1.2.0
+
 # 릴리즈 빌드 확인
 flutter build apk --release
 flutter build ios --release

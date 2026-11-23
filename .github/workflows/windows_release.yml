@@ -1,0 +1,61 @@
+# Windows 빌드·vpk pack·S3 업로드
+# - windows/* 태그 push 때만 실행 (예: windows/1.2.0)
+# - Setup.exe는 산출물로 1일 보관
+name: Windows Release
+
+on:
+  push:
+    tags:
+      - 'windows/*'
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.2
+          channel: stable
+          cache: true
+
+      - name: Install vpk
+        shell: pwsh
+        run: |
+          dotnet tool install -g vpk
+          "$env:USERPROFILE\.dotnet\tools" >> $env:GITHUB_PATH
+
+      - name: Create env.json
+        shell: pwsh
+        env:
+          JUSO_CONFM_KEY: ${{ secrets.JUSO_CONFM_KEY }}
+          NAVER_MAPS_CLIENT_ID: ${{ secrets.NAVER_MAPS_CLIENT_ID }}
+          NAVER_MAPS_CLIENT_SECRET: ${{ secrets.NAVER_MAPS_CLIENT_SECRET }}
+          WINDOWS_UPDATE_URL: ${{ secrets.WINDOWS_UPDATE_URL }}
+        run: |
+          [ordered]@{
+            JUSO_CONFM_KEY = $env:JUSO_CONFM_KEY
+            NAVER_MAPS_CLIENT_ID = $env:NAVER_MAPS_CLIENT_ID
+            NAVER_MAPS_CLIENT_SECRET = $env:NAVER_MAPS_CLIENT_SECRET
+            WINDOWS_UPDATE_URL = $env:WINDOWS_UPDATE_URL
+          } | ConvertTo-Json | Set-Content -Path env.json -Encoding utf8NoBOM
+
+      - name: Build, pack and upload
+        shell: pwsh
+        env:
+          VPK_BUCKET: ${{ secrets.VPK_BUCKET }}
+          VPK_KEY_ID: ${{ secrets.VPK_KEY_ID }}
+          VPK_SECRET: ${{ secrets.VPK_SECRET }}
+        run: dart run tool/build.dart windows --upload
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-setup
+          path: build/windows/releases/*-Setup.exe
+          retention-days: 1
+          if-no-files-found: error
