@@ -36,22 +36,43 @@ class SplashScreen extends ConsumerWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          Center(child: _logo(context)),
+          Center(
+            child: _fadeIn(
+              context,
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  AppImages.splashLogo(),
+                  if (context.isDesktop && status != SplashStatus.update) ...[
+                    const SizedBox(height: 40),
+                    const SizedBox.square(
+                      dimension: 40,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(color: StateColor.dimmed, shape: BoxShape.circle),
+                        child: Center(
+                          child: AppLoadingSpinner(viewState: AppLoadingSpinnerViewState(size: AppLoadingSpinnerSize.small)),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
           if (status == SplashStatus.update) _loading(),
         ],
       ),
     );
   }
 
-  /// 로고 (데스크톱은 0.5초 동안 나타남)
-  Widget _logo(BuildContext context) {
-    if (!context.isDesktop) { return AppImages.splashLogo(); }
+  Widget _fadeIn(BuildContext context, Widget child) {
+    if (!context.isDesktop) { return child; }
 
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0, end: 1),
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 500),
       builder: (context, opacity, child) => Opacity(opacity: opacity, child: child),
-      child: AppImages.splashLogo(),
+      child: child,
     );
   }
 
