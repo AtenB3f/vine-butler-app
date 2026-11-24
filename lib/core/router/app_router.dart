@@ -63,6 +63,18 @@ class MainShellRouteData extends StatefulShellRouteData {
   ) {
     return MainShell(navigationShell: navigationShell);
   }
+
+  /// 탭 화면 진입 페이지 (데스크톱은 스플래시에서 페이드로 전환)
+  @override
+  Page<void> pageBuilder(BuildContext context, GoRouterState state, StatefulNavigationShell navigationShell) {
+    if (!context.isDesktop) { return super.pageBuilder(context, state, navigationShell); }
+
+    return CustomTransitionPage<void>(
+      key: state.pageKey,
+      child: builder(context, state, navigationShell),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation, child: child),
+    );
+  }
 }
 
 class PropertyBranchData extends StatefulShellBranchData {

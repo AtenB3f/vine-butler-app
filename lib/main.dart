@@ -60,7 +60,6 @@ Future<void> _setUpWindowsWindow() async {
   await windowManager.waitUntilReadyToShow(options, () async {
     await windowManager.show();
     await windowManager.focus();
-    WidgetsBinding.instance.scheduleForcedFrame();
   });
 }
 
