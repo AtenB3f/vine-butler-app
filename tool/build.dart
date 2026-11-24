@@ -115,7 +115,7 @@ Future<int> _packWindows() async {
 
   final exitCode = await _run('vpk', [
     'pack',
-    '--packId', 'com.atenb.vinebutler',
+    '--packId', 'VineButler',
     '--packVersion', buildName,
     '--packDir', 'build/windows/x64/runner/Release',
     '--mainExe', 'vine_butler.exe',
@@ -127,7 +127,7 @@ Future<int> _packWindows() async {
 
   if (exitCode != 0) { return exitCode; }
 
-  File('$windowsReleaseDir/com.atenb.vinebutler-win-Setup.exe').copySync('build/windows/VineButler_v$buildName.exe');
+  File('$windowsReleaseDir/VineButler-win-Setup.exe').copySync('build/windows/VineButler_v$buildName.exe');
 
   return exitCode;
 }

@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.atenb" "\0"
-            VALUE "FileDescription", "vine_butler" "\0"
+            VALUE "FileDescription", "넝쿨집사" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "vine_butler" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2025 com.example. All rights reserved." "\0"
             VALUE "OriginalFilename", "vine_butler.exe" "\0"
-            VALUE "ProductName", "vine_butler" "\0"
+            VALUE "ProductName", "넝쿨집사" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
