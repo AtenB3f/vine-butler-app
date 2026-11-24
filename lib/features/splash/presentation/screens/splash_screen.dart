@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -39,7 +37,6 @@ class SplashScreen extends ConsumerWidget {
         fit: StackFit.expand,
         children: [
           Center(child: AppImages.splashLogo()),
-          const Positioned(left: 8, top: 40, child: _LifecycleProbe()),
           if (status == SplashStatus.update) _loading(),
         ],
       ),
@@ -68,34 +65,5 @@ class SplashScreen extends ConsumerWidget {
     if (isOkay == null) { return; }
 
     viewModel.action(isOkay ? const SplashAction.update() : const SplashAction.close());
-  }
-}
-
-class _LifecycleProbe extends StatefulWidget {
-  const _LifecycleProbe();
-
-  @override
-  State<_LifecycleProbe> createState() => _LifecycleProbeState();
-}
-
-class _LifecycleProbeState extends State<_LifecycleProbe> {
-  late final Timer _timer;
-  int _count = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) => setState(() => _count += 1));
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Text('$_count ${WidgetsBinding.instance.lifecycleState}', style: const TextStyle(color: Colors.white, fontSize: 20));
   }
 }

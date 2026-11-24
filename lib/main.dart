@@ -60,6 +60,7 @@ Future<void> _setUpWindowsWindow() async {
   await windowManager.waitUntilReadyToShow(options, () async {
     await windowManager.show();
     await windowManager.focus();
+    WidgetsBinding.instance.scheduleForcedFrame();
   });
 }
 
@@ -147,12 +148,31 @@ class _DesktopRouterFrameState extends State<_DesktopRouterFrame> {
   Widget build(BuildContext context) {
     final configuration = appRouter.routerDelegate.currentConfiguration;
 
-    if (configuration.isEmpty || configuration.uri.path == const SplashRoute().location) { return widget.child; }
+    if (configuration.isEmpty) { return widget.child; }
+    if (configuration.uri.path == const SplashRoute().location) { return _splashFrame(); }
 
     return DesktopFrame(
       currentTab: _currentDesktopTab(),
       onTabTap: (tab) => appRouter.go(_desktopTabLocation(tab)),
       child: widget.child,
+    );
+  }
+
+  /// 스플래시 화면 틀 (Windows 창 버튼 포함)
+  Widget _splashFrame() {
+    if (!Platform.isWindows) { return widget.child; }
+
+    return Stack(
+      children: [
+        Positioned.fill(child: widget.child),
+        const Positioned(
+          left: 0,
+          top: 0,
+          right: 0,
+          height: 28,
+          child: WindowCaption(backgroundColor: Colors.transparent, brightness: Brightness.dark),
+        ),
+      ],
     );
   }
 
