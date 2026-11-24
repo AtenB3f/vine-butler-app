@@ -107,21 +107,29 @@ Future<int> _uploadMacos() async {
 ///
 /// - 버전은 `pubspec.yaml` `version`의 build-name (Velopack이 새 버전 판단에 사용하므로 릴리스마다 올려야 함)
 /// - `--mainExe`: `windows/CMakeLists.txt`의 `BINARY_NAME`
-/// - 결과: `windowsReleaseDir`에 `*-Setup.exe`, `.nupkg`, `releases.win.json`
-Future<int> _packWindows() {
+/// - `--packTitle`: 영문만 사용 (한글이면 차이분 패키지 생성 실패, vpk 1.2.161 기준)
+/// - 결과: `windowsReleaseDir`에 `*-Setup.exe`, `.nupkg`, `releases.win.json`, 배포용 `build/windows/VineButler_v<버전>.exe`
+Future<int> _packWindows() async {
   final versionLine = File('pubspec.yaml').readAsLinesSync().firstWhere((line) => line.startsWith('version:'));
   final buildName = versionLine.substring('version:'.length).trim().split('+').first;
 
-  return _run('vpk', [
+  final exitCode = await _run('vpk', [
     'pack',
     '--packId', 'com.atenb.vinebutler',
     '--packVersion', buildName,
     '--packDir', 'build/windows/x64/runner/Release',
     '--mainExe', 'vine_butler.exe',
-    '--packTitle', '넝쿨집사',
+    '--packTitle', 'VineButler',
+    '--runtime', 'win-x64',
     '--icon', 'windows/runner/resources/app_icon.ico',
     '--outputDir', windowsReleaseDir,
   ]);
+
+  if (exitCode != 0) { return exitCode; }
+
+  File('$windowsReleaseDir/com.atenb.vinebutler-win-Setup.exe').copySync('build/windows/VineButler_v$buildName.exe');
+
+  return exitCode;
 }
 
 /// S3와 `windowsReleaseDir` 사이 Windows 릴리스 내려받기·올리기 함수
