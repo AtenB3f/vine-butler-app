@@ -1,5 +1,5 @@
 # Windows 빌드·vpk pack·S3 업로드
-# - windows/* 태그 push 때만 실행 (예: windows/1.2.0)
+# - windows/* 태그 push 때만 실행 (예: windows/v1.2.5)
 # - Setup.exe는 산출물로 1일 보관
 name: Windows Release
 

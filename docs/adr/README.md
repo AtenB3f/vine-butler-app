@@ -28,3 +28,4 @@
 | [0003](0003-local-db-drift.md) | 로컬 DB로 Isar 대신 Drift(SQLite)를 선택 | accepted | 2026-10-12 |
 | [0004](0004-in-flight-request-interceptor.md) | 진행 중인 같은 API 요청을 Dio 인터셉터에서 하나로 합침 | accepted | 2026-10-30 |
 | [0005](0005-background-transfer-adapter.md) | 백그라운드 전환 중 AI 생성 요청 유지를 위해 OS 전송 API를 Dio 어댑터로 연결 | accepted | 2026-11-02 |
+| [0006](0006-windows-auto-update-velopack.md) | Windows 자동 업데이트에 Velopack(velopack_flutter)을 사용 | proposed | 2026-11-17 |
