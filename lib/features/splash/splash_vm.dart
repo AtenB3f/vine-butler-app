@@ -53,10 +53,10 @@ class SplashVM extends Notifier<SplashViewState> {
   }
 
   Future<void> _check() async {
-    final display = Future<void>.delayed(_duration());
-    final isUpdateAvailable = await _updateUseCase.isUpdateAvailable();
-
-    await display;
+    final (_, isUpdateAvailable) = await (
+      Future<void>.delayed(_duration()),
+      _updateUseCase.isUpdateAvailable(),
+    ).wait;
 
     if (!ref.mounted) { return; }
 
