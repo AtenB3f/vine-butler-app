@@ -93,7 +93,7 @@ Future<bool?> showAppAlertDialog(BuildContext context, AppAlertDialogViewState v
     context: context,
     barrierDismissible: true,
     barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-    barrierColor: StateColor.overlay,
+    barrierColor: StateColor.dimmed,
     transitionDuration: _alertDuration,
     pageBuilder: (dialogContext, animation, secondaryAnimation) => Dialog(
       backgroundColor: Colors.transparent,

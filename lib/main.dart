@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:velopack_flutter/velopack_flutter.dart';
 import 'package:vine_butler/components/components.dart';
 import 'package:vine_butler/components/desktop_frame.dart';
 import 'package:vine_butler/components/widgets/tab/desktop_tab_type.dart';
@@ -13,10 +14,14 @@ import 'package:vine_butler/core/network/api_env.dart';
 import 'package:vine_butler/core/router/app_router.dart';
 import 'package:vine_butler/core/shared/app_manager.dart';
 import 'package:vine_butler/features/property_list/property_list_vm.dart';
+import 'package:vine_butler/features/splash/presentation/launch_screen.dart';
+import 'package:vine_butler/shared/utils/config.dart';
 import 'package:window_manager/window_manager.dart';
 
-Future<void> main() async {
+Future<void> main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  if (Platform.isWindows) { await _setUpWindowsUpdate(args); }
 
   if (defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS) {
     await FlutterNaverMap().init(
@@ -28,7 +33,7 @@ Future<void> main() async {
     AppManager.shared.mapImagesReady = NativeMap.prepareImages(WidgetsBinding.instance.platformDispatcher.views.first.devicePixelRatio);
   }
 
-  if (Platform.isWindows) { _setUpWindowsWindow(); }
+  if (Platform.isWindows) { await _setUpWindowsWindow(); }
 
   final supportDirectory = await getApplicationSupportDirectory();
   final imageDirectory = Directory('${supportDirectory.path}${Platform.pathSeparator}property_images');
@@ -36,6 +41,8 @@ Future<void> main() async {
   final container = ProviderContainer(overrides: [imageDirectoryProvider.overrideWithValue(imageDirectory)]);
 
   await AppManager.shared.loadSettings(container.read(appSettingsRepositoryProvider));
+
+  if (Platform.isIOS || Platform.isAndroid) { LaunchScreen.hold(); }
 
   runApp(UncontrolledProviderScope(container: container, child: const VineButlerApp()));
   _preloadPropertyList(container);
@@ -45,13 +52,32 @@ Future<void> main() async {
 ///
 /// - OS 타이틀바를 숨기고 `DesktopFrame` 상단 AppBar로 대신함
 /// - 최소 사이즈 800×500 (macOS는 `MainFlutterWindow.swift`에서 지정)
-void _setUpWindowsWindow() {
-  final window = WindowManager.instance.getCurrent();
+Future<void> _setUpWindowsWindow() async {
+  await windowManager.ensureInitialized();
 
-  if (window == null) { return; }
+  const options = WindowOptions(titleBarStyle: TitleBarStyle.hidden, minimumSize: Size(800, 500));
 
-  window.titleBarStyle = TitleBarStyle.hidden;
-  window.minimumSize = const Size(800, 500).toNative();
+  await windowManager.waitUntilReadyToShow(options, () async {
+    await windowManager.show();
+    await windowManager.focus();
+  });
+}
+
+/// Windows 자동 업데이트(Velopack) 설정
+///
+/// - 설치·업데이트·제거 때 Velopack이 아래 인자로 앱을 실행하면 바로 종료
+///   - `--veloapp-install`, `--veloapp-updated`, `--veloapp-obsolete`, `--veloapp-uninstall`
+/// - vpk로 패킹한 release에서만 동작 (debug에서 호출하면 예외)
+Future<void> _setUpWindowsUpdate(List<String> args) async {
+  if (args.any((arg) => arg.startsWith('--veloapp-'))) { exit(0); }
+
+  if (!kReleaseMode || AppConfig.windowsUpdateUrl.isEmpty) { return; }
+
+  try {
+    await initializeVelopack(url: AppConfig.windowsUpdateUrl);
+  } catch (error) {
+    debugPrint('[UPDATE] velopack init failed $error');
+  }
 }
 
 /// 매물 목록 미리 불러오기
@@ -119,10 +145,33 @@ class _DesktopRouterFrameState extends State<_DesktopRouterFrame> {
 
   @override
   Widget build(BuildContext context) {
+    final configuration = appRouter.routerDelegate.currentConfiguration;
+
+    if (configuration.isEmpty) { return widget.child; }
+    if (configuration.uri.path == const SplashRoute().location) { return _splashFrame(); }
+
     return DesktopFrame(
       currentTab: _currentDesktopTab(),
       onTabTap: (tab) => appRouter.go(_desktopTabLocation(tab)),
       child: widget.child,
+    );
+  }
+
+  /// 스플래시 화면 틀 (Windows 창 버튼 포함)
+  Widget _splashFrame() {
+    if (!Platform.isWindows) { return widget.child; }
+
+    return Stack(
+      children: [
+        Positioned.fill(child: widget.child),
+        const Positioned(
+          left: 0,
+          top: 0,
+          right: 0,
+          height: 28,
+          child: WindowCaption(backgroundColor: Colors.transparent, brightness: Brightness.dark),
+        ),
+      ],
     );
   }
 

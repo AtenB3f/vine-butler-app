@@ -5,7 +5,7 @@
 ![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter)
 ![Dart](https://img.shields.io/badge/Dart-3.9-0175C2?logo=dart)
 ![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20Android%20%7C%20macOS%20%7C%20Windows-lightgrey)
-![Version](https://img.shields.io/badge/version-1.2.0-green)
+![Version](https://img.shields.io/badge/version-1.2.5-green)
 
 | 홈 | 매물 검색 · 필터 | 지도 | 매물 등록 |
 |:---:|:---:|:---:|:---:|
@@ -22,7 +22,7 @@
 |---|---|
 | 개발 기간 | 2026.09 ~ 진행 중 |
 | 개발 인원 | 1인 (기획 · 디자인 · 개발 · 배포) |
-| 현재 상태 | iOS App Store 1.1.0 / Google Play 비공개 테스트 1.1.0 / Windows·macOS 1.2.0 출시 준비 |
+| 현재 상태 | iOS App Store 1.1.0 / Google Play 비공개 테스트 1.1.0 / Windows 1.2.5 테스트 배포 / macOS 1.2.0 출시 |
 
 ### 목차
 
@@ -39,7 +39,6 @@
     - [4. 같은 API 요청 중복 전송](#4-같은-api-요청-중복-전송)
     - [5. 백그라운드 전환 시 AI 요청 끊김](#5-백그라운드-전환-시-ai-요청-끊김)
   - [멀티 플랫폼 대응](#멀티-플랫폼-대응)
-  - [개발 프로세스](#개발-프로세스)
   - [로드맵](#로드맵)
   - [프로젝트 구조](#프로젝트-구조)
   - [실행 방법](#실행-방법)
@@ -60,11 +59,7 @@
 - 현재 위치 기반 지도 표시
 - 화면 범위 안 매물만 zoom별 최대 개수만큼 표시
 
-**데스크톱 화면** — 목록·상세·지도를 2열(콘텐츠 + 오른쪽 사이드)로 표시
-- 경계선을 드래그해 너비 조절 (양쪽 최소 360)
-- 조절한 너비는 저장해 다음 실행에도 유지
-
-**AI를 활용한 블로그 글쓰기 기능 (1.3.0 공개 예정, 현재 진입점 숨김)**
+**AI를 활용한 블로그 글쓰기 기능**
 - 매물 상세 정보 + 사진으로 장점을 뽑아 글 생성
 
 **이미지 텍스트 인식(OCR) AI 매물 등록(예정)**
@@ -86,6 +81,7 @@
 | 지도 | flutter_naver_map / webview_flutter / webview_windows | 모바일: 네이버 지도 SDK, 데스크톱: 웹뷰 + 네이버 지도 JS |
 | 위치 | geolocator | 현재 위치 기반 지도 표시 |
 | 데스크톱 창 | window_manager | 데스크톱 창 최소 크기·타이틀바 제어 |
+| 자동 업데이트 (Windows) | velopack_flutter (Velopack) | 백그라운드 다운로드 → 앱 팝업 → 재시작 흐름, 정적 파일 호스팅(S3)만으로 운영 |
 | 설정 저장 | shared_preferences | 사이드 너비 등 앱 설정 저장 |
 
 <br>
@@ -218,19 +214,7 @@ ref.read(propertyListVMProvider.notifier).action(PropertyListAction.search(query
 - 지도 위젯을 `native_map` / `mac_map` / `windows_map`으로 분리하고 같은 `ViewState`를 받도록 맞춤
 - 웹뷰 지도는 JavaScript 채널 메시지(`marker:<id>`, `map`, `ready`)로 Flutter와 통신
 - 데스크톱용 `DesktopSplitView` 공용 컴포넌트로 2열 레이아웃을 만들고, 모바일 화면 본문(`PropertyDetailBody` 등)을 그대로 재사용
-
-<br>
-
-## 개발 프로세스
-**결정 기록 (ADR)** — 성능·구조 결정을 [MADR](https://adr.github.io/madr/) 형식으로 기록
-
-**브랜치 · PR** — 기능별 브랜치 → PR → merge commit, 커밋 메시지는 `type: 한글 설명`
-
-**배포 스크립트** — `tool/build.dart`
-- API 키 파일(`env.json`) 필수 키와 Android 서명 설정을 검사한 뒤 빌드
-- 키 누락으로 지도·주소 검색이 동작하지 않는 빌드가 스토어에 올라가는 것을 막음
-
-**출시 관리** — 버전별 체크리스트로 개인정보처리방침, 권한 문구, 스토어 개인정보 라벨 변경 사항 관리
+- Windows는 스토어 없이 Setup.exe로 배포, 설치 폴더 `%LocalAppData%\VineButler`, 창 타이틀바는 `window_manager`로 숨기고 앱 상단 바로 대체
 
 <br>
 
@@ -242,7 +226,7 @@ ref.read(propertyListVMProvider.notifier).action(PropertyListAction.search(query
 |---|---|---|
 | 1.0.0 | App Store 출시 | 매물 등록·검색·상세·지도, 로컬 저장, iOS·Android 스토어 출시 |
 | 1.1.0 | App Store 출시, Google Play 비공개 테스트 | 금액 입력 키패드, 사진 크게 보기, 현재 위치 기준 지도, zoom별 마커 제한 |
-| 1.2.0 | 진행 중 | 데스크톱 UI(완료), macOS App Store 배포, Windows 배포·Velopack 자동 업데이트 |
+| 1.2.0 | 완료 | 데스크톱 UI, Windows 배포·Velopack 자동 업데이트, macOS App Store 배포 |
 | 1.3.0 | 예정 | (데스크톱) 사진·녹음 파일 AI 분석으로 매물 등록, 매물 소개 블로그 글 AI 작성 |
 | 2.0.0 | 예정 | 백엔드 연동, 회원가입·로그인, 서버 저장, 인앱결제 |
 | 2.1.0 | 예정 | 로컬 ↔ 서버 데이터 동기화 |

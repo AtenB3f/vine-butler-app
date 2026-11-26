@@ -15,16 +15,20 @@ import 'package:vine_butler/data/repository/app_settings_repository_impl.dart';
 import 'package:vine_butler/data/repository/blog_repository_impl.dart';
 import 'package:vine_butler/data/repository/location_repository_impl.dart';
 import 'package:vine_butler/data/repository/property_repository_impl.dart';
+import 'package:vine_butler/data/repository/store_app_update_repository_impl.dart';
 import 'package:vine_butler/data/repository/user_role_repository_impl.dart';
+import 'package:vine_butler/data/repository/windows_app_update_repository_impl.dart';
 import 'package:vine_butler/data/storage/image_storage_impl.dart';
 import 'package:vine_butler/domain/repository/address_repository.dart';
 import 'package:vine_butler/domain/repository/app_settings_repository.dart';
+import 'package:vine_butler/domain/repository/app_update_repository.dart';
 import 'package:vine_butler/domain/repository/blog_repository.dart';
 import 'package:vine_butler/domain/repository/image_storage.dart';
 import 'package:vine_butler/domain/repository/location_repository.dart';
 import 'package:vine_butler/domain/repository/property_repository.dart';
 import 'package:vine_butler/domain/repository/user_role_repository.dart';
 import 'package:vine_butler/domain/usecase/address_usecase.dart';
+import 'package:vine_butler/domain/usecase/app_update_usecase.dart';
 import 'package:vine_butler/domain/usecase/blog_usecase.dart';
 import 'package:vine_butler/domain/usecase/property_usecase.dart';
 
@@ -92,3 +96,10 @@ final blogUseCaseProvider = Provider<BlogUseCase>(
 );
 
 final appSettingsRepositoryProvider = Provider<AppSettingsRepository>((ref) => AppSettingsRepositoryImpl(SharedPreferencesAsync()));
+
+/// 앱 업데이트 저장소
+final appUpdateRepositoryProvider = Provider<AppUpdateRepository>(
+  (ref) => Platform.isWindows ? WindowsAppUpdateRepositoryImpl() : const StoreAppUpdateRepositoryImpl(),
+);
+
+final appUpdateUseCaseProvider = Provider<AppUpdateUseCase>((ref) => AppUpdateUseCase(ref.watch(appUpdateRepositoryProvider)));

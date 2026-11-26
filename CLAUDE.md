@@ -11,7 +11,7 @@
 - **앱 이름**: 넝쿨집사 (번들 ID / 패키지명 `com.atenb.vinebutler`)
 - **타겟 플랫폼**: iOS(iPhone 전용) / macOS / Windows / Android
 - **최소 지원 버전**: iOS 15.0 / macOS 12.0 / Windows 10 / Android 7.0 (API 24, Flutter 기본값)
-- **현재 버전**: 1.2.0+5 (스토어 업로드마다 빌드번호 증가)
+- **현재 버전**: 1.2.5+10 (스토어 업로드마다 빌드번호 증가)
 - **현재 상태**: iOS 1.1.0 App Store 출시 / Android 1.1.0 비공개 테스트 중 / Windows·macOS 1.2.0 배포 준비
 
 ## 기술 스택
@@ -28,8 +28,9 @@
 | 사진 첨부·저장 | image_picker, path_provider | ^1.2.4 / ^2.1.6 |
 | 아이콘 | flutter_svg | ^2.3.0 |
 | 위치 | geolocator | ^14.1.2 |
-| 데스크톱 창 | window_manager | ^0.6.0 |
+| 데스크톱 창 | window_manager (velopack_flutter와 hooks 버전 충돌로 0.5 사용) | ^0.5.2 |
 | 설정 저장 | shared_preferences | ^2.5.6 |
+| 자동 업데이트 (Windows) | velopack_flutter (빌드 시 Rust 필요, macOS 빌드 포함) | ^0.3.3 |
 | 외부 API | 도로명주소 API(주소 검색), 네이버 Geocode API(좌표 변환) | — |
 | 백엔드 | [추후 연동] | — |
 
@@ -112,7 +113,7 @@ flutter run
 # 특정 디바이스 지정 실행
 flutter run -d [device-id]
 
-# API 키 주입 실행 (env.json에 NAVER_MAPS_CLIENT_ID / NAVER_MAPS_CLIENT_SECRET / JUSO_CONFM_KEY 작성, env.json은 gitignore)
+# API 키 주입 실행 (env.json에 NAVER_MAPS_CLIENT_ID / NAVER_MAPS_CLIENT_SECRET / JUSO_CONFM_KEY 작성, Windows 빌드는 WINDOWS_UPDATE_URL도 필요, env.json은 gitignore)
 flutter run --dart-define-from-file=env.json
 
 # 개발 실행은 VS Code 실행(F5) 사용 — .vscode/launch.json에 --dart-define-from-file=env.json 포함
@@ -121,6 +122,11 @@ flutter run --dart-define-from-file=env.json
 dart run tool/build.dart ipa   # iOS .ipa
 dart run tool/build.dart aab   # Android .aab (key.properties 없으면 중단)
 dart run tool/build.dart apk   # Android 직접 설치용 .apk (key.properties 없으면 중단)
+dart run tool/build.dart windows   # Windows Setup.exe·업데이트 파일 (Windows에서만, Rust·.NET SDK·vpk 필요)
+dart run tool/build.dart windows --upload   # 위 빌드 + S3에서 이전 버전 받기·업로드 (환경 변수 VPK_BUCKET·VPK_KEY_ID·VPK_SECRET 필요)
+
+# Windows 릴리스 (GitHub Actions에서 빌드·S3 업로드, Setup.exe는 Actions 산출물로 1일 보관, 키는 저장소 Secrets)
+git tag windows/v1.2.5 && git push origin windows/v1.2.5
 
 # 릴리즈 빌드 확인
 flutter build apk --release
@@ -175,10 +181,3 @@ Dart 코드를 작성·수정하기 전에 아래 문서를 확인할 것 (해�
 - 성능·구조 개선처럼 이유와 근거를 남길 결정이 생기면 먼저 사용자에게 ADR 작성 여부를 물어보고, 허락받은 경우에만 작성할 것
 - `docs/adr/adr-template.md`(MADR 형식)를 복사해 다음 번호로 작성하고 `docs/adr/README.md` 목록에 추가
 - 채택(`accepted`)된 ADR은 본문을 고치지 않고, 결정이 바뀌면 새 ADR을 써서 대체할 것
-
-### 사용자의 질문에 답할 때
-- 아래와 같이 비교하거나 비유하여 설명할 경우 비교하는 코드를 좌우로 배치하여 한 눈에 비교할 수 있도록 보여줘야함
-- 사용자가 하는 기술적인 질문 중 dart언어 규칙이 swift에 동일한 개념이 있다면 swift에 비유하여 설명할 것   
-- 동시성 처리에 대한 개념을 사용자가 물어볼 경우 답변이 swift concurency와 비슷한 개념이라면 비유하여 설명할 것
-- 반응형 프로그래밍에 대한 질문 중 Combine과 유사한 기능을 하는 개념이라면 이를 비유하여 설명할 것
-- SwiftUI에서 처리하는 데이터 바인딩 방식과 Riverpod의 방식이 다른 경우 차이점을 코드로 비교하여 설명할 것
