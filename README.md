@@ -225,18 +225,14 @@ ref.read(propertyListVMProvider.notifier).action(PropertyListAction.search(query
 | 버전 | 상태 | 내용 |
 |---|---|---|
 | 1.0.0 | App Store 출시 | 매물 등록·검색·상세·지도, 로컬 저장, iOS·Android 스토어 출시 |
-| 1.1.0 | App Store 출시, Google Play 비공개 테스트 | 금액 입력 키패드, 사진 크게 보기, 현재 위치 기준 지도, zoom별 마커 제한 |
-| 1.2.0 | 완료 | 데스크톱 UI, Windows 배포·Velopack 자동 업데이트, macOS App Store 배포 |
-| 1.3.0 | 예정 | (데스크톱) 사진·녹음 파일 AI 분석으로 매물 등록, 매물 소개 블로그 글 AI 작성 |
-| 2.0.0 | 예정 | 백엔드 연동, 회원가입·로그인, 서버 저장, 인앱결제 |
-| 2.1.0 | 예정 | 로컬 ↔ 서버 데이터 동기화 |
-| 2.2.0 | 예정 | 1.3.0 AI 기능 모바일 적용 |
-| 2.3.0 | 예정 | 관리자 권한용 외부 매물 데이터 표시 |
-
-**미리 준비해 둔 설계**
-- **AI 기능(1.3.0)** — API 키를 앱에 넣지 않고 서버리스 프록시 + 초대 코드로 호출, 2.0.0에서 백엔드 구현체로 교체
-- **백엔드 전환(2.0.0)** — Repository 인터페이스 뒤에 구현체를 두어, 로컬 → 원격 전환 시 presentation 코드 수정 없음
-- **서버 동기화(2.1.0)** — 1.0.0부터 UUID 기본키, `updatedAt`, `deletedAt`, `syncedAt`을 저장해 `syncedAt == null || updatedAt > syncedAt`이면 동기화 대상으로 판단
+| [1.1.0](docs/roadmap/v1.1.0.md) | App Store 출시, Google Play 비공개 테스트 | 금액 입력 키패드, 사진 크게 보기, 현재 위치 기준 지도, zoom별 마커 제한 |
+| [1.2.0](docs/roadmap/v1.2.0.md) | 완료 | 데스크톱 UI, Windows 배포·Velopack 자동 업데이트, macOS App Store 배포 |
+| [1.3.0](docs/roadmap/v1.3.0.md) | 예정 | 리팩터링·UI 개선 |
+| [1.4.0](docs/roadmap/v1.4.0.md) | 예정 | (데스크톱) 사진·녹음 파일 AI 분석으로 매물 등록, 매물 소개 블로그 글 AI 작성 |
+| [2.0.0](docs/roadmap/v2.0.0.md) | 예정 | 백엔드 연동, 회원가입·로그인, 서버 저장, 인앱결제 |
+| [2.1.0](docs/roadmap/v2.1.0.md) | 예정 | 로컬 ↔ 서버 데이터 동기화 |
+| [2.2.0](docs/roadmap/v2.2.0.md) | 예정 | 1.4.0 AI 기능 모바일 적용 |
+| [2.3.0](docs/roadmap/v2.3.0.md) | 예정 | 관리자 권한용 외부 매물 데이터 표시 |
 
 <br>
 
